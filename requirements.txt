@@ -1,0 +1,23 @@
+# Core
+numpy
+scipy
+pillow
+
+# Deep learning (install the CUDA build of torch on Colab/Kaggle if you have a GPU)
+torch
+torchvision
+segmentation-models-pytorch
+
+# Geospatial
+rasterio
+geopandas
+shapely
+
+# Optional: download roads/villages from OpenStreetMap (needs internet)
+# osmnx
+
+# Optional: plots
+# matplotlib
+
+# Tests
+pytest

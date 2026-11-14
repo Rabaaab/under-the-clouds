@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Under the Clouds</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root {
+    --bg: #0f1722; --panel: #16212f; --text: #e8eef6; --muted: #9db0c6;
+    --accent: #ff4d4d; --line: #263449; --warn: #ffb020;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; }
+  header { padding: 10px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+  header h1 { font-size: 18px; margin: 0; }
+  header .tag { color: var(--muted); }
+  #banner { display: none; background: var(--warn); color: #1b1300; padding: 6px 16px; font-weight: 600; }
+  main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 320px; }
+  #mapwrap { position: relative; min-height: 360px; }
+  #map { position: absolute; inset: 0; background: #0b121b; }
+  #divider { position: absolute; top: 0; bottom: 0; width: 3px; background: #fff; box-shadow: 0 0 6px rgba(0,0,0,.6); z-index: 900; pointer-events: none; left: 50%; }
+  #ctl { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 1000; background: rgba(15,23,34,.9); padding: 8px 14px; border-radius: 10px; display: flex; gap: 10px; align-items: center; width: min(520px, 90%); }
+  #ctl input[type=range] { flex: 1; accent-color: var(--accent); }
+  #ctl span { font-weight: 600; }
+  aside { background: var(--panel); border-left: 1px solid var(--line); padding: 14px 16px; overflow: auto; }
+  aside h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 6px; }
+  aside h2:first-child { margin-top: 0; }
+  .big { font-size: 22px; font-weight: 700; }
+  .row { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: right; padding: 3px 4px; border-bottom: 1px solid var(--line); }
+  th:first-child, td:first-child { text-align: left; }
+  label.tog { display: flex; gap: 8px; align-items: center; padding: 2px 0; }
+  .muted { color: var(--muted); }
+  #err { display: none; margin: 16px; padding: 12px; border: 1px solid var(--warn); border-radius: 8px; }
+  code { background: #0b121b; padding: 1px 5px; border-radius: 4px; }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; grid-template-rows: 60vh auto; } aside { border-left: 0; border-top: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Under the Clouds</h1>
+  <span class="tag">Radar change detection with road and village impact</span>
+  <span class="tag" id="event"></span>
+</header>
+<div id="banner"></div>
+<div id="err"></div>
+<main>
+  <div id="mapwrap">
+    <div id="map"></div>
+    <div id="divider"></div>
+    <div id="ctl"><span>Before</span><input id="slider" type="range" min="0" max="100" value="50" aria-label="Before / after slider"><span>After</span></div>
+  </div>
+  <aside>
+    <h2>Impact</h2>
+    <div id="impact" class="muted">Loading…</div>
+    <h2>Layers</h2>
+    <label class="tog"><input type="checkbox" id="tChange" checked> Detected new flooding</label>
+    <label class="tog"><input type="checkbox" id="tRoads" checked> Affected roads</label>
+    <label class="tog"><input type="checkbox" id="tVillages" checked> Villages near flooding</label>
+    <h2>Accuracy</h2>
+    <div id="metrics" class="muted">–</div>
+    <h2>Notes</h2>
+    <div id="notes" class="muted">–</div>
+  </aside>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(async function () {
+  const $ = (id) => document.getElementById(id);
+  const fail = (msg) => { const e = $('err'); e.style.display = 'block'; e.textContent = msg; };
+
+  let meta;
+  try {
+    const r = await fetch('data/meta.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    meta = await r.json();
+  } catch (e) {
+    fail('Could not load data/meta.json. Open this page through a local server (python -m http.server -d app 8000) and run scripts/run_demo.py first.');
+    return;
+  }
+
+  $('event').textContent = meta.event_name || '';
+  if (meta.synthetic) {
+    const b = $('banner');
+    b.style.display = 'block';
+    b.textContent = 'SYNTHETIC DEMO DATA: simulated radar with a known flood. Numbers show the code works, not real-world accuracy.';
+  }
+
+  const bounds = meta.bounds;
+  const map = L.map('map', { zoomSnap: 0.25 }).fitBounds(bounds);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  ['beforePane', 'afterPane', 'vectorPane'].forEach((name, i) => {
+    map.createPane(name).style.zIndex = 410 + i * 15;
+  });
+  L.imageOverlay('data/before.png', bounds, { pane: 'beforePane' }).addTo(map);
+  L.imageOverlay('data/after.png', bounds, { pane: 'afterPane' }).addTo(map);
+  // The detected change lives in the "after" pane, so it only shows on the after side of the slider.
+  const change = L.imageOverlay('data/change.png', bounds, { pane: 'afterPane' }).addTo(map);
+
+  const slider = $('slider'), divider = $('divider'), afterPane = map.getPane('afterPane');
+  function updateClip() {
+    const ratio = slider.value / 100;
+    const nw = map.containerPointToLayerPoint([0, 0]);
+    const se = map.containerPointToLayerPoint(map.getSize());
+    const x = nw.x + (se.x - nw.x) * ratio;
+    afterPane.style.clip = 'rect(' + nw.y + 'px,' + se.x + 'px,' + se.y + 'px,' + x + 'px)';
+    divider.style.left = (ratio * 100) + '%';
+  }
+  slider.addEventListener('input', updateClip);
+  map.on('move zoom resize viewreset', updateClip);
+  updateClip();
+  // The grid layout settles after first paint, so re-measure the map and fit the scene again.
+  const refit = () => { map.invalidateSize(); map.fitBounds(bounds); updateClip(); };
+  requestAnimationFrame(refit);
+  window.addEventListener('load', refit);
+  window.addEventListener('resize', refit);
+
+  async function geo(path, opts) {
+    const r = await fetch(path, { cache: 'no-store' });
+    return L.geoJSON(await r.json(), opts).addTo(map);
+  }
+  const roads = await geo('data/roads_affected.geojson', {
+    pane: 'vectorPane',
+    style: { color: '#ffd400', weight: 4 },
+    onEachFeature: (f, l) => f.properties && f.properties.name && l.bindTooltip(String(f.properties.name))
+  });
+  const villages = await geo('data/villages_near.geojson', {
+    pane: 'vectorPane',
+    pointToLayer: (f, ll) => L.circleMarker(ll, { pane: 'vectorPane', radius: 7, color: '#fff', weight: 2, fillColor: '#00c2ff', fillOpacity: 1 }),
+    onEachFeature: (f, l) => f.properties && f.properties.name && l.bindTooltip(String(f.properties.name))
+  });
+
+  $('tChange').onchange = (e) => e.target.checked ? change.addTo(map) : map.removeLayer(change);
+  $('tRoads').onchange = (e) => e.target.checked ? roads.addTo(map) : map.removeLayer(roads);
+  $('tVillages').onchange = (e) => e.target.checked ? villages.addTo(map) : map.removeLayer(villages);
+
+  // Impact panel (textContent only: values come from data files)
+  const s = meta.summary || {};
+  const impact = $('impact');
+  impact.className = '';
+  impact.textContent = '';
+  const big = document.createElement('div');
+  big.className = 'big';
+  big.textContent = (s.road_km_affected ?? 0).toFixed(1) + ' km of road affected';
+  impact.appendChild(big);
+  const rows = [
+    ['Flooded area', (s.flooded_area_km2 ?? 0).toFixed(2) + ' km²'],
+    ['Road network in scene', (s.road_km_total ?? 0).toFixed(1) + ' km'],
+    ['Road segments affected', String(s.road_segments_affected ?? 0)],
+    ['Villages within ' + (s.village_buffer_m ?? 0) + ' m', String(s.villages_near_flood ?? 0)]
+  ];
+  rows.forEach(([k, v]) => {
+    const d = document.createElement('div'); d.className = 'row';
+    const a = document.createElement('span'); a.textContent = k;
+    const b = document.createElement('strong'); b.textContent = v;
+    d.append(a, b); impact.appendChild(d);
+  });
+  if ((s.village_names || []).length) {
+    const p = document.createElement('div'); p.className = 'muted';
+    p.textContent = 'Near flooding: ' + s.village_names.join(', ');
+    impact.appendChild(p);
+  }
+
+  // Metrics
+  const m = meta.metrics || {};
+  const mEl = $('metrics');
+  if (Object.keys(m).length) {
+    mEl.className = ''; mEl.textContent = '';
+    const t = document.createElement('table');
+    const head = t.createTHead().insertRow();
+    ['Method', 'IoU', 'F1', 'Prec.', 'Recall'].forEach((h) => { const th = document.createElement('th'); th.textContent = h; head.appendChild(th); });
+    const body = t.createTBody();
+    Object.entries(m).forEach(([name, sc]) => {
+      const r = body.insertRow();
+      [name, sc.iou, sc.f1, sc.precision, sc.recall].forEach((v, i) => {
+        const c = r.insertCell(); c.textContent = i === 0 ? v : (v * 100).toFixed(1) + '%';
+      });
+    });
+    mEl.appendChild(t);
+    const cap = document.createElement('div'); cap.className = 'muted';
+    cap.textContent = meta.synthetic ? 'Measured against synthetic truth.' : 'Measured against the reference mask.';
+    mEl.appendChild(cap);
+  } else {
+    mEl.textContent = 'No reference mask provided, so no accuracy numbers are shown.';
+  }
+
+  const th = meta.thresholds_db || {};
+  $('notes').textContent = [
+    'Method used for the map: ' + (meta.primary_method || '?') + '.',
+    th.before !== undefined ? 'Baseline thresholds (dB): before ' + th.before.toFixed(1) + ', after ' + th.after.toFixed(1) + '.' : '',
+    meta.note || ''
+  ].filter(Boolean).join(' ');
+})();
+</script>
+</body>
+</html>

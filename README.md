@@ -58,7 +58,7 @@ before + after radar images
 |---|---|---|
 | NISAR L-band radar | Core demo input | NASA Earthdata / ASF DAAC |
 | Sentinel-1 radar | Training and events before NISAR operated | ASF DAAC / Copernicus |
-| Sen1Floods11 | Labeled water masks for training | Public dataset (**TBD**: confirm license and access) |
+| Sen1Floods11 (hand-labelled subset) | Labeled water masks for training and testing | Public Google Cloud bucket (Bonafilia et al., 2020; check the dataset's terms before reuse) |
 | Optical imagery (HLS / Sentinel-2) | Independent reference on cloud-free days | NASA Earthdata |
 | NASADEM | Slope mask to reduce false alarms | NASA Earthdata |
 | OpenStreetMap | Roads and villages for the impact layer | OpenStreetMap (not NASA data) |
@@ -85,21 +85,77 @@ Validation plan: compare against the baseline, against a cloud-free optical wate
 
 ## Repository structure
 
-*Planned. Update as the code lands.*
-
 ```
 under-the-clouds/
   README.md
-  data/        # not committed (large files); see download notes
-  notebooks/   # exploration and training
-  src/         # preprocessing, model, evaluation
-  app/         # web map (slider, change layer, impact panel)
-  docs/        # slides, figures, notes
+  requirements.txt
+  pytest.ini
+  src/utc/
+    preprocess.py   # dB, speckle filter, normalisation, tiling
+    baseline.py     # Otsu threshold water mask (the baseline to beat)
+    model.py        # U-Net (ResNet-34) + BCE/Dice loss
+    dataset.py      # chips and the PyTorch dataset
+    sen1floods11.py # download, chips, scene-level evaluation (CNN vs baselines)
+    osm.py          # roads and villages from OpenStreetMap
+    train.py        # training loop
+    infer.py        # sliding-window prediction over a scene
+    change.py       # new water = after minus before
+    postprocess.py  # remove small blobs, mask steep slopes
+    metrics.py      # IoU, F1, precision, recall
+    impact.py       # roads and villages affected (+ OSM loader, untested)
+    pipeline.py     # end-to-end run
+    synthetic.py    # fake radar scenes with a known flood (for tests/demo)
+    export_web.py   # writes the files the web map reads
+    demo.py, event.py
+  scripts/          # run_demo.py, run_event.py, train.py, sen1floods11.py, fetch_osm.py
+  notebooks/        # train_colab.ipynb (Colab / Kaggle GPU training)
+  app/              # web map (before/after slider, change layer, impact panel)
+  tests/
+  docs/DATA.md      # how to get the real data (checklist)
+  data/, outputs/   # not committed
 ```
 
 ## How to run
 
-**TBD.** Setup, data download and run commands will be added here once the code exists. Planned tools: Python, PyTorch, segmentation-models-pytorch, rasterio, geopandas, osmnx, and a web map library.
+```bash
+pip install -r requirements.txt
+python -m pytest                              # unit tests
+python scripts/run_demo.py --out app/data     # end-to-end run on SYNTHETIC data
+python -m http.server -d app 8000             # then open http://localhost:8000
+```
+
+For real data see [docs/DATA.md](docs/DATA.md). Training and real-event commands:
+
+```bash
+# 1. Training data: Sen1Floods11 hand-labelled set (about 650 MB), cut into chips
+python scripts/sen1floods11.py download --root data/sen1floods11
+python scripts/sen1floods11.py prepare  --root data/sen1floods11 --out data/chips
+
+# 2. Train (use a GPU: see notebooks/train_colab.ipynb for Colab / Kaggle)
+python scripts/train.py --train-dir data/chips/train --val-dir data/chips/valid --epochs 30 --out outputs/unet.pt
+
+# 3. Compare the CNN with threshold baselines on the held-out test scenes
+python scripts/sen1floods11.py evaluate --root data/sen1floods11 --split test --checkpoint outputs/unet.pt
+
+# 4. Roads and villages for the event area (needs internet and `pip install osmnx`)
+python scripts/fetch_osm.py --bbox WEST SOUTH EAST NORTH --out data/osm
+
+# 5. Run an event
+python scripts/run_event.py --before before.tif --after after.tif --linear --checkpoint outputs/unet.pt \
+    --roads data/osm/roads.geojson --villages data/osm/villages.geojson --out app/data
+```
+
+### How the model is trained
+
+U-Net with an ImageNet-pretrained ResNet-34 encoder, two input channels (VV and VH in dB, scaled from -50..1 dB to 0..1), BCE + Dice loss, Adam (learning rate 1e-4 by default), flips and rotations as augmentation, 256 x 256 chips. The best checkpoint is chosen by validation IoU, and the test split is used once at the end. Results are scored per scene, pooled over valid pixels, against two baselines: an Otsu threshold per scene, and one global threshold fitted on the training scenes (the strongest simple baseline).
+
+### What has and has not been verified
+
+- **Verified (29 unit tests pass):** preprocessing, threshold baselines, metrics, change logic, clean-up, the U-Net forward pass and loss, training, sliding-window prediction, the roads/villages impact layer, GeoTIFF reading, the web export, and the Sen1Floods11 chip and evaluation code.
+- **Verified against the real dataset (small sample only):** the Sen1Floods11 file layout, units and label values were checked against the official repo and a few real chips. The downloader, chip preparation, a 2-epoch CPU training run and the evaluation script ran end to end on 3 real scenes per split. The numbers from that run are meaningless (tiny data, 2 epochs).
+- **Verified:** the OpenStreetMap download worked on one small area (roads and villages near Merzouga).
+- **Verified in a browser:** the web map loads the synthetic demo and the before/after slider works.
+- **Not yet done:** the full training run on a GPU, the pretrained-weights path (needs internet; it has not been run here), any real NISAR or Sentinel-1 event scene, and any real accuracy numbers. The synthetic demo numbers only show that the code runs.
 
 ## Team
 
@@ -122,6 +178,7 @@ AI tools were used during the project, as required by the NASA Space Apps submis
 - NASA Space Apps Challenge: https://www.spaceappschallenge.org
 - NASA Earthdata: https://www.earthdata.nasa.gov
 - ASF Vertex data search: https://search.asf.alaska.edu
+- Bonafilia, Tellman, Anderson, Issenberg (2020), *Sen1Floods11: a georeferenced dataset to train and test deep learning flood algorithms for Sentinel-1*, CVPR Workshops. https://github.com/cloudtostreet/Sen1Floods11
 - Daudt et al. (2018), *Fully Convolutional Siamese Networks for Change Detection* (background for change-detection CNNs)
 
 ## License

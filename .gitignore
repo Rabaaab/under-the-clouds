@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Large data and model files (do not commit)
+data/
+cache/
+outputs/
+*.pt
+*.pth
+*.tif
+*.tiff
+*.npz
+*.zip
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Internal team plan (kept in Notion, not published)
+docs/TEAM_PLAN.md
+
+# Secrets
+.env
+*.netrc
+_netrc
