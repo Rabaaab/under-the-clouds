@@ -5,199 +5,414 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Under the Clouds</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0f1722; --panel: #16212f; --text: #e8eef6; --muted: #9db0c6;
-    --accent: #ff4d4d; --line: #263449; --warn: #ffb020;
+    --ground: #0E1728; --glass: rgba(26,42,70,.62); --glass-edge: rgba(213,218,215,.24);
+    --text: #F4F8FF; --muted: #B4C2D6; --micro: #A9B8CE;
+    --red: #E5546A; --gold: #D3A54F; --aurora: #D35F3F; --blue: #334A73; --silver: #D5DAD7;
+    --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; --display: 'Outfit', 'Inter', system-ui, sans-serif;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
-  body { background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; }
-  header { padding: 10px 16px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
-  header h1 { font-size: 18px; margin: 0; }
-  header .tag { color: var(--muted); }
-  #banner { display: none; background: var(--warn); color: #1b1300; padding: 6px 16px; font-weight: 600; }
-  main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 320px; }
-  #mapwrap { position: relative; min-height: 360px; }
-  #map { position: absolute; inset: 0; background: #0b121b; }
-  #divider { position: absolute; top: 0; bottom: 0; width: 3px; background: #fff; box-shadow: 0 0 6px rgba(0,0,0,.6); z-index: 900; pointer-events: none; left: 50%; }
-  #ctl { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 1000; background: rgba(15,23,34,.9); padding: 8px 14px; border-radius: 10px; display: flex; gap: 10px; align-items: center; width: min(520px, 90%); }
-  #ctl input[type=range] { flex: 1; accent-color: var(--accent); }
-  #ctl span { font-weight: 600; }
-  aside { background: var(--panel); border-left: 1px solid var(--line); padding: 14px 16px; overflow: auto; }
-  aside h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 18px 0 6px; }
-  aside h2:first-child { margin-top: 0; }
-  .big { font-size: 22px; font-weight: 700; }
-  .row { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px solid var(--line); }
-  .row:last-child { border-bottom: 0; }
-  table { width: 100%; border-collapse: collapse; }
-  th, td { text-align: right; padding: 3px 4px; border-bottom: 1px solid var(--line); }
-  th:first-child, td:first-child { text-align: left; }
-  label.tog { display: flex; gap: 8px; align-items: center; padding: 2px 0; }
-  .muted { color: var(--muted); }
-  #err { display: none; margin: 16px; padding: 12px; border: 1px solid var(--warn); border-radius: 8px; }
-  code { background: #0b121b; padding: 1px 5px; border-radius: 4px; }
-  @media (max-width: 800px) { main { grid-template-columns: 1fr; grid-template-rows: 60vh auto; } aside { border-left: 0; border-top: 1px solid var(--line); } }
+  body { background: var(--ground); color: var(--text); font: 400 15px/1.5 var(--sans); overflow: hidden; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+  .out { font-family: var(--display); }
+  .gl { background: var(--glass); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid var(--glass-edge); }
+  .eyeb { font: 600 12px var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--red); }
+  .micro { font: 600 11px var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--micro); }
+
+  #map { position: fixed; inset: 0; background: var(--ground); z-index: 0; }
+  .leaflet-container { background: var(--ground); font-family: var(--sans); }
+  .leaflet-tooltip { background: rgba(14,23,40,.96); color: var(--text); border: 1px solid var(--glass-edge); border-radius: 10px; box-shadow: 0 6px 22px rgba(0,0,0,.45); padding: 6px 11px; font: 600 13px var(--sans); }
+  .leaflet-tooltip::before { display: none; }
+  .leaflet-tooltip .ar { display: block; color: var(--muted); font-weight: 400; }
+  .scrim { position: fixed; left: 0; right: 0; top: 0; height: 150px; background: linear-gradient(rgba(14,23,40,.8), rgba(14,23,40,0)); z-index: 500; pointer-events: none; }
+  .ui { position: fixed; z-index: 700; }
+
+  /* header */
+  .brand { left: 44px; top: 26px; height: 52px; display: flex; align-items: center; gap: 12px; }
+  .brand svg { display: block; }
+  .brand b { font: 600 24px var(--display); letter-spacing: -.02em; }
+  .nav { right: 44px; top: 30px; height: 44px; display: flex; align-items: center; gap: 4px; }
+  .nav button { font: 500 14px var(--sans); color: #C9D6E6; padding: 10px 14px; border-radius: 999px; }
+  .nav button:hover { background: rgba(255,255,255,.09); }
+  .nav button.on { background: rgba(255,255,255,.1); color: var(--text); }
+  .menubtn { display: none; right: 14px; top: 28px; padding: 9px 16px; border-radius: 999px; font: 600 13px var(--sans); }
+
+  /* title and legend */
+  .title { left: 44px; top: 104px; border-radius: 20px; padding: 18px 22px; }
+  .title .eyeb { white-space: nowrap; font-size: 11px; letter-spacing: .14em; }
+  .title .t { margin-top: 6px; font: 600 34px/1.05 var(--display); letter-spacing: -.025em; }
+  .side { right: 44px; top: 104px; width: 270px; display: flex; flex-direction: column; gap: 12px; }
+  .legend { border-radius: 18px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px; }
+  .lay { display: flex; align-items: center; gap: 10px; padding: 5px 0; font: 500 13px var(--sans); color: #E3EBF5; cursor: pointer; }
+  .lay input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .lay .sw { flex: none; width: 20px; display: grid; place-items: center; }
+  .sw .sq { width: 12px; height: 12px; border-radius: 3px; background: var(--aurora); }
+  .sw .ln { width: 18px; height: 3px; border-radius: 2px; background: var(--gold); }
+  .sw .dt { width: 10px; height: 10px; border-radius: 50%; background: var(--silver); }
+  .lay .t { flex: 1; }
+  .lay .ck { flex: none; width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid rgba(213,218,215,.5); display: grid; place-items: center; transition: background .12s, border-color .12s; }
+  .lay input:checked ~ .ck { background: var(--text); border-color: var(--text); }
+  .lay input:checked ~ .ck::after { content: ''; width: 8px; height: 4px; border: solid var(--ground); border-width: 0 0 2px 2px; transform: rotate(-45deg) translate(1px,-1px); }
+  .lay input:focus-visible ~ .ck { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .placespanel { border-radius: 18px; padding: 14px 8px 8px 18px; max-height: 46vh; overflow: auto; display: none; }
+  .placespanel.open { display: block; }
+  .placespanel .h { display: flex; justify-content: space-between; align-items: center; padding-right: 10px; }
+  .pl { display: block; width: 100%; text-align: left; padding: 8px 10px 8px 0; border-top: 1px solid rgba(255,255,255,.1); font: 500 14px var(--sans); }
+  .pl:first-of-type { margin-top: 8px; }
+  .pl:hover { color: var(--gold); }
+  .pl .a { display: block; direction: rtl; text-align: left; font-weight: 400; font-size: 12.5px; color: var(--muted); }
+  .morebtn { margin: 6px 0 4px; font: 600 12px var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--gold); padding: 8px 0; }
+
+  /* compare divider */
+  #divider { position: fixed; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--text); box-shadow: 0 0 0 1px rgba(0,0,0,.28); z-index: 600; pointer-events: none; left: 50%; }
+  .tag { position: absolute; top: 118px; border-radius: 999px; padding: 7px 14px; font: 600 11px var(--sans); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
+  .tag i { font-style: normal; font-weight: 500; letter-spacing: .02em; text-transform: none; color: var(--muted); margin-left: 8px; font-size: 12px; }
+  .tag.a { right: 14px; } .tag.b { left: 14px; }
+  #handle { position: absolute; top: 50%; left: 1px; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: var(--text); color: var(--ground); display: grid; place-items: center; box-shadow: 0 4px 18px rgba(0,0,0,.55); pointer-events: auto; cursor: ew-resize; touch-action: none; }
+
+  /* figures, method, timeline */
+  .method { left: 44px; bottom: 298px; display: inline-flex; padding: 4px; gap: 2px; border-radius: 999px; font: 600 13px var(--sans); color: var(--muted); }
+  .method button { padding: 7px 16px; border-radius: 999px; color: var(--muted); }
+  .method button[aria-checked=true] { background: var(--blue); color: var(--text); }
+  .chips { left: 44px; bottom: 206px; display: flex; gap: 16px; }
+  .chip { border-radius: 18px; padding: 14px 20px; display: flex; flex-direction: column; gap: 2px; text-align: left; }
+  .chip .v { font: 500 28px var(--display); letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+  .chip .v small { font: 500 15px var(--display); color: var(--muted); margin-left: 5px; }
+  .chip .l { font-size: 12px; color: var(--muted); }
+  button.chip:hover { border-color: rgba(213,218,215,.5); }
+  .timeline { left: 44px; right: 44px; bottom: 34px; height: 150px; border-radius: 24px; padding: 18px 28px; }
+  .timeline .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .tlbar { position: absolute; left: 52px; right: 52px; top: 0; bottom: 0; }
+  .tlline { position: absolute; left: 0; right: 0; top: 66px; height: 1px; background: rgba(255,255,255,.2); }
+  .tlband { position: absolute; top: 60px; height: 13px; border-radius: 7px; background: rgba(211,95,63,.38); }
+  .tk { position: absolute; top: 66px; width: 44px; height: 56px; margin-left: -22px; transform: translateY(-14px); display: flex; flex-direction: column; align-items: center; gap: 8px; font: 500 12px var(--sans); color: var(--micro); cursor: default; }
+  .tk i { display: block; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #8696B2; margin-top: 8px; }
+  .tk.on { color: var(--text); cursor: pointer; } .tk.on i { width: 14px; height: 14px; margin-top: 5px; background: var(--gold); border: 0; }
+  .tk.on:hover i { box-shadow: 0 0 0 5px rgba(211,165,79,.25); }
+  .tkl { position: absolute; top: 44px; width: 80px; margin-left: -40px; text-align: center; font: 600 10.5px var(--sans); letter-spacing: .12em; color: var(--gold); }
+  .tlnote { position: absolute; right: 28px; bottom: 12px; font-size: 12px; color: var(--micro); }
+  .credit { position: absolute; left: 28px; bottom: 12px; font-size: 11.5px; color: var(--micro); max-width: 52%; line-height: 1.35; }
+
+  .zoom { right: 44px; bottom: 206px; display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; }
+  .zoom button { width: 40px; height: 40px; font: 500 20px var(--sans); }
+  .zoom button + button { border-top: 1px solid rgba(255,255,255,.14); }
+  .zoom button:hover { background: rgba(255,255,255,.1); }
+
+  /* sheet (how it works, method, about) */
+  .sheetwrap { position: fixed; inset: 0; z-index: 2000; background: rgba(8,13,24,.7); display: none; align-items: center; justify-content: center; padding: 20px; }
+  .sheetwrap.open { display: flex; }
+  .sheet { width: min(760px, 100%); max-height: min(86vh, 760px); overflow: auto; border-radius: 26px; padding: 26px 30px 28px; background: #172640; border: 1px solid var(--glass-edge); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+  .sheet .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .tabs { display: inline-flex; gap: 4px; padding: 4px; background: rgba(255,255,255,.07); border-radius: 999px; }
+  .tabs button { padding: 7px 16px; border-radius: 999px; font: 600 13px var(--sans); color: var(--muted); }
+  .tabs button[aria-selected=true] { background: var(--blue); color: var(--text); }
+  .x { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.08); font: 400 20px var(--sans); }
+  .x:hover { background: rgba(255,255,255,.16); }
+  .sheet h2 { margin: 22px 0 6px; font: 600 30px/1.1 var(--display); letter-spacing: -.02em; }
+  .sheet p { margin: 10px 0 0; color: #C9D6E6; max-width: 62ch; }
+  .sheet ol, .sheet ul { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+  .sheet li { padding: 12px 16px; border-radius: 14px; background: rgba(255,255,255,.06); color: #C9D6E6; }
+  .sheet li b { display: block; color: var(--text); font: 600 16px var(--display); margin-bottom: 2px; }
+  .sheet table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 14px; }
+  .sheet th, .sheet td { text-align: right; padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .sheet th:first-child, .sheet td:first-child { text-align: left; }
+  .sheet th { color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+  #err { display: none; position: fixed; z-index: 3000; left: 20px; right: 20px; top: 90px; padding: 14px 18px; border-radius: 14px; background: #2A1520; border: 1px solid var(--red); }
+
+  @media (max-width: 860px) {
+    .brand { left: 14px; top: 16px; } .brand b { font-size: 19px; }
+    .nav { display: none; } .menubtn { display: block; }
+    .title { left: 12px; right: 12px; top: 76px; max-width: none; padding: 12px 16px; border-radius: 16px; }
+    .title .t { font-size: 26px; } .title .eyeb { font-size: 10px; letter-spacing: .1em; white-space: normal; }
+    .side { right: 12px; left: auto; top: 148px; width: 190px; }
+    .legend { padding: 10px 14px; } .lay { padding: 3px 0; font-size: 12px; }
+    .tag { top: auto; bottom: 322px; padding: 5px 11px; } .tag i { display: none; }
+    .chips { left: 12px; right: 12px; bottom: 150px; gap: 8px; } .chip { padding: 10px 12px; flex: 1; border-radius: 14px; } .chip .v { font-size: 22px; } .chip .v small { font-size: 12px; } .chip .l { font-size: 11px; }
+    .method { left: 12px; bottom: 268px; font-size: 12px; } .method button { padding: 6px 12px; }
+    .timeline { left: 12px; right: 12px; bottom: 12px; height: 126px; padding: 12px 16px; border-radius: 20px; }
+    .tlbar { left: 22px; right: 22px; } .tlline { top: 58px; } .tlband { top: 52px; } .tk { top: 58px; width: 30px; margin-left: -15px; font-size: 10px; } .tk:not(.on) span { display: none; } .tkl { top: 38px; font-size: 9px; }
+    .credit { display: none; } .tlnote { display: none; } .timeline .row .micro { font-size: 10px; }
+    .zoom { display: none; }
+    .placespanel { max-height: 36vh; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>Under the Clouds</h1>
-  <span class="tag">Radar change detection with road and village impact</span>
-  <span class="tag" id="event"></span>
-</header>
-<div id="banner"></div>
+<div id="map" aria-label="Flood map. Drag to pan, scroll to zoom."></div>
+<div class="scrim"></div>
 <div id="err"></div>
-<main>
-  <div id="mapwrap">
-    <div id="map"></div>
-    <div id="divider"></div>
-    <div id="ctl"><span>Before</span><input id="slider" type="range" min="0" max="100" value="50" aria-label="Before / after slider"><span>After</span></div>
+
+<div id="divider">
+  <div class="tag a gl">After<i id="dAfter"></i></div>
+  <div class="tag b gl">Before<i id="dBefore"></i></div>
+  <div id="handle" role="slider" tabindex="0" aria-label="Before and after comparison" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5L3 11l5 6M14 5l5 6-5 6"/></svg></div>
+</div>
+
+<div class="ui brand"><svg role="img" aria-label="Under the Clouds, orbit with a small satellite" width="58" height="41" viewBox="-14 -12 160 112"><g fill="#F4F8FF"><circle cx="-7.4" cy="36.4" r="0.7"/><circle cx="-4.1" cy="30.2" r="0.8"/><circle cx="-0.2" cy="24.3" r="0.9"/><circle cx="4.3" cy="18.8" r="1.0"/><circle cx="9.3" cy="13.8" r="1.1"/><circle cx="14.9" cy="9.4" r="1.1"/><circle cx="20.8" cy="5.5" r="1.2"/><circle cx="27.1" cy="2.3" r="1.3"/><circle cx="33.7" cy="-0.3" r="1.4"/><circle cx="40.5" cy="-2.3" r="1.5"/><circle cx="47.5" cy="-3.5" r="1.6"/><circle cx="54.5" cy="-4.0" r="1.7"/><circle cx="61.6" cy="-3.8" r="1.8"/><circle cx="68.6" cy="-2.9" r="1.9"/><circle cx="75.5" cy="-1.2" r="2.0"/><circle cx="82.2" cy="1.1" r="2.0"/><circle cx="88.6" cy="4.1" r="2.1"/><circle cx="94.7" cy="7.7" r="2.2"/><circle cx="100.4" cy="11.9" r="2.3"/><circle cx="105.7" cy="16.7" r="2.4"/><circle cx="110.4" cy="21.9" r="2.5"/><circle cx="114.6" cy="27.7" r="2.6"/></g><g fill="#F4F8FF" transform="translate(126 35) rotate(-28) scale(0.82)"><rect x="-4.2" y="-4.2" width="8.4" height="8.4" rx="1.5"/><rect x="-8.7" y="-0.7" width="4.5" height="1.4"/><rect x="-15.899999999999999" y="-3.8" width="7.2" height="7.6"/><rect x="-24.099999999999998" y="-3.8" width="7.2" height="7.6"/><rect x="4.2" y="-0.7" width="4.5" height="1.4"/><rect x="8.7" y="-3.8" width="7.2" height="7.6"/><rect x="16.9" y="-3.8" width="7.2" height="7.6"/></g><path fill="#F4F8FF" d="M31.8 14.7a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM40 14.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 14.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60.4 14.7a4.6 4.6 0 1 0 9.2 0a4.6 4.6 0 1 0 -9.2 0zM73.2 14.7a1.8 1.8 0 1 0 3.7 0a1.8 1.8 0 1 0 -3.7 0zM22.3 24.5a2.7 2.7 0 1 0 5.5 0a2.7 2.7 0 1 0 -5.5 0zM30 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM21.3 34.3a3.7 3.7 0 1 0 7.4 0a3.7 3.7 0 1 0 -7.4 0zM30 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80.2 34.3a4.8 4.8 0 1 0 9.7 0a4.8 4.8 0 1 0 -9.7 0zM92 34.3a3 3 0 1 0 5.9 0a3 3 0 1 0 -5.9 0zM10.1 44.1a4.9 4.9 0 1 0 9.7 0a4.9 4.9 0 1 0 -9.7 0zM20 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM103 44.1a2 2 0 1 0 3.9 0a2 2 0 1 0 -3.9 0zM10 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM20 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM103.2 53.9a1.8 1.8 0 1 0 3.7 0a1.8 1.8 0 1 0 -3.7 0zM10.7 63.7a4.3 4.3 0 1 0 8.5 0a4.3 4.3 0 1 0 -8.5 0zM20 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90.7 63.7a4.3 4.3 0 1 0 8.5 0a4.3 4.3 0 1 0 -8.5 0z"/><g fill="#E5546A" transform="translate(55 89.4)"><rect x="-4.7" y="-4.7" width="9.4" height="9.4"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" transform="rotate(45)"/></g></svg><b>under the clouds</b></div>
+<div class="ui nav" role="navigation" aria-label="Sections"><button data-open="how">How it works</button><button data-open="method">Method</button><button class="on" id="navResults">Results</button><button data-open="about">About</button></div>
+<button class="ui menubtn gl" data-open="how">Menu</button>
+
+<div class="ui title gl">
+  <div class="eyeb" id="eyebrow">Flood map</div>
+  <div class="t" id="place">Loading</div>
+</div>
+
+<div class="ui side">
+  <div class="legend gl">
+    <label class="lay"><input type="checkbox" id="tChange" checked><span class="sw"><i class="sq"></i></span><span class="t">New flooding</span><span class="ck"></span></label>
+    <label class="lay"><input type="checkbox" id="tRoads" checked><span class="sw"><i class="ln"></i></span><span class="t">Road in flooded areas</span><span class="ck"></span></label>
+    <label class="lay"><input type="checkbox" id="tVillages" checked><span class="sw"><i class="dt"></i></span><span class="t">Places near new water</span><span class="ck"></span></label>
   </div>
-  <aside>
-    <h2>Impact</h2>
-    <div id="impact" class="muted">Loading…</div>
-    <h2>Layers</h2>
-    <label class="tog"><input type="checkbox" id="tChange" checked> Detected new flooding</label>
-    <label class="tog"><input type="checkbox" id="tRoads" checked> Affected roads</label>
-    <label class="tog"><input type="checkbox" id="tVillages" checked> Villages near flooding</label>
-    <h2>Accuracy</h2>
-    <div id="metrics" class="muted">–</div>
-    <h2>Notes</h2>
-    <div id="notes" class="muted">–</div>
-  </aside>
-</main>
+  <div class="placespanel gl" id="placesPanel" role="region" aria-label="Places near the flood">
+    <div class="h"><span class="micro">Places near the flood</span><button class="x" id="closePlaces" aria-label="Close places list" style="width:30px;height:30px;font-size:17px">&times;</button></div>
+    <div id="placesList"></div>
+  </div>
+</div>
+
+<div class="ui method gl" id="seg" role="radiogroup" aria-label="Detection method" hidden></div>
+<div class="ui chips">
+  <div class="chip gl"><span class="v out"><span id="nArea">0</span><small>km&sup2;</small></span><span class="l">new flooding found</span></div>
+  <div class="chip gl"><span class="v out"><span id="nRoad">0</span><small>km</small></span><span class="l">road in flooded areas</span></div>
+  <button class="chip gl" id="placesBtn" type="button" aria-expanded="false" aria-controls="placesPanel"><span class="v out"><span id="nPlaces">0</span></span><span class="l" id="lPlaces">places within 500 m &middot; show list</span></button>
+</div>
+<div class="ui zoom gl"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">&minus;</button></div>
+
+<div class="ui timeline gl">
+  <div class="row"><span class="micro" id="tlTitle" style="color:#C9D6E6">Sentinel-1 passes &middot; one every 6 days</span><span class="micro" id="badge" style="color:var(--gold)">Model estimate &middot; no reference map yet</span></div>
+  <div class="tlbar" id="tlbar"></div>
+  <div class="credit" id="credit">Contains modified Copernicus Sentinel data (2026), ASF DAAC HyP3. Roads and places &copy; OpenStreetMap contributors.</div>
+  <div class="tlnote" id="tlnote">Filled: processed. Open: radar available, not processed.</div>
+</div>
+
+<div class="sheetwrap" id="sheetwrap" role="dialog" aria-modal="true" aria-label="About this map">
+  <div class="sheet">
+    <div class="top"><div class="tabs" role="tablist"><button role="tab" data-tab="how">How it works</button><button role="tab" data-tab="method">Method</button><button role="tab" data-tab="about">About</button></div><button class="x" id="closeSheet" aria-label="Close">&times;</button></div>
+    <div id="sheetBody"></div>
+  </div>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (async function () {
   const $ = (id) => document.getElementById(id);
   const fail = (msg) => { const e = $('err'); e.style.display = 'block'; e.textContent = msg; };
+  const getJSON = async (p) => { const r = await fetch(p, { cache: 'no-store' }); if (!r.ok) throw new Error(p + ': HTTP ' + r.status); return r.json(); };
+  const loadImg = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('image failed: ' + src)); i.src = src; });
 
   let meta;
-  try {
-    const r = await fetch('data/meta.json', { cache: 'no-store' });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    meta = await r.json();
-  } catch (e) {
-    fail('Could not load data/meta.json. Open this page through a local server (python -m http.server -d app 8000) and run scripts/run_demo.py first.');
-    return;
-  }
+  try { meta = await getJSON('data/meta.json'); }
+  catch (e) { fail('Could not load data/meta.json. Open this page through a local server (python -m http.server -d app 8000) and run scripts/run_demo.py first.'); return; }
 
-  $('event').textContent = meta.event_name || '';
-  if (meta.synthetic) {
-    const b = $('banner');
-    b.style.display = 'block';
-    b.textContent = 'SYNTHETIC DEMO DATA: simulated radar with a known flood. Numbers show the code works, not real-world accuracy.';
-  }
-
+  // ---------- text from the data ----------
+  const eventName = meta.event_name || '';
   const bounds = meta.bounds;
-  const map = L.map('map', { zoomSnap: 0.25 }).fitBounds(bounds);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
-  }).addTo(map);
+  const em = /^(.*?),\s*(.*?)\s*\(/.exec(eventName);
+  $('place').textContent = em ? em[2] : (eventName || 'Flood scene');
+  const dm0 = /\(([A-Za-z]+ \d+)\s*[-–]\s*([A-Za-z]+ \d+),\s*(\d{4})\)/.exec(eventName);
+  $('eyebrow').textContent = em ? em[1] + (dm0 ? ' · ' + dm0[1] + ' – ' + dm0[2] + ', ' + dm0[3] : '') : 'Flood map';
+  const hasMetrics = Object.keys(meta.metrics || {}).length > 0;
+  $('badge').textContent = meta.synthetic ? 'Synthetic demo data' : (hasMetrics ? 'Scored against a reference mask' : 'Model estimate · no reference map yet');
+  const dm = /\(([A-Za-z]+ \d+)\s*[-–]\s*([A-Za-z]+ \d+),\s*(\d{4})\)/.exec(eventName);
+  if (dm) { $('dBefore').textContent = dm[1]; $('dAfter').textContent = dm[2]; }
 
-  ['beforePane', 'afterPane', 'vectorPane'].forEach((name, i) => {
-    map.createPane(name).style.zIndex = 410 + i * 15;
-  });
-  L.imageOverlay('data/before.png', bounds, { pane: 'beforePane' }).addTo(map);
-  L.imageOverlay('data/after.png', bounds, { pane: 'afterPane' }).addTo(map);
-  // The detected change lives in the "after" pane: it shows left of the divider, growing as the slider moves to After.
-  const change = L.imageOverlay('data/change.png', bounds, { pane: 'afterPane' }).addTo(map);
+  // ---------- map: radar fills the screen, no basemap ----------
+  const map = L.map('map', { zoomControl: false, attributionControl: false, zoomSnap: 0.1, zoomDelta: 0.5, maxBoundsViscosity: 1 });
+  const centre = [(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2];
+  const cover = () => { map.invalidateSize(); const z = map.getBoundsZoom(bounds, true); map.setMinZoom(z); map.setMaxBounds(bounds); if (map.getZoom() < z || !map._covered) { map.setView(centre, z, { animate: false }); map._covered = true; } updateClip(); };
+  map.setView(centre, 11);
+  ['beforePane', 'afterPane', 'changePane', 'vectorPane'].forEach((n, i) => { map.createPane(n).style.zIndex = 410 + i * 10; });
 
-  const slider = $('slider'), divider = $('divider'), afterPane = map.getPane('afterPane');
+  // ---------- radar colouring: grey radar to a blue, teal and cream ramp (same ramp for both dates) ----------
+  const STOPS = [[0, [16, 30, 56]], [0.40, [54, 92, 126]], [0.75, [156, 182, 172]], [1, [240, 236, 216]]];
+  const lut = (lo, hi) => {
+    const out = new Uint8ClampedArray(256 * 3);
+    for (let v = 0; v < 256; v++) {
+      let g = Math.min(1, Math.max(0, (v - lo) / Math.max(1, hi - lo))); g = Math.pow(g, 0.95);
+      let k = 0; while (k < STOPS.length - 2 && g > STOPS[k + 1][0]) k++;
+      const [a, ca] = STOPS[k], [b, cb] = STOPS[k + 1], t = (g - a) / (b - a);
+      for (let c = 0; c < 3; c++) out[v * 3 + c] = ca[c] + (cb[c] - ca[c]) * t;
+    }
+    return out;
+  };
+  async function duotone(imgs) {
+    try {
+      const cs = imgs.map((im) => { const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0); return { c, x, d: x.getImageData(0, 0, c.width, c.height) }; });
+      const hist = new Uint32Array(256); let n = 0;
+      cs.forEach(({ d }) => { for (let i = 0; i < d.data.length; i += 4) if (d.data[i + 3] > 0) { hist[d.data[i]]++; n++; } });
+      const pct = (p) => { let s = 0; for (let v = 0; v < 256; v++) { s += hist[v]; if (s >= n * p) return v; } return 255; };
+      const L = lut(pct(0.01), pct(0.996));
+      return cs.map(({ c, x, d }) => { const p = d.data; for (let i = 0; i < p.length; i += 4) { const v = p[i] * 3; p[i] = L[v]; p[i + 1] = L[v + 1]; p[i + 2] = L[v + 2]; } x.putImageData(d, 0, 0); return c.toDataURL('image/png'); });
+    } catch (e) { return imgs.map((im) => im.src); }
+  }
+  const FLOOD = [211, 95, 63];
+  const tintCache = {};
+  async function tinted(url) {
+    if (tintCache[url]) return tintCache[url];
+    try {
+      const im = await loadImg(url), c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+      const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0);
+      const d = x.getImageData(0, 0, c.width, c.height), p = d.data;
+      for (let i = 0; i < p.length; i += 4) if (p[i + 3] > 0) { p[i] = FLOOD[0]; p[i + 1] = FLOOD[1]; p[i + 2] = FLOOD[2]; p[i + 3] = Math.max(p[i + 3], 225); }
+      let sx = 0, sy = 0, n = 0; const W2 = c.width;
+      for (let i = 3, k = 0; i < p.length; i += 4, k++) if (p[i - 0] > 0 && (k % 5) === 0) { sx += k % W2; sy += (k / W2) | 0; n++; }
+      if (n) tintCache[url + '#centroid'] = [sx / n / c.width, sy / n / c.height];
+      x.putImageData(d, 0, 0);
+      return (tintCache[url] = c.toDataURL('image/png'));
+    } catch (e) { return (tintCache[url] = url); }
+  }
+
+  const [imB, imA] = await Promise.all([loadImg('data/before.png'), loadImg('data/after.png')]);
+  const [urlB, urlA] = await duotone([imB, imA]);
+  L.imageOverlay(urlB, bounds, { pane: 'beforePane' }).addTo(map);
+  L.imageOverlay(urlA, bounds, { pane: 'afterPane' }).addTo(map);
+  const change = L.imageOverlay('data/change.png', bounds, { pane: 'changePane' }).addTo(map);
+
+  // ---------- compare: After image (and the flood) shows left of the divider ----------
+  let ratio = 0.5;
+  const divider = $('divider'), handle = $('handle');
+  const clipped = [map.getPane('afterPane'), map.getPane('changePane')];
   function updateClip() {
-    const ratio = slider.value / 100;
-    const nw = map.containerPointToLayerPoint([0, 0]);
-    const se = map.containerPointToLayerPoint(map.getSize());
+    const nw = map.containerPointToLayerPoint([0, 0]), se = map.containerPointToLayerPoint(map.getSize());
     const x = nw.x + (se.x - nw.x) * ratio;
-    afterPane.style.clip = 'rect(' + nw.y + 'px,' + x + 'px,' + se.y + 'px,' + nw.x + 'px)';
-    divider.style.left = (ratio * 100) + '%';
+    clipped.forEach((p) => { p.style.clip = 'rect(' + nw.y + 'px,' + x + 'px,' + se.y + 'px,' + nw.x + 'px)'; });
+    divider.style.left = (ratio * 100) + '%'; handle.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
   }
-  slider.addEventListener('input', updateClip);
+  const setRatio = (r) => { ratio = Math.max(0, Math.min(1, r)); updateClip(); };
+  let anim = 0;
+  const animateTo = (r) => { cancelAnimationFrame(anim); const r0 = ratio, t0 = performance.now(); const step = (now) => { const k = Math.min(1, (now - t0) / 700), e = k * k * (3 - 2 * k); setRatio(r0 + (r - r0) * e); if (k < 1) anim = requestAnimationFrame(step); }; anim = requestAnimationFrame(step); };
   map.on('move zoom resize viewreset', updateClip);
-  updateClip();
-  // The grid layout settles after first paint, so re-measure the map and fit the scene again.
-  const refit = () => { map.invalidateSize(); map.fitBounds(bounds); updateClip(); };
-  requestAnimationFrame(refit);
-  window.addEventListener('load', refit);
-  window.addEventListener('resize', refit);
+  const moveTo = (ev) => setRatio(ev.clientX / window.innerWidth);
+  handle.addEventListener('pointerdown', (ev) => { cancelAnimationFrame(anim); handle.setPointerCapture(ev.pointerId); map.dragging.disable(); moveTo(ev); });
+  handle.addEventListener('pointermove', (ev) => { if (handle.hasPointerCapture(ev.pointerId)) moveTo(ev); });
+  const endDrag = (ev) => { if (handle.hasPointerCapture(ev.pointerId)) handle.releasePointerCapture(ev.pointerId); map.dragging.enable(); };
+  handle.addEventListener('pointerup', endDrag); handle.addEventListener('pointercancel', endDrag);
+  handle.addEventListener('keydown', (ev) => { const step = ev.shiftKey ? 0.2 : 0.05; if (ev.key === 'ArrowLeft') { setRatio(ratio - step); ev.preventDefault(); } if (ev.key === 'ArrowRight') { setRatio(ratio + step); ev.preventDefault(); } if (ev.key === 'Home') setRatio(0); if (ev.key === 'End') setRatio(1); });
+  $('zin').onclick = () => map.zoomIn(); $('zout').onclick = () => map.zoomOut();
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(cover, 120); });
+  cover(); requestAnimationFrame(cover); window.addEventListener('load', cover);
 
-  async function geo(path, opts) {
-    const r = await fetch(path, { cache: 'no-store' });
-    return L.geoJSON(await r.json(), opts).addTo(map);
-  }
-  const roads = await geo('data/roads_affected.geojson', {
-    pane: 'vectorPane',
-    style: { color: '#ffd400', weight: 4 },
-    onEachFeature: (f, l) => f.properties && f.properties.name && l.bindTooltip(String(f.properties.name))
-  });
-  const villages = await geo('data/villages_near.geojson', {
-    pane: 'vectorPane',
-    pointToLayer: (f, ll) => L.circleMarker(ll, { pane: 'vectorPane', radius: 7, color: '#fff', weight: 2, fillColor: '#00c2ff', fillOpacity: 1 }),
-    onEachFeature: (f, l) => f.properties && f.properties.name && l.bindTooltip(String(f.properties.name))
-  });
-
-  $('tChange').onchange = (e) => e.target.checked ? change.addTo(map) : map.removeLayer(change);
-  $('tRoads').onchange = (e) => e.target.checked ? roads.addTo(map) : map.removeLayer(roads);
-  $('tVillages').onchange = (e) => e.target.checked ? villages.addTo(map) : map.removeLayer(villages);
-
-  // Impact panel (textContent only: values come from data files)
-  const s = meta.summary || {};
-  const impact = $('impact');
-  impact.className = '';
-  impact.textContent = '';
-  const big = document.createElement('div');
-  big.className = 'big';
-  big.textContent = (s.road_km_affected ?? 0).toFixed(1) + ' km of road affected';
-  impact.appendChild(big);
-  const rows = [
-    ['Flooded area', (s.flooded_area_km2 ?? 0).toFixed(2) + ' km²'],
-    ['Road network in scene', (s.road_km_total ?? 0).toFixed(1) + ' km'],
-    ['Road segments affected', String(s.road_segments_affected ?? 0)],
-    ['Villages within ' + (s.village_buffer_m ?? 0) + ' m', String(s.villages_near_flood ?? 0)]
-  ];
-  rows.forEach(([k, v]) => {
-    const d = document.createElement('div'); d.className = 'row';
-    const a = document.createElement('span'); a.textContent = k;
-    const b = document.createElement('strong'); b.textContent = v;
-    d.append(a, b); impact.appendChild(d);
-  });
-  if ((s.village_names || []).length) {
-    const p = document.createElement('div'); p.className = 'muted';
-    p.textContent = 'Near flooding: ' + s.village_names.join(', ');
-    impact.appendChild(p);
+  // ---------- names: Latin first, Arabic as a second line ----------
+  const AR = /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]+/g;
+  const latin = (n) => { const l = String(n || '').replace(AR, ' ').replace(/\s+/g, ' ').trim(); return l || String(n || '').trim(); };
+  const arabic = (n) => (String(n || '').match(AR) || []).join(' ');
+  function nameTip(n) {
+    const el = document.createElement('div'); const a = document.createElement('div'); a.textContent = latin(n); el.appendChild(a);
+    const ar = arabic(n); if (ar && latin(n) !== ar) { const b = document.createElement('div'); b.className = 'ar'; b.dir = 'rtl'; b.textContent = ar; el.appendChild(b); }
+    return el;
   }
 
-  // Metrics
-  const m = meta.metrics || {};
-  const mEl = $('metrics');
-  if (Object.keys(m).length) {
-    mEl.className = ''; mEl.textContent = '';
-    const t = document.createElement('table');
-    const head = t.createTHead().insertRow();
-    ['Method', 'IoU', 'F1', 'Prec.', 'Recall'].forEach((h) => { const th = document.createElement('th'); th.textContent = h; head.appendChild(th); });
-    const body = t.createTBody();
-    Object.entries(m).forEach(([name, sc]) => {
-      const r = body.insertRow();
-      [name, sc.iou, sc.f1, sc.precision, sc.recall].forEach((v, i) => {
-        const c = r.insertCell(); c.textContent = i === 0 ? v : (v * 100).toFixed(1) + '%';
-      });
+  // ---------- methods ----------
+  const mainName = meta.primary_method === 'cnn' ? 'U-Net (CNN)' : (meta.primary_method === 'baseline' ? 'Threshold' : 'Main');
+  const methods = [{ key: 'main', label: mainName, dir: 'data/', meta }];
+  try { const bm = await getJSON('data/baseline/meta.json'); methods.push({ key: 'baseline', label: 'Threshold baseline', dir: 'data/baseline/', meta: bm }); } catch (e) { /* optional */ }
+  async function loadGeo(path, opts) { try { return L.geoJSON(await getJSON(path), opts); } catch (e) { return L.layerGroup(); } }
+  for (const m of methods) {
+    m.roads = await loadGeo(m.dir + 'roads_affected.geojson', { pane: 'vectorPane', style: { color: '#D3A54F', weight: 2.4, opacity: 1, lineCap: 'round' }, onEachFeature: (f, l) => f.properties && f.properties.name && l.bindTooltip(nameTip(f.properties.name), { sticky: true }) });
+    m.places = [];
+    m.villages = await loadGeo(m.dir + 'villages_near.geojson', {
+      pane: 'vectorPane',
+      pointToLayer: (f, ll) => { const c = L.circleMarker(ll, { pane: 'vectorPane', radius: 4.5, color: '#0E1728', weight: 1.6, fillColor: '#F4F8FF', fillOpacity: 1 }); c.on('mouseover', () => c.setStyle({ radius: 7, fillColor: '#D3A54F' })); c.on('mouseout', () => c.setStyle({ radius: 4.5, fillColor: '#F4F8FF' })); m.places.push({ name: f.properties && f.properties.name, ll }); return c; },
+      onEachFeature: (f, l) => f.properties && f.properties.name && l.bindTooltip(nameTip(f.properties.name), { direction: 'top', offset: [0, -4] })
     });
-    mEl.appendChild(t);
-    const cap = document.createElement('div'); cap.className = 'muted';
-    cap.textContent = meta.synthetic ? 'Measured against synthetic truth.' : 'Measured against the reference mask.';
-    mEl.appendChild(cap);
-  } else {
-    mEl.textContent = 'No reference mask provided, so no accuracy numbers are shown.';
+  }
+  const tog = { change: $('tChange'), roads: $('tRoads'), villages: $('tVillages') };
+  let cur = methods[0];
+  function applyLayers() {
+    methods.forEach((m) => { map.removeLayer(m.roads); map.removeLayer(m.villages); });
+    if (tog.roads.checked) cur.roads.addTo(map);
+    if (tog.villages.checked) cur.villages.addTo(map);
+    if (tog.change.checked) { if (!map.hasLayer(change)) change.addTo(map); } else { map.removeLayer(change); }
+    updateClip();
+  }
+  Object.values(tog).forEach((t) => t.addEventListener('change', applyLayers));
+
+  // ---------- figures, places ----------
+  const countUp = (el, to, dec) => { const t0 = performance.now(), from = parseFloat(el.dataset.v || '0'); el.dataset.v = String(to); const step = (now) => { const p = Math.min(1, (now - t0) / 700), e = 1 - Math.pow(1 - p, 3); el.textContent = (from + (to - from) * e).toFixed(dec); if (p < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); };
+  const panel = $('placesPanel'), pbtn = $('placesBtn'), plist = $('placesList');
+  const setPanel = (open) => { panel.classList.toggle('open', open); pbtn.setAttribute('aria-expanded', String(open)); };
+  pbtn.onclick = () => setPanel(!panel.classList.contains('open')); $('closePlaces').onclick = () => setPanel(false);
+  let showAll = false;
+  function fillPlaces(m) {
+    const names = (m.meta.summary && m.meta.summary.village_names) || [], seen = new Set(), list = [];
+    names.forEach((n) => { const k = latin(n); if (k && !seen.has(k)) { seen.add(k); list.push(n); } });
+    const LIMIT = 8;
+    const draw = () => {
+      plist.textContent = '';
+      (showAll ? list : list.slice(0, LIMIT)).forEach((n) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'pl'; b.textContent = latin(n);
+        const ar = arabic(n); if (ar && latin(n) !== ar) { const a = document.createElement('span'); a.className = 'a'; a.dir = 'rtl'; a.textContent = ar; b.appendChild(a); }
+        b.onclick = () => { const p = m.places.find((q) => q.name === n); if (p) map.flyTo(p.ll, Math.max(map.getZoom(), 12), { duration: 0.8 }); if (window.innerWidth < 860) setPanel(false); };
+        plist.appendChild(b);
+      });
+      if (list.length > LIMIT) { const more = document.createElement('button'); more.type = 'button'; more.className = 'morebtn'; more.textContent = showAll ? 'Show fewer' : 'Show all places'; more.onclick = () => { showAll = !showAll; draw(); }; plist.appendChild(more); }
+    };
+    if (!list.length) { plist.textContent = 'None found.'; return; }
+    draw();
+  }
+  async function showMethod(m) {
+    cur = m; showAll = false;
+    const s = m.meta.summary || {};
+    countUp($('nArea'), s.flooded_area_km2 ?? 0, 1); countUp($('nRoad'), s.road_km_affected ?? 0, 1); countUp($('nPlaces'), s.villages_near_flood ?? 0, 0);
+    $('lPlaces').textContent = 'places within ' + (s.village_buffer_m ?? 500) + ' m · show list';
+    fillPlaces(m); applyLayers();
+    change.setUrl(await tinted(m.dir + 'change.png'));
+    if (!map._focused && tintCache[m.dir + 'change.png#centroid']) { map._focused = true; const [fx, fy] = tintCache[m.dir + 'change.png#centroid']; map.setView([bounds[1][0] - fy * (bounds[1][0] - bounds[0][0]), bounds[0][1] + fx * (bounds[1][1] - bounds[0][1])], map.getMinZoom(), { animate: false }); }
+  }
+  if (methods.length > 1) {
+    const seg = $('seg'); seg.hidden = false;
+    methods.forEach((m, i) => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', i === 0 ? 'true' : 'false'); b.textContent = m.label; b.onclick = () => { seg.querySelectorAll('button').forEach((x) => x.setAttribute('aria-checked', x === b ? 'true' : 'false')); showMethod(m); }; seg.appendChild(b); });
   }
 
-  const th = meta.thresholds_db || {};
-  $('notes').textContent = [
-    'Method used for the map: ' + (meta.primary_method || '?') + '.',
-    th.before !== undefined ? 'Baseline thresholds (dB): before ' + th.before.toFixed(1) + ', after ' + th.after.toFixed(1) + '.' : '',
-    meta.note || ''
-  ].filter(Boolean).join(' ');
+  // ---------- timeline of Sentinel-1 passes on this track ----------
+  const PASSES = ['Dec 22', 'Dec 28', 'Jan 3', 'Jan 9', 'Jan 15', 'Jan 21', 'Jan 27', 'Feb 2', 'Feb 8', 'Feb 14', 'Feb 20'];
+  const tlbar = $('tlbar');
+  if (dm && !meta.synthetic && PASSES.includes(dm[1]) && PASSES.includes(dm[2])) {
+    const pos = (d) => (PASSES.indexOf(d) / (PASSES.length - 1)) * 100;
+    const band = document.createElement('div'); band.className = 'tlband'; band.style.left = pos(dm[1]) + '%'; band.style.width = (pos(dm[2]) - pos(dm[1])) + '%';
+    const line = document.createElement('div'); line.className = 'tlline'; tlbar.append(line, band);
+    PASSES.forEach((d) => {
+      const on = d === dm[1] || d === dm[2];
+      const t = document.createElement(on ? 'button' : 'div'); t.className = 'tk' + (on ? ' on' : ''); t.style.left = pos(d) + '%';
+      t.innerHTML = '<i></i><span></span>'; t.querySelector('span').textContent = d;
+      if (on) { t.type = 'button'; t.title = d === dm[1] ? 'Show the Before image' : 'Show the After image'; t.setAttribute('aria-label', (d === dm[1] ? 'Before, ' : 'After, ') + d); t.onclick = () => animateTo(d === dm[1] ? 0 : 1); }
+      else t.title = 'Radar available, not processed';
+      tlbar.appendChild(t);
+    });
+    [[dm[1], 'BEFORE'], [dm[2], 'AFTER']].forEach(([d, l]) => { const e = document.createElement('div'); e.className = 'tkl'; e.style.left = pos(d) + '%'; e.textContent = l; tlbar.appendChild(e); });
+  } else { $('tlTitle').textContent = ''; $('tlnote').textContent = ''; document.querySelector('.timeline').style.height = '84px'; document.querySelector('.chips').style.bottom = '140px'; document.querySelector('.method').style.bottom = '232px'; }
+
+  // ---------- sheet: how it works, method, about ----------
+  const sheetWrap = $('sheetwrap'), body = $('sheetBody');
+  const li = (b, t) => '<li><b>' + b + '</b>' + t + '</li>';
+  const TABS = {
+    how: () => '<h2>How it works</h2><p>Radar sees through cloud, rain and night, so it can map a flood when ordinary cameras cannot.</p><ol>' +
+      li('1. Two radar images', 'Sentinel-1 scenes from before and after the flood.') + li('2. A neural network reads them', 'A U-Net marks each pixel as water or not water.') +
+      li('3. Only the new water', 'Water after the event that was not water before it. Rivers, lakes and the sea are removed.') + li('4. Roads and places', 'OpenStreetMap roads and places are checked against the new flooding.') + '</ol>',
+    method: () => '<h2>Method</h2><p>A U-Net with an ImageNet-pretrained ResNet-34 encoder, trained for 30 epochs on the public Sen1Floods11 flood dataset (252 hand-labelled training scenes, radar bands VV and VH).</p>' +
+      '<table><tr><th>Benchmark</th><th>IoU</th><th>Best simple baseline</th></tr><tr><td>Test split, 90 scenes</td><td>0.687</td><td>0.530</td></tr><tr><td>Held-out Bolivia event, 15 scenes</td><td>0.601</td><td>0.586</td></tr></table>' +
+      '<p>The test split shares flood events with the training split, so the Bolivia row is the fairer check, and there the lead is small. This map has no accuracy score yet, because we have no reference flood map for these dates.</p>' +
+      '<p>For the map, the sea and a 1 km coastal strip are masked and tiny shapes are removed. That also removes some real narrow flooding, so the true area is probably between the cleaned and raw values.</p>',
+    about: () => '<h2>About</h2><p>An independent team project for the NASA Space Apps Challenge 2026, challenge Dancing with the SARs. Built by Rabab, Ikram and Aya. Not an official NASA product.</p><ul>' +
+      li('Model output, not a flood map', 'Road and place counts show what lies in or near detected water. They do not mean a road is impassable or a village is flooded.') +
+      li('Sentinel-1, not NISAR', 'No public NISAR data exists for these dates. Flooded vegetation and very shallow water look grey in radar and can be missed.') +
+      li('Data', 'Contains modified Copernicus Sentinel data (2026), processed by ASF DAAC HyP3. Roads and places &copy; OpenStreetMap contributors. Training data: Sen1Floods11.') +
+      li('AI use', 'Claude was used for research, code, documentation and design. The team ran the code, trained the model and checked the results.') + '</ul>'
+  };
+  const openSheet = (tab) => { body.innerHTML = TABS[tab](); sheetWrap.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab))); sheetWrap.classList.add('open'); };
+  const closeSheet = () => sheetWrap.classList.remove('open');
+  document.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openSheet(b.dataset.open)));
+  sheetWrap.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => openSheet(b.dataset.tab)));
+  $('closeSheet').onclick = closeSheet; sheetWrap.addEventListener('click', (e) => { if (e.target === sheetWrap) closeSheet(); });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeSheet(); setPanel(false); } });
+  $('navResults').onclick = closeSheet;
+
+  showMethod(methods[0]);
 })();
 </script>
 </body>

@@ -125,6 +125,7 @@ Impact on roads and places (OpenStreetMap):
 | Flood used | New water | Road length in flooded areas | Places within 500 m |
 |---|---|---|---|
 | Baseline, cleaned (vector) | 46.0 km² | 32.2 km | 33 |
+| Baseline, cleaned in the pipeline (the "Threshold baseline" view on the web map) | 48.6 km² | 34.8 km (78 segments) | 34 |
 | U-Net, cleaned (vector) | 48.9 km² | 21.3 km | 32 |
 | U-Net, cleaned in the pipeline (shown on the web map) | 51.2 km² | 22.9 km (60 segments) | 35 |
 
@@ -172,7 +173,8 @@ under-the-clouds/
     demo.py, event.py
   scripts/          # run_demo.py, run_event.py, train.py, sen1floods11.py, fetch_osm.py, prepare_scene.py
   notebooks/        # train_colab.ipynb (Colab / Kaggle GPU training)
-  app/              # web map (before/after slider, change layer, impact panel)
+  app/              # web map: before/after slider, Sentinel-1 timeline, flood layer, roads and places
+    data/baseline/  # threshold-baseline result for the "Threshold baseline" view
   tests/
   docs/DATA.md      # how to get the real data (checklist)
   data/, outputs/   # not committed
