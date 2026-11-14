@@ -26,6 +26,7 @@
   .micro { font: 600 11px var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--micro); }
 
   #map { position: fixed; inset: 0; background: var(--ground); z-index: 0; }
+  .basemap { filter: invert(1) hue-rotate(180deg) brightness(.82) contrast(.92) saturate(.55); }
   .leaflet-container { background: var(--ground); font-family: var(--sans); }
   .leaflet-tooltip { background: rgba(14,23,40,.96); color: var(--text); border: 1px solid var(--glass-edge); border-radius: 10px; box-shadow: 0 6px 22px rgba(0,0,0,.45); padding: 6px 11px; font: 600 13px var(--sans); }
   .leaflet-tooltip::before { display: none; }
@@ -36,7 +37,7 @@
   /* header */
   .brand { left: 44px; top: 26px; height: 52px; display: flex; align-items: center; gap: 12px; }
   .brand svg { display: block; }
-  .brand b { font: 600 24px var(--display); letter-spacing: -.02em; }
+  .brand b { font: 600 21px var(--display); letter-spacing: -.02em; }
   .nav { right: 44px; top: 30px; height: 44px; display: flex; align-items: center; gap: 4px; }
   .nav button { font: 500 14px var(--sans); color: #C9D6E6; padding: 10px 14px; border-radius: 999px; }
   .nav button:hover { background: rgba(255,255,255,.09); }
@@ -44,17 +45,23 @@
   .menubtn { display: none; right: 14px; top: 28px; padding: 9px 16px; border-radius: 999px; font: 600 13px var(--sans); }
 
   /* title and legend */
-  .title { left: 44px; top: 104px; border-radius: 20px; padding: 18px 22px; }
-  .title .eyeb { white-space: nowrap; font-size: 11px; letter-spacing: .14em; }
-  .title .t { margin-top: 6px; font: 600 34px/1.05 var(--display); letter-spacing: -.025em; }
-  .side { right: 44px; top: 104px; width: 270px; display: flex; flex-direction: column; gap: 12px; }
-  .legend { border-radius: 18px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px; }
-  .lay { display: flex; align-items: center; gap: 10px; padding: 5px 0; font: 500 13px var(--sans); color: #E3EBF5; cursor: pointer; }
+  .title { left: 44px; top: 104px; border-radius: 16px; padding: 12px 16px; }
+  .title .eyeb { white-space: nowrap; font-size: 10px; letter-spacing: .14em; }
+  .title .t { margin-top: 4px; font: 600 26px/1.05 var(--display); letter-spacing: -.02em; }
+  .side { right: 44px; top: 104px; width: 232px; display: flex; flex-direction: column; gap: 12px; }
+  .legend { border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .lay { display: flex; align-items: center; gap: 9px; padding: 3px 0; font: 500 12px var(--sans); color: #E3EBF5; cursor: pointer; }
   .lay input { position: absolute; opacity: 0; width: 0; height: 0; }
   .lay .sw { flex: none; width: 20px; display: grid; place-items: center; }
   .sw .sq { width: 12px; height: 12px; border-radius: 3px; background: var(--aurora); }
   .sw .ln { width: 18px; height: 3px; border-radius: 2px; background: var(--gold); }
   .sw .dt { width: 10px; height: 10px; border-radius: 50%; background: var(--silver); }
+  .sw .rd { width: 12px; height: 12px; border-radius: 3px; background: #6F8FA8; }
+  .sw .cg { width: 14px; height: 10px; border-radius: 3px; background: linear-gradient(90deg, #5FB4E8, #2A3B55 50%, #E3B25A); }
+  .chgkey { padding: 4px 0 6px 29px; }
+  .chgkey .bar { display: block; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #5FB4E8, #2A3B55 50%, #E3B25A); }
+  .chgkey .lab { display: flex; justify-content: space-between; margin-top: 3px; font: 500 10px var(--sans); color: var(--micro); }
+  .chgkey p { margin: 5px 0 0; font: 500 11px/1.35 var(--sans); color: var(--muted); }
   .lay .t { flex: 1; }
   .lay .ck { flex: none; width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid rgba(213,218,215,.5); display: grid; place-items: center; transition: background .12s, border-color .12s; }
   .lay input:checked ~ .ck { background: var(--text); border-color: var(--text); }
@@ -69,37 +76,47 @@
   .pl .a { display: block; direction: rtl; text-align: left; font-weight: 400; font-size: 12.5px; color: var(--muted); }
   .morebtn { margin: 6px 0 4px; font: 600 12px var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--gold); padding: 8px 0; }
 
+  /* logo: twinkling stars */
+  @keyframes twinkle { 0%, 100% { opacity: .25; transform: scale(.7); } 50% { opacity: 1; transform: scale(1.15); } }
+  @keyframes sparkle { 0%, 100% { opacity: .75; transform: scale(.85) rotate(0deg); } 50% { opacity: 1; transform: scale(1.1) rotate(45deg); } }
+  .brand .twk circle { transform-box: fill-box; transform-origin: center; animation: twinkle 2.6s ease-in-out infinite; }
+  .brand .spark { transform-box: fill-box; transform-origin: center; animation: sparkle 4s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .brand .twk circle, .brand .spark { animation: none; } }
+
   /* compare divider */
-  #divider { position: fixed; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--text); box-shadow: 0 0 0 1px rgba(0,0,0,.28); z-index: 600; pointer-events: none; left: 50%; }
-  .tag { position: absolute; top: 118px; border-radius: 999px; padding: 7px 14px; font: 600 11px var(--sans); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
+  #divider { position: fixed; top: 0; bottom: 0; width: 2px; margin-left: -1px; z-index: 705; pointer-events: none; left: 50%; }
+  #divider .dline { position: absolute; left: 0; top: 44px; bottom: 0; width: 2px; background: var(--text); box-shadow: 0 0 0 1px rgba(0,0,0,.28); transform: scaleY(0); transform-origin: top; transition: transform .45s cubic-bezier(.2,.7,.2,1), opacity .3s; opacity: 0; }
+  #divider.show .dline { transform: scaleY(1); opacity: 1; }
+  #divider.show #handle { box-shadow: 0 0 0 6px rgba(244,248,255,.18), 0 4px 18px rgba(0,0,0,.55); }
+  .tag { position: absolute; top: 9px; border-radius: 999px; padding: 7px 14px; font: 600 11px var(--sans); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
   .tag i { font-style: normal; font-weight: 500; letter-spacing: .02em; text-transform: none; color: var(--muted); margin-left: 8px; font-size: 12px; }
   .tag.a { right: 14px; } .tag.b { left: 14px; }
-  #handle { position: absolute; top: 50%; left: 1px; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: var(--text); color: var(--ground); display: grid; place-items: center; box-shadow: 0 4px 18px rgba(0,0,0,.55); pointer-events: auto; cursor: ew-resize; touch-action: none; }
+  #handle { position: absolute; top: 4px; left: 1px; width: 40px; height: 40px; margin: 0 0 0 -20px; transition: box-shadow .2s; border-radius: 50%; background: var(--text); color: var(--ground); display: grid; place-items: center; box-shadow: 0 4px 18px rgba(0,0,0,.55); pointer-events: auto; cursor: ew-resize; touch-action: none; }
 
   /* figures, method, timeline */
-  .method { left: 44px; bottom: 298px; display: inline-flex; padding: 4px; gap: 2px; border-radius: 999px; font: 600 13px var(--sans); color: var(--muted); }
-  .method button { padding: 7px 16px; border-radius: 999px; color: var(--muted); }
+  .method { left: 44px; bottom: 236px; display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; font: 600 12px var(--sans); color: var(--muted); }
+  .method button { padding: 5px 12px; border-radius: 999px; color: var(--muted); }
   .method button[aria-checked=true] { background: var(--blue); color: var(--text); }
-  .chips { left: 44px; bottom: 206px; display: flex; gap: 16px; }
-  .chip { border-radius: 18px; padding: 14px 20px; display: flex; flex-direction: column; gap: 2px; text-align: left; }
-  .chip .v { font: 500 28px var(--display); letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
-  .chip .v small { font: 500 15px var(--display); color: var(--muted); margin-left: 5px; }
-  .chip .l { font-size: 12px; color: var(--muted); }
+  .chips { left: 44px; bottom: 160px; display: flex; gap: 10px; }
+  .chip { border-radius: 14px; padding: 9px 14px; display: flex; flex-direction: column; gap: 2px; text-align: left; }
+  .chip .v { font: 500 21px var(--display); letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+  .chip .v small { font: 500 12px var(--display); color: var(--muted); margin-left: 5px; }
+  .chip .l { font-size: 11px; color: var(--muted); }
   button.chip:hover { border-color: rgba(213,218,215,.5); }
-  .timeline { left: 44px; right: 44px; bottom: 34px; height: 150px; border-radius: 24px; padding: 18px 28px; }
+  .timeline { left: 44px; right: 44px; bottom: 24px; height: 118px; border-radius: 18px; padding: 12px 22px; }
   .timeline .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
   .tlbar { position: absolute; left: 52px; right: 52px; top: 0; bottom: 0; }
-  .tlline { position: absolute; left: 0; right: 0; top: 66px; height: 1px; background: rgba(255,255,255,.2); }
-  .tlband { position: absolute; top: 60px; height: 13px; border-radius: 7px; background: rgba(211,95,63,.38); }
-  .tk { position: absolute; top: 66px; width: 44px; height: 56px; margin-left: -22px; transform: translateY(-14px); display: flex; flex-direction: column; align-items: center; gap: 8px; font: 500 12px var(--sans); color: var(--micro); cursor: default; }
+  .tlline { position: absolute; left: 0; right: 0; top: 52px; height: 1px; background: rgba(255,255,255,.2); }
+  .tlband { position: absolute; top: 46px; height: 13px; border-radius: 7px; background: rgba(211,95,63,.38); }
+  .tk { position: absolute; top: 52px; width: 44px; height: 56px; margin-left: -22px; transform: translateY(-14px); display: flex; flex-direction: column; align-items: center; gap: 8px; font: 500 12px var(--sans); color: var(--micro); cursor: default; }
   .tk i { display: block; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #8696B2; margin-top: 8px; }
   .tk.on { color: var(--text); cursor: pointer; } .tk.on i { width: 14px; height: 14px; margin-top: 5px; background: var(--gold); border: 0; }
   .tk.on:hover i { box-shadow: 0 0 0 5px rgba(211,165,79,.25); }
-  .tkl { position: absolute; top: 44px; width: 80px; margin-left: -40px; text-align: center; font: 600 10.5px var(--sans); letter-spacing: .12em; color: var(--gold); }
-  .tlnote { position: absolute; right: 28px; bottom: 12px; font-size: 12px; color: var(--micro); }
-  .credit { position: absolute; left: 28px; bottom: 12px; font-size: 11.5px; color: var(--micro); max-width: 52%; line-height: 1.35; }
+  .tkl { position: absolute; top: 31px; width: 80px; margin-left: -40px; text-align: center; font: 600 10.5px var(--sans); letter-spacing: .12em; color: var(--gold); }
+  .tlnote { position: absolute; right: 22px; bottom: 9px; font-size: 11px; color: var(--micro); }
+  .credit { position: absolute; left: 22px; bottom: 9px; font-size: 10.5px; color: var(--micro); max-width: 52%; line-height: 1.35; }
 
-  .zoom { right: 44px; bottom: 206px; display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; }
+  .zoom { right: 44px; bottom: 160px; display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; }
   .zoom button { width: 40px; height: 40px; font: 500 20px var(--sans); }
   .zoom button + button { border-top: 1px solid rgba(255,255,255,.14); }
   .zoom button:hover { background: rgba(255,255,255,.1); }
@@ -125,6 +142,10 @@
   .sheet th { color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
   #err { display: none; position: fixed; z-index: 3000; left: 20px; right: 20px; top: 90px; padding: 14px 18px; border-radius: 14px; background: #2A1520; border: 1px solid var(--red); }
 
+
+  /* scroll areas: smooth, and no visible scrollbar */
+  .sheet, .placespanel { scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; overscroll-behavior: contain; }
+  .sheet::-webkit-scrollbar, .placespanel::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
   /* ---------- Earth first screen and stages ---------- */
   #earth { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 650; touch-action: none; cursor: grab; background: radial-gradient(900px 620px at 60% 30%, #243A5C 0%, #152641 55%, #0C172A 100%); }
@@ -157,12 +178,52 @@
   .callout .lnk { font: 600 13px var(--sans); color: var(--muted); padding: 4px 0; }
   .callout .lnk:hover { color: var(--text); }
 
+
+  /* ---------- world view ---------- */
+  body[data-view=scene] .liveonly { display: none !important; }
+  body[data-view=live] .sceneonly { display: none !important; }
+  .sw .rd { width: 14px; height: 10px; border-radius: 3px; background: linear-gradient(90deg, #36607E, #F0ECD8); }
+  .bm { display: flex; flex-direction: column; gap: 6px; padding: 8px 0 2px; border-top: 1px solid rgba(255,255,255,.1); margin-top: 6px; }
+  .bmseg, .sseg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; background: rgba(255,255,255,.07); font: 600 12px var(--sans); }
+  .bmseg button, .sseg button { padding: 5px 9px; border-radius: 999px; color: var(--muted); white-space: nowrap; }
+  .bmseg button[aria-checked=true], .sseg button[aria-checked=true] { background: var(--blue); color: var(--text); }
+  .sidescene { right: 44px; top: 104px; width: 270px; border-radius: 18px; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .leg2 { display: flex; flex-direction: column; gap: 6px; font: 500 13px var(--sans); color: #E3EBF5; }
+  .leg2 span { display: flex; align-items: center; gap: 10px; } .leg2 i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+  .sq2 { background: var(--aurora); } .sq3 { background: #7FD1FF; }
+  .schips { left: 44px; bottom: 228px; display: flex; gap: 16px; }
+  .rank { left: 44px; right: 44px; bottom: 24px; border-radius: 18px; padding: 12px 22px 10px; }
+  .rank .row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .rank .cols { display: flex; gap: 6px; align-items: flex-end; margin-top: 10px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+  .rank .cols::-webkit-scrollbar { display: none; }
+  .rk { flex: 1 1 0; min-width: 62px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 2px 8px; border-radius: 12px; }
+  .rk:hover { background: rgba(255,255,255,.07); }
+  .rk .rv { font: 500 15px var(--display); font-variant-numeric: tabular-nums; }
+  .rk .bar { position: relative; width: 22px; height: 64px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: visible; }
+  .rk .fill { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 6px; background: var(--aurora); }
+  .rk .tick { position: absolute; left: -4px; right: -4px; height: 2px; background: var(--text); }
+  .rk .rn { font: 500 11.5px var(--sans); color: var(--muted); text-align: center; white-space: nowrap; }
+  .rk.on .rn { color: var(--gold); font-weight: 600; } .rk.on .bar { box-shadow: 0 0 0 2px var(--gold); }
+  .rk.live .bar { background: transparent; border: 1.5px dashed rgba(213,218,215,.5); } .rk.live .rv { color: var(--muted); }
+  .rank .rnote { margin-top: 4px; font-size: 11.5px; color: var(--micro); }
+  .cloudnote { left: 44px; top: 292px; max-width: 330px; padding: 12px 16px; border-radius: 16px; font: 500 13.5px/1.45 var(--sans); color: #E3EBF5; }
+  .cloudnote::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 8px; border-radius: 50%; background: var(--gold); }
+  .cloudnote .csrc { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.12); }
+  .cloudnote .csrc[hidden] { display: none; }
+  .cloudnote .csrc a { font: 600 12.5px var(--sans); color: var(--gold); text-decoration: none; }
+  .cloudnote .csrc a:hover { color: #F0C874; text-decoration: underline; }
+  .wlink { display: block; margin-top: 8px; font: 600 13px var(--sans); color: var(--gold); padding: 4px 0; text-align: left; }
+  #cloudBtn { margin-top: 10px; }
+  #cloudBtn[aria-pressed=true] { color: var(--text); }
+  .wlink:hover { color: #F0C874; }
+
   @media (max-width: 860px) {
     .brand { left: 14px; top: 16px; } .brand b { font-size: 19px; }
     .nav { display: none; } .menubtn { display: block; }
     .title { left: 12px; right: 12px; top: 76px; max-width: none; padding: 12px 16px; border-radius: 16px; }
     .title .t { font-size: 26px; } .title .eyeb { font-size: 10px; letter-spacing: .1em; white-space: normal; }
-    .side { right: 12px; left: auto; top: 148px; width: 190px; }
+    .side { right: 12px; left: auto; top: 186px; width: 190px; }
+    .lg { display: none; } .title .links { display: flex; gap: 18px; } .title .links .wlink { margin-top: 6px; }
     .legend { padding: 10px 14px; } .lay { padding: 3px 0; font-size: 12px; }
     .tag { top: auto; bottom: 322px; padding: 5px 11px; } .tag i { display: none; }
     .chips { left: 12px; right: 12px; bottom: 150px; gap: 8px; } .chip { padding: 10px 12px; flex: 1; border-radius: 14px; } .chip .v { font-size: 22px; } .chip .v small { font-size: 12px; } .chip .l { font-size: 11px; }
@@ -178,53 +239,75 @@
     .callout { left: 12px !important; right: 12px; top: auto !important; bottom: 14px; width: auto; padding: 18px 18px 16px; }
     .callout .ct { font-size: 28px; }
     .placespanel { max-height: 36vh; }
+    .cloudnote { left: 12px; right: 12px; top: auto; bottom: 360px; max-width: none; padding: 10px 14px; font-size: 12.5px; }
+    .sidescene { right: 12px; left: 12px; width: auto; top: 176px; padding: 10px 14px; gap: 8px; } .leg2 { flex-direction: row; gap: 14px; flex-wrap: wrap; }
+    .schips { left: 12px; right: 12px; bottom: 222px; gap: 8px; } .schips .chip { flex: 1; padding: 10px 12px; border-radius: 14px; } .schips .chip .v { font-size: 22px; } .schips .chip .l { font-size: 11px; }
+    .rank { left: 12px; right: 12px; bottom: 12px; padding: 12px 14px 10px; border-radius: 20px; } .rank .rnote { display: none; } .rk { min-width: 56px; } .rk .bar { height: 48px; }
+    .bm { display: none; }
   }
 </style>
 </head>
-<body>
+<body data-view="live">
 <div id="map" aria-label="Flood map. Drag to pan, scroll to zoom."></div>
 <div class="scrim"></div>
 <div id="err"></div>
 
-<canvas id="earth" aria-label="Interactive Earth. Drag to rotate, scroll to zoom, click the marker to explore Ksar El Kebir."></canvas>
+<canvas id="earth" aria-label="Interactive Earth. Drag to rotate, scroll to zoom, click a marker to explore a flood."></canvas>
 <div class="ui hero earthui">
   <div class="eyeb">NASA Space Apps 2026 &middot; Dancing with the SARs</div>
   <h1>Radar sees what clouds hide.</h1>
-  <p>Satellite radar and AI map new floods under cloud, and show which roads and places lie in or near the water.</p>
-  <div class="cta"><button class="pri" id="ctaExplore">Explore Ksar El Kebir</button><button class="sec" data-open="how">How it works</button></div>
+  <p>A global flood mapper for satellite radar. A neural network finds flooded land through cloud, checked on 11 floods in 11 countries, with a live case in Morocco.</p>
+  <div class="cta"><button class="pri" id="ctaExplore">Explore Morocco 2026</button><button class="sec" data-open="how">How it works</button></div>
 </div>
 <div class="ui efoot earthui">
-  <div class="efigs"><div class="chip gl"><span class="v out" id="eArea">&ndash;</span><span class="l">new flooding found</span></div><div class="chip gl"><span class="v out" id="eRoad">&ndash;</span><span class="l">road in flooded areas</span></div><div class="chip gl"><span class="v out" id="ePlaces">&ndash;</span><span class="l">places within 500 m of new water</span></div></div>
-  <div class="micro" style="color:#C9D6E6;text-shadow:0 1px 6px rgba(0,0,0,.7)">Model estimate &middot; no reference map yet &middot; drag the Earth, click the marker</div>
+  <div class="efigs"><div class="chip gl"><span class="v out" id="eArea">&ndash;</span><span class="l">floods in 11 countries, checked</span></div><div class="chip gl"><span class="v out" id="eRoad">&ndash;</span><span class="l">on 90 held-out scenes</span></div><div class="chip gl"><span class="v out" id="ePlaces">&ndash;</span><span class="l">live case, Morocco 2026</span></div></div>
+  <div class="micro" style="color:#C9D6E6;text-shadow:0 1px 6px rgba(0,0,0,.7)">Click a marker: white dots are benchmark floods, the orange one is the live case &middot; drag to turn the Earth</div>
 </div>
 <div class="callout gl" id="callout" role="region" aria-label="Ksar El Kebir">
   <div class="eyeb" id="cEyebrow">Flood map</div>
   <div class="ct out" id="cTitle">Ksar El Kebir</div>
   <p class="cp">Sentinel-1 radar from before and after the flood. New flooding found by a neural network.</p>
   <div class="cf"><span><b id="cArea">&ndash;</b> km&sup2;</span><span><b id="cRoad">&ndash;</b> km road</span><span><b id="cPlaces">&ndash;</b> places</span></div>
-  <div class="cb"><button class="pri" id="openMapBtn">Open the flood map &rarr;</button><button class="lnk" id="backEarthBtn">Back to the Earth</button></div>
+  <div class="cb"><button class="pri" id="openMapBtn">Open the flood map &rarr;</button><button class="lnk" id="cloudCta" style="color:var(--gold)">See the cloud test: optical vs radar</button><button class="lnk" id="backEarthBtn">Back to the Earth</button></div>
 </div>
 
-<div id="divider" class="mapui">
-  <div class="tag a gl">After<i id="dAfter"></i></div>
-  <div class="tag b gl">Before<i id="dBefore"></i></div>
+<div id="divider" class="mapui liveonly">
+  <div class="dline"></div>
+  <div class="tag a gl"><span id="tagA">After</span><i id="dAfter"></i></div>
+  <div class="tag b gl"><span id="tagB">Before</span><i id="dBefore"></i></div>
   <div id="handle" role="slider" tabindex="0" aria-label="Before and after comparison" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5L3 11l5 6M14 5l5 6-5 6"/></svg></div>
 </div>
 
-<div class="ui brand"><svg role="img" aria-label="Under the Clouds, orbit with a small satellite" width="58" height="41" viewBox="-14 -12 160 112"><g fill="#F4F8FF"><circle cx="-7.4" cy="36.4" r="0.7"/><circle cx="-4.1" cy="30.2" r="0.8"/><circle cx="-0.2" cy="24.3" r="0.9"/><circle cx="4.3" cy="18.8" r="1.0"/><circle cx="9.3" cy="13.8" r="1.1"/><circle cx="14.9" cy="9.4" r="1.1"/><circle cx="20.8" cy="5.5" r="1.2"/><circle cx="27.1" cy="2.3" r="1.3"/><circle cx="33.7" cy="-0.3" r="1.4"/><circle cx="40.5" cy="-2.3" r="1.5"/><circle cx="47.5" cy="-3.5" r="1.6"/><circle cx="54.5" cy="-4.0" r="1.7"/><circle cx="61.6" cy="-3.8" r="1.8"/><circle cx="68.6" cy="-2.9" r="1.9"/><circle cx="75.5" cy="-1.2" r="2.0"/><circle cx="82.2" cy="1.1" r="2.0"/><circle cx="88.6" cy="4.1" r="2.1"/><circle cx="94.7" cy="7.7" r="2.2"/><circle cx="100.4" cy="11.9" r="2.3"/><circle cx="105.7" cy="16.7" r="2.4"/><circle cx="110.4" cy="21.9" r="2.5"/><circle cx="114.6" cy="27.7" r="2.6"/></g><g fill="#F4F8FF" transform="translate(126 35) rotate(-28) scale(0.82)"><rect x="-4.2" y="-4.2" width="8.4" height="8.4" rx="1.5"/><rect x="-8.7" y="-0.7" width="4.5" height="1.4"/><rect x="-15.899999999999999" y="-3.8" width="7.2" height="7.6"/><rect x="-24.099999999999998" y="-3.8" width="7.2" height="7.6"/><rect x="4.2" y="-0.7" width="4.5" height="1.4"/><rect x="8.7" y="-3.8" width="7.2" height="7.6"/><rect x="16.9" y="-3.8" width="7.2" height="7.6"/></g><path fill="#F4F8FF" d="M31.8 14.7a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM40 14.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 14.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60.4 14.7a4.6 4.6 0 1 0 9.2 0a4.6 4.6 0 1 0 -9.2 0zM73.2 14.7a1.8 1.8 0 1 0 3.7 0a1.8 1.8 0 1 0 -3.7 0zM22.3 24.5a2.7 2.7 0 1 0 5.5 0a2.7 2.7 0 1 0 -5.5 0zM30 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM21.3 34.3a3.7 3.7 0 1 0 7.4 0a3.7 3.7 0 1 0 -7.4 0zM30 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80.2 34.3a4.8 4.8 0 1 0 9.7 0a4.8 4.8 0 1 0 -9.7 0zM92 34.3a3 3 0 1 0 5.9 0a3 3 0 1 0 -5.9 0zM10.1 44.1a4.9 4.9 0 1 0 9.7 0a4.9 4.9 0 1 0 -9.7 0zM20 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM103 44.1a2 2 0 1 0 3.9 0a2 2 0 1 0 -3.9 0zM10 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM20 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM103.2 53.9a1.8 1.8 0 1 0 3.7 0a1.8 1.8 0 1 0 -3.7 0zM10.7 63.7a4.3 4.3 0 1 0 8.5 0a4.3 4.3 0 1 0 -8.5 0zM20 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90.7 63.7a4.3 4.3 0 1 0 8.5 0a4.3 4.3 0 1 0 -8.5 0z"/><g fill="#E5546A" transform="translate(55 89.4)"><rect x="-4.7" y="-4.7" width="9.4" height="9.4"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" transform="rotate(45)"/></g></svg><b>under the clouds</b></div>
+<div class="ui brand"><svg role="img" aria-label="Under the Clouds, orbit with a small satellite" width="58" height="41" viewBox="-14 -12 160 112"><g fill="#F4F8FF"><circle cx="-7.4" cy="36.4" r="0.7"/><circle cx="-4.1" cy="30.2" r="0.8"/><circle cx="-0.2" cy="24.3" r="0.9"/><circle cx="4.3" cy="18.8" r="1.0"/><circle cx="9.3" cy="13.8" r="1.1"/><circle cx="14.9" cy="9.4" r="1.1"/><circle cx="20.8" cy="5.5" r="1.2"/><circle cx="27.1" cy="2.3" r="1.3"/><circle cx="33.7" cy="-0.3" r="1.4"/><circle cx="40.5" cy="-2.3" r="1.5"/><circle cx="47.5" cy="-3.5" r="1.6"/><circle cx="54.5" cy="-4.0" r="1.7"/><circle cx="61.6" cy="-3.8" r="1.8"/><circle cx="68.6" cy="-2.9" r="1.9"/><circle cx="75.5" cy="-1.2" r="2.0"/><circle cx="82.2" cy="1.1" r="2.0"/><circle cx="88.6" cy="4.1" r="2.1"/><circle cx="94.7" cy="7.7" r="2.2"/><circle cx="100.4" cy="11.9" r="2.3"/><circle cx="105.7" cy="16.7" r="2.4"/><circle cx="110.4" cy="21.9" r="2.5"/><circle cx="114.6" cy="27.7" r="2.6"/></g><g fill="#F4F8FF" transform="translate(126 35) rotate(-28) scale(0.82)"><rect x="-4.2" y="-4.2" width="8.4" height="8.4" rx="1.5"/><rect x="-8.7" y="-0.7" width="4.5" height="1.4"/><rect x="-15.899999999999999" y="-3.8" width="7.2" height="7.6"/><rect x="-24.099999999999998" y="-3.8" width="7.2" height="7.6"/><rect x="4.2" y="-0.7" width="4.5" height="1.4"/><rect x="8.7" y="-3.8" width="7.2" height="7.6"/><rect x="16.9" y="-3.8" width="7.2" height="7.6"/></g><path fill="#F4F8FF" d="M31.8 14.7a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM40 14.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 14.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60.4 14.7a4.6 4.6 0 1 0 9.2 0a4.6 4.6 0 1 0 -9.2 0zM73.2 14.7a1.8 1.8 0 1 0 3.7 0a1.8 1.8 0 1 0 -3.7 0zM22.3 24.5a2.7 2.7 0 1 0 5.5 0a2.7 2.7 0 1 0 -5.5 0zM30 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM21.3 34.3a3.7 3.7 0 1 0 7.4 0a3.7 3.7 0 1 0 -7.4 0zM30 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80.2 34.3a4.8 4.8 0 1 0 9.7 0a4.8 4.8 0 1 0 -9.7 0zM92 34.3a3 3 0 1 0 5.9 0a3 3 0 1 0 -5.9 0zM10.1 44.1a4.9 4.9 0 1 0 9.7 0a4.9 4.9 0 1 0 -9.7 0zM20 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM103 44.1a2 2 0 1 0 3.9 0a2 2 0 1 0 -3.9 0zM10 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM20 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM103.2 53.9a1.8 1.8 0 1 0 3.7 0a1.8 1.8 0 1 0 -3.7 0zM10.7 63.7a4.3 4.3 0 1 0 8.5 0a4.3 4.3 0 1 0 -8.5 0zM20 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90.7 63.7a4.3 4.3 0 1 0 8.5 0a4.3 4.3 0 1 0 -8.5 0z"/><g class="twk"><circle cx="-8" cy="4" r="1.3" fill="#F4F8FF" style="animation-delay:0s"/><circle cx="126" cy="2" r="1.1" fill="#F4F8FF" style="animation-delay:0.7s"/><circle cx="140" cy="60" r="1.4" fill="#F4F8FF" style="animation-delay:1.3s"/><circle cx="2" cy="84" r="1.0" fill="#F4F8FF" style="animation-delay:0.4s"/><circle cx="120" cy="86" r="1.2" fill="#F4F8FF" style="animation-delay:1.9s"/><circle cx="86" cy="-6" r="1.0" fill="#F4F8FF" style="animation-delay:1.1s"/><circle cx="-11" cy="60" r="1.1" fill="#F4F8FF" style="animation-delay:2.4s"/><circle cx="64" cy="96" r="0.9" fill="#F4F8FF" style="animation-delay:0.9s"/></g><g class="spark"><g fill="#E5546A" transform="translate(55 89.4)"><rect x="-4.7" y="-4.7" width="9.4" height="9.4"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" transform="rotate(45)"/></g></g></svg><b>under the clouds</b></div>
 <div class="ui nav" role="navigation" aria-label="Sections"><button id="navEarth">Earth</button><button data-open="how">How it works</button><button data-open="method">Method</button><button id="navResults">Results</button><button data-open="about">About</button></div>
 <button class="ui menubtn gl" data-open="how">Menu</button>
 
 <div class="ui title gl mapui">
   <div class="eyeb" id="eyebrow">Flood map</div>
   <div class="t" id="place">Loading</div>
+  <div class="links">
+    <button class="wlink liveonly" id="cloudBtn" type="button" aria-pressed="false">Cloud test<span class="lg">: NASA optical vs radar</span> &rarr;</button>
+    <button class="wlink liveonly" id="worldBtn" type="button"><span class="lg">Compare with </span>11 floods<span class="lg"> in other countries</span> &rarr;</button>
+  </div>
 </div>
 
-<div class="ui side mapui">
+<div class="ui cloudnote gl mapui liveonly" id="cloudNote" hidden><span id="cloudMsg">NASA's optical image of 8 Feb 2026 is covered by cloud. The radar sees the flood anyway.</span>
+  <div class="csrc" id="cloudSrc" hidden>
+    <span class="micro">NASA optical image &middot; MODIS Terra</span>
+    <div class="bmseg" id="cloudDates" role="radiogroup" aria-label="Date of the NASA optical image"><button type="button" role="radio" aria-checked="false" data-d="2026-02-01">1 Feb &middot; clear sky</button><button type="button" role="radio" aria-checked="true" data-d="2026-02-08">8 Feb &middot; flood day</button></div>
+    <a id="cloudVerify" href="#" target="_blank" rel="noopener">Check it yourself on NASA Worldview &nearr;</a>
+  </div>
+</div>
+
+<div class="ui side mapui liveonly">
   <div class="legend gl">
     <label class="lay"><input type="checkbox" id="tChange" checked><span class="sw"><i class="sq"></i></span><span class="t">New flooding</span><span class="ck"></span></label>
     <label class="lay"><input type="checkbox" id="tRoads" checked><span class="sw"><i class="ln"></i></span><span class="t">Road in flooded areas</span><span class="ck"></span></label>
     <label class="lay"><input type="checkbox" id="tVillages" checked><span class="sw"><i class="dt"></i></span><span class="t">Places near new water</span><span class="ck"></span></label>
+    <label class="lay"><input type="checkbox" id="tRadar"><span class="sw"><i class="rd"></i></span><span class="t">Radar image</span><span class="ck"></span></label>
+    <label class="lay" title="Change in radar brightness between the two dates, for any kind of surface change. Not a flood map: wind on water, crops and building work also change it."><input type="checkbox" id="tChg"><span class="sw"><i class="cg"></i></span><span class="t">Radar change</span><span class="ck"></span></label>
+    <div class="chgkey" id="chgKey" hidden><i class="bar"></i><div class="lab"><span>darker</span><span>no change</span><span>brighter</span></div><p>Any change between the two dates, not only water. Not a flood map.</p></div>
+    <div class="bm"><span class="micro">Basemap &middot; NASA imagery</span><div class="bmseg" id="bmseg" role="radiogroup" aria-label="Basemap"><button type="button" role="radio" aria-checked="true" data-bm="osm">Dark</button><button type="button" role="radio" aria-checked="false" data-bm="bm">Blue Marble</button><button type="button" role="radio" aria-checked="false" data-bm="tc">True colour</button></div></div>
   </div>
   <div class="placespanel gl" id="placesPanel" role="region" aria-label="Places near the flood">
     <div class="h"><span class="micro">Places near the flood</span><button class="x" id="closePlaces" aria-label="Close places list" style="width:30px;height:30px;font-size:17px">&times;</button></div>
@@ -232,19 +315,35 @@
   </div>
 </div>
 
-<div class="ui method gl mapui" id="seg" role="radiogroup" aria-label="Detection method" hidden></div>
-<div class="ui chips mapui">
+<div class="ui method gl mapui liveonly" id="seg" role="radiogroup" aria-label="Detection method" hidden></div>
+<div class="ui chips mapui liveonly">
   <div class="chip gl"><span class="v out"><span id="nArea">0</span><small>km&sup2;</small></span><span class="l">new flooding found</span></div>
   <div class="chip gl"><span class="v out"><span id="nRoad">0</span><small>km</small></span><span class="l">road in flooded areas</span></div>
   <button class="chip gl" id="placesBtn" type="button" aria-expanded="false" aria-controls="placesPanel"><span class="v out"><span id="nPlaces">0</span></span><span class="l" id="lPlaces">places within 500 m &middot; show list</span></button>
 </div>
 <div class="ui zoom gl mapui"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">&minus;</button></div>
 
-<div class="ui timeline gl mapui">
+<div class="ui timeline gl mapui liveonly">
   <div class="row"><span class="micro" id="tlTitle" style="color:#C9D6E6">Sentinel-1 passes &middot; one every 6 days</span><span class="micro" id="badge" style="color:var(--gold)">Model estimate &middot; no reference map yet</span></div>
   <div class="tlbar" id="tlbar"></div>
-  <div class="credit" id="credit">Contains modified Copernicus Sentinel data (2026), ASF DAAC HyP3. Roads and places &copy; OpenStreetMap contributors.</div>
+  <div class="credit" id="credit">Contains modified Copernicus Sentinel data (2026), ASF DAAC HyP3. Roads, places and basemap &copy; OpenStreetMap contributors.</div>
   <div class="tlnote" id="tlnote">Filled: processed. Open: radar available, not processed.</div>
+</div>
+
+<div class="ui sidescene mapui sceneonly gl" id="sceneLegend">
+  <div class="micro">Show</div>
+  <div class="sseg" id="sseg" role="radiogroup" aria-label="Layers"><button type="button" role="radio" aria-checked="true" data-s="model">Model</button><button type="button" role="radio" aria-checked="false" data-s="truth">Hand-labelled</button><button type="button" role="radio" aria-checked="false" data-s="both">Both</button></div>
+  <div class="leg2"><span><i class="sq2"></i>Model: water</span><span><i class="sq3"></i>Hand-labelled water</span></div>
+</div>
+<div class="ui schips mapui sceneonly">
+  <div class="chip gl"><span class="v out"><span id="sIou">&ndash;</span></span><span class="l">model IoU</span></div>
+  <div class="chip gl"><span class="v out"><span id="sBase">&ndash;</span></span><span class="l">simple threshold IoU</span></div>
+  <div class="chip gl"><span class="v out"><span id="sN">&ndash;</span></span><span class="l">labelled scenes scored</span></div>
+</div>
+<div class="ui rank gl mapui sceneonly" id="rank">
+  <div class="row"><span class="micro" style="color:#C9D6E6">Model accuracy by flood &middot; IoU, higher is better</span><span class="micro" id="rankNote" style="color:var(--gold)"></span></div>
+  <div class="cols" id="rankCols"></div>
+  <div class="rnote" id="rankNote2">Bars: our model. White tick: best simple threshold. Scores are over all labelled scenes of each flood. Select a flood to see a typical scene.</div>
 </div>
 
 <div class="sheetwrap" id="sheetwrap" role="dialog" aria-modal="true" aria-label="About this map">
@@ -278,12 +377,15 @@
   const dm = /\(([A-Za-z]+ \d+)\s*[-–]\s*([A-Za-z]+ \d+),\s*(\d{4})\)/.exec(eventName);
   if (dm) { $('dBefore').textContent = dm[1]; $('dAfter').textContent = dm[2]; }
 
-  // ---------- map: radar fills the screen, no basemap ----------
-  const map = L.map('map', { zoomControl: false, attributionControl: false, zoomSnap: 0.1, zoomDelta: 0.5, maxBoundsViscosity: 1 });
+  // ---------- map: radar over a dark basemap; zoom out past the scene like a normal map ----------
+  const map = L.map('map', { zoomControl: false, attributionControl: false, zoomSnap: 0.1, zoomDelta: 0.5, maxZoom: 16 });
+  const osmLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, className: 'basemap' }).addTo(map);
   const centre = [(bounds[0][0] + bounds[1][0]) / 2, (bounds[0][1] + bounds[1][1]) / 2];
-  const cover = () => { map.invalidateSize(); const z = map.getBoundsZoom(bounds, true); map.setMinZoom(z); map.setMaxBounds(bounds); if (map.getZoom() < z || !map._covered) { map.setView(centre, z, { animate: false }); map._covered = true; } updateClip(); };
+  let viewBounds = bounds, basemapKey = 'osm';
+  const cover = () => { map.invalidateSize(); const vb = L.latLngBounds(viewBounds), z = map.getBoundsZoom(vb, true); map.setMinZoom(Math.max(3, z - 4)); map.setMaxBounds([[vb.getSouth() - 3, vb.getWest() - 4], [vb.getNorth() + 3, vb.getEast() + 4]]); if (!map._covered) { map.setView(vb.getCenter(), z, { animate: false }); map._covered = true; } updateClip(); };
   map.setView(centre, 11);
   ['beforePane', 'afterPane', 'changePane', 'vectorPane'].forEach((n, i) => { map.createPane(n).style.zIndex = 410 + i * 10; });
+  [['sRadar', 412], ['sTruth', 442], ['sModel', 446], ['chgPane', 425]].forEach(([n, z]) => { map.createPane(n).style.zIndex = z; });
 
   // ---------- radar colouring: grey radar to a blue, teal and cream ramp (same ramp for both dates) ----------
   const STOPS = [[0, [16, 30, 56]], [0.40, [54, 92, 126]], [0.75, [156, 182, 172]], [1, [240, 236, 216]]];
@@ -326,9 +428,40 @@
 
   const [imB, imA] = await Promise.all([loadImg('data/before.png'), loadImg('data/after.png')]);
   const [urlB, urlA] = await duotone([imB, imA]);
-  L.imageOverlay(urlB, bounds, { pane: 'beforePane' }).addTo(map);
-  L.imageOverlay(urlA, bounds, { pane: 'afterPane' }).addTo(map);
+  // radar images: hidden by default (basemap only); the legend's 'Radar image' box brings them back
+  const radB = L.imageOverlay(urlB, bounds, { pane: 'beforePane' }), radA = L.imageOverlay(urlA, bounds, { pane: 'afterPane' });
   const change = L.imageOverlay('data/change.png', bounds, { pane: 'changePane' }).addTo(map);
+
+  // ---------- radar change: how much the radar brightness moved between the two dates (any surface change, not a flood map) ----------
+  // The two PNGs store dB linearly (-50 to +1 dB over 0..255), so the difference can be rebuilt in the browser. Blue = darker, gold = brighter.
+  let chgLayer = null, chgBusy = false;
+  async function buildChange() {
+    const W = imB.naturalWidth, H = imB.naturalHeight, N = W * H;
+    const grab = (im) => {
+      const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0);
+      const d = x.getImageData(0, 0, W, H).data, o = new Float32Array(N), bad = new Uint8Array(N);
+      for (let i = 0; i < N; i++) { const v = d[i * 4]; o[i] = -50 + v * 51 / 255; if (v >= 254) bad[i] = 1; }
+      return { o, bad };
+    };
+    const box = (src, r) => {            // 5 x 5 mean to calm the radar speckle
+      const tmp = new Float32Array(N), out = new Float32Array(N), k = 2 * r + 1, cl = (v, m) => Math.min(m, Math.max(0, v));
+      for (let y = 0; y < H; y++) { const row = y * W; let s = 0; for (let x = -r; x <= r; x++) s += src[row + cl(x, W - 1)]; for (let x = 0; x < W; x++) { tmp[row + x] = s / k; s += src[row + cl(x + r + 1, W - 1)] - src[row + cl(x - r, W - 1)]; } }
+      for (let x = 0; x < W; x++) { let s = 0; for (let y = -r; y <= r; y++) s += tmp[cl(y, H - 1) * W + x]; for (let y = 0; y < H; y++) { out[y * W + x] = s / k; s += tmp[cl(y + r + 1, H - 1) * W + x] - tmp[cl(y - r, H - 1) * W + x]; } }
+      return out;
+    };
+    const b = grab(imB), a = grab(imA), sb = box(b.o, 2), sa = box(a.o, 2);
+    const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d'), img = x.createImageData(W, H), p = img.data;
+    const DARK = [95, 180, 232], BRIGHT = [227, 178, 90], T0 = 2.5;
+    for (let i = 0; i < N; i++) {
+      if (b.bad[i] || a.bad[i]) continue;
+      const d = sa[i] - sb[i], m = Math.abs(d); if (m < T0) continue;
+      const t = Math.min(1, (m - T0) / 6), col = d < 0 ? DARK : BRIGHT;
+      p[i * 4] = col[0]; p[i * 4 + 1] = col[1]; p[i * 4 + 2] = col[2]; p[i * 4 + 3] = Math.round(70 + 170 * t);
+    }
+    x.putImageData(img, 0, 0);
+    const blob = await new Promise((res) => c.toBlob(res, 'image/png'));
+    return L.imageOverlay(URL.createObjectURL(blob), bounds, { pane: 'chgPane' });
+  }
 
   // ---------- compare: After image (and the flood) shows left of the divider ----------
   let ratio = 0.5;
@@ -345,9 +478,14 @@
   const animateTo = (r) => { cancelAnimationFrame(anim); const r0 = ratio, t0 = performance.now(); const step = (now) => { const k = Math.min(1, (now - t0) / 700), e = k * k * (3 - 2 * k); setRatio(r0 + (r - r0) * e); if (k < 1) anim = requestAnimationFrame(step); }; anim = requestAnimationFrame(step); };
   map.on('move zoom resize viewreset', updateClip);
   const moveTo = (ev) => setRatio(ev.clientX / window.innerWidth);
-  handle.addEventListener('pointerdown', (ev) => { cancelAnimationFrame(anim); handle.setPointerCapture(ev.pointerId); map.dragging.disable(); moveTo(ev); });
+  let hideT = 0, dragging = false;
+  const showLine = () => { clearTimeout(hideT); divider.classList.add('show'); };
+  const hideLine = (ms) => { clearTimeout(hideT); hideT = setTimeout(() => { if (!dragging && !cloudMode) divider.classList.remove('show'); }, ms); };
+  handle.addEventListener('pointerenter', showLine); handle.addEventListener('pointerleave', () => hideLine(900));
+  handle.addEventListener('focus', showLine); handle.addEventListener('blur', () => hideLine(300));
+  handle.addEventListener('pointerdown', (ev) => { dragging = true; showLine(); cancelAnimationFrame(anim); handle.setPointerCapture(ev.pointerId); map.dragging.disable(); moveTo(ev); });
   handle.addEventListener('pointermove', (ev) => { if (handle.hasPointerCapture(ev.pointerId)) moveTo(ev); });
-  const endDrag = (ev) => { if (handle.hasPointerCapture(ev.pointerId)) handle.releasePointerCapture(ev.pointerId); map.dragging.enable(); };
+  const endDrag = (ev) => { if (handle.hasPointerCapture(ev.pointerId)) handle.releasePointerCapture(ev.pointerId); map.dragging.enable(); dragging = false; hideLine(1200); };
   handle.addEventListener('pointerup', endDrag); handle.addEventListener('pointercancel', endDrag);
   handle.addEventListener('keydown', (ev) => { const step = ev.shiftKey ? 0.2 : 0.05; if (ev.key === 'ArrowLeft') { setRatio(ratio - step); ev.preventDefault(); } if (ev.key === 'ArrowRight') { setRatio(ratio + step); ev.preventDefault(); } if (ev.key === 'Home') setRatio(0); if (ev.key === 'End') setRatio(1); });
   $('zin').onclick = () => map.zoomIn(); $('zout').onclick = () => map.zoomOut();
@@ -378,13 +516,19 @@
       onEachFeature: (f, l) => f.properties && f.properties.name && l.bindTooltip(nameTip(f.properties.name), { direction: 'top', offset: [0, -4] })
     });
   }
-  const tog = { change: $('tChange'), roads: $('tRoads'), villages: $('tVillages') };
-  let cur = methods[0];
+  const tog = { change: $('tChange'), roads: $('tRoads'), villages: $('tVillages'), radar: $('tRadar'), chg: $('tChg') };
+  let cur = methods[0], cloudMode = false, cloudPrev = null;
   function applyLayers() {
     methods.forEach((m) => { map.removeLayer(m.roads); map.removeLayer(m.villages); });
     if (tog.roads.checked) cur.roads.addTo(map);
     if (tog.villages.checked) cur.villages.addTo(map);
     if (tog.change.checked) { if (!map.hasLayer(change)) change.addTo(map); } else { map.removeLayer(change); }
+    const wantChg = tog.chg.checked && !cloudMode;
+    $('chgKey').hidden = !tog.chg.checked;
+    if (wantChg && !chgLayer && !chgBusy) { chgBusy = true; buildChange().then((l) => { chgLayer = l; chgBusy = false; applyLayers(); }).catch(() => { chgBusy = false; tog.chg.checked = false; $('chgKey').hidden = true; }); }
+    if (chgLayer) { if (wantChg) { if (!map.hasLayer(chgLayer)) chgLayer.addTo(map); } else map.removeLayer(chgLayer); }
+    // cloud test: only the After radar (left of the line) over NASA's optical image (right of the line)
+    [radB, radA].forEach((r) => { const want = cloudMode ? r === radA : tog.radar.checked; if (want) { if (!map.hasLayer(r)) r.addTo(map); } else map.removeLayer(r); });
     updateClip();
   }
   Object.values(tog).forEach((t) => t.addEventListener('change', applyLayers));
@@ -419,7 +563,7 @@
     $('lPlaces').textContent = 'places within ' + (s.village_buffer_m ?? 500) + ' m · show list';
     fillPlaces(m); applyLayers();
     change.setUrl(await tinted(m.dir + 'change.png'));
-    if (!map._focused && tintCache[m.dir + 'change.png#centroid']) { map._focused = true; const [fx, fy] = tintCache[m.dir + 'change.png#centroid']; map.setView([bounds[1][0] - fy * (bounds[1][0] - bounds[0][0]), bounds[0][1] + fx * (bounds[1][1] - bounds[0][1])], map.getMinZoom(), { animate: false }); }
+    if (!map._focused && tintCache[m.dir + 'change.png#centroid']) { map._focused = true; const [fx, fy] = tintCache[m.dir + 'change.png#centroid']; map.setView([bounds[1][0] - fy * (bounds[1][0] - bounds[0][0]), bounds[0][1] + fx * (bounds[1][1] - bounds[0][1])], map.getBoundsZoom(L.latLngBounds(viewBounds), true), { animate: false }); }
   }
   if (methods.length > 1) {
     const seg = $('seg'); seg.hidden = false;
@@ -447,18 +591,22 @@
   // ---------- sheet: how it works, method, about ----------
   const sheetWrap = $('sheetwrap'), body = $('sheetBody');
   const li = (b, t) => '<li><b>' + b + '</b>' + t + '</li>';
+  const worldRows = () => world ? Object.entries(world).sort((x, y) => y[1].model.iou - x[1].model.iou).map(([id, e]) => '<tr><td>' + dispName(id) + (e.split === 'bolivia' ? ' (held out)' : '') + '</td><td>' + e.n_scenes + '</td><td>' + e.model.iou.toFixed(2) + '</td><td>' + e.baseline_vh.iou.toFixed(2) + '</td></tr>').join('') : '';
   const TABS = {
-    how: () => '<h2>How it works</h2><p>Radar sees through cloud, rain and night, so it can map a flood when ordinary cameras cannot.</p><ol>' +
-      li('1. Two radar images', 'Sentinel-1 scenes from before and after the flood.') + li('2. A neural network reads them', 'A U-Net marks each pixel as water or not water.') +
-      li('3. Only the new water', 'Water after the event that was not water before it. Rivers, lakes and the sea are removed.') + li('4. Roads and places', 'OpenStreetMap roads and places are checked against the new flooding.') + '</ol>',
-    method: () => '<h2>Method</h2><p>A U-Net with an ImageNet-pretrained ResNet-34 encoder, trained for 30 epochs on the public Sen1Floods11 flood dataset (252 hand-labelled training scenes, radar bands VV and VH).</p>' +
-      '<table><tr><th>Benchmark</th><th>IoU</th><th>Best simple baseline</th></tr><tr><td>Test split, 90 scenes</td><td>0.687</td><td>0.530</td></tr><tr><td>Held-out Bolivia event, 15 scenes</td><td>0.601</td><td>0.586</td></tr></table>' +
-      '<p>The test split shares flood events with the training split, so the Bolivia row is the fairer check, and there the lead is small. This map has no accuracy score yet, because we have no reference flood map for these dates.</p>' +
-      '<p>For the map, the sea and a 1 km coastal strip are masked and tiny shapes are removed. That also removes some real narrow flooding, so the true area is probably between the cleaned and raw values.</p>',
+    how: () => '<h2>How it works</h2><p>Radar sees through cloud, rain and night, so it can map a flood when ordinary cameras cannot. The same steps work anywhere on Earth.</p><ol>' +
+      li('1. Radar images', 'Sentinel-1 scenes, delivered through NASA\u2019s ASF DAAC, from before and after a flood.') + li('2. A neural network reads them', 'A U-Net marks each pixel as water or not water.') +
+      li('3. Only the new water', 'Water after the event that was not water before it. Rivers, lakes and the sea are removed.') + li('4. Impact', 'Roads and places from OpenStreetMap are checked against the new flooding.') + '</ol>',
+    method: () => '<h2>Method and checks</h2><p>A U-Net with an ImageNet-pretrained ResNet-34 encoder, trained for 30 epochs on the public Sen1Floods11 dataset: Sentinel-1 radar (VV and VH) with hand-labelled water maps from floods in 11 countries.</p>' +
+      '<table><tr><th>Check</th><th>Model IoU</th><th>Best simple threshold</th></tr><tr><td>Test split, 90 scenes from 10 floods</td><td>0.687</td><td>0.530</td></tr><tr><td>Bolivia flood, held out, 15 scenes</td><td>0.601</td><td>0.586*</td></tr></table>' +
+      '<p>*Naive per-scene threshold; against the single tuned threshold the model leads by 0.08.</p>' +
+      (world ? '<table><tr><th>Flood</th><th>Scenes</th><th>Model IoU</th><th>Threshold IoU</th></tr>' + worldRows() + '</table>' : '') +
+      '<p>The test scenes come from the same floods as the training scenes but are different pictures, so the Bolivia row is the fairer check. Morocco 2026 has no accuracy score yet, because we have no reference flood map for those dates.</p>' +
+      '<p>For the Morocco map, the sea and a 1 km coastal strip are masked and tiny shapes are removed. That also removes some real narrow flooding, so the true area is probably between the cleaned and raw values.</p>',
     about: () => '<h2>About</h2><p>An independent team project for the NASA Space Apps Challenge 2026, challenge Dancing with the SARs. Built by Rabab, Ikram and Aya. Not an official NASA product.</p><ul>' +
       li('Model output, not a flood map', 'Road and place counts show what lies in or near detected water. They do not mean a road is impassable or a village is flooded.') +
-      li('Sentinel-1, not NISAR', 'No public NISAR data exists for these dates. Flooded vegetation and very shallow water look grey in radar and can be missed.') +
-      li('Data', 'Contains modified Copernicus Sentinel data (2026), processed by ASF DAAC HyP3. Roads and places &copy; OpenStreetMap contributors. Training data: Sen1Floods11.') +
+      li('Sentinel-1, not NISAR', 'No public NISAR data exists for the Morocco dates, so we used Sentinel-1. The pipeline is built to take other radar. Flooded vegetation and very shallow water look grey in radar and can be missed.') +
+      li('NASA data', 'Sentinel-1 scenes from the ASF DAAC and processing by ASF HyP3. Earth imagery: NASA Blue Marble, Black Marble and VIIRS true colour (clouds of 8 Feb 2026) through NASA GIBS and Visible Earth.') +
+      li('Other data', 'Contains modified Copernicus Sentinel data. Roads and places \u00a9 OpenStreetMap contributors. Training and checks: Sen1Floods11.') +
       li('AI use', 'Claude was used for research, code, documentation and design. The team ran the code, trained the model and checked the results.') + '</ul>'
   };
   const openSheet = (tab) => { body.innerHTML = TABS[tab](); sheetWrap.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab))); sheetWrap.classList.add('open'); };
@@ -467,7 +615,123 @@
   sheetWrap.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => openSheet(b.dataset.tab)));
   $('closeSheet').onclick = closeSheet; sheetWrap.addEventListener('click', (e) => { if (e.target === sheetWrap) closeSheet(); });
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeSheet(); setPanel(false); } });
-  $('navResults').onclick = () => { closeSheet(); openMap(); };
+  $('navResults').onclick = () => { closeSheet(); if (stage === 'map') { selected = 'live'; showLive(); } else { selected = 'live'; openMap(); } };
+
+  // ================= World view: benchmark floods in other countries =================
+  let world = null;
+  try { world = await getJSON('data/world/world.json'); } catch (e) { world = null; }
+  const dispName = (id) => ({ 'Mekong': 'Mekong Delta', 'Sri-Lanka': 'Sri Lanka' }[id] || id);
+  const liveEyebrow = $('eyebrow').textContent, livePlace = $('place').textContent;
+  let view = 'live', sceneLayers = [], sceneId = null;
+  const bodyEl = document.body;
+
+  function clearLive() {
+    [radB, radA, change].forEach((l) => map.removeLayer(l)); if (chgLayer) map.removeLayer(chgLayer);
+    methods.forEach((m) => { map.removeLayer(m.roads); map.removeLayer(m.villages); });
+  }
+  function clearScene() { sceneLayers.forEach((l) => map.removeLayer(l)); sceneLayers = []; }
+  function showLive() {
+    clearScene(); view = 'live'; sceneId = null; bodyEl.dataset.view = 'live';
+    applyLayers();
+    $('eyebrow').textContent = liveEyebrow; $('place').textContent = livePlace;
+    viewBounds = bounds; map._covered = false; cover();
+    if (map._liveCentre) map.setView(map._liveCentre, map.getBoundsZoom(L.latLngBounds(viewBounds), true), { animate: false });
+    renderRank(null);
+  }
+  function applyScene() {
+    const mode = document.querySelector('#sseg [aria-checked=true]').dataset.s;
+    const [radar, truth, model] = sceneLayers;
+    if (!radar) return;
+    map.getPane('sTruth').style.display = (mode === 'truth' || mode === 'both') ? '' : 'none';
+    map.getPane('sModel').style.display = (mode === 'model' || mode === 'both') ? '' : 'none';
+  }
+  function showScene(id) {
+    const e = world && world[id]; if (!e) return;
+    if (view === 'live') { map._liveCentre = map.getCenter(); }
+    setCloud(false); clearLive(); clearScene(); view = 'scene'; sceneId = id; bodyEl.dataset.view = 'scene';
+    const u = 'data/world/' + id + '/';
+    sceneLayers = [L.imageOverlay(u + 'radar.jpg', e.bounds, { pane: 'sRadar' }), L.imageOverlay(u + 'truth.png', e.bounds, { pane: 'sTruth' }), L.imageOverlay(u + 'model.png', e.bounds, { pane: 'sModel' })];
+    sceneLayers.forEach((l) => l.addTo(map)); applyScene();
+    $('eyebrow').textContent = 'Benchmark flood \u00b7 Sentinel-1 radar'; $('place').textContent = dispName(id);
+    $('sIou').textContent = e.model.iou.toFixed(2); $('sBase').textContent = e.baseline_vh.iou.toFixed(2); $('sN').textContent = String(e.n_scenes);
+    $('rankNote').textContent = (e.model.precision > 0.6 && e.model.recall < 0.4) ? 'Hardest flood: finds only ' + Math.round(e.model.recall * 100) + '% of the water, but what it marks is right (' + Math.round(e.model.precision * 100) + '%)' : (e.split === 'bolivia' ? 'Held-out flood: not in training' : 'Same flood, different scenes than training');
+    viewBounds = e.bounds; map._covered = false; cover(); renderRank(id);
+  }
+  function renderRank(active) {
+    const host = $('rankCols'); if (!host) return; host.textContent = '';
+    const items = world ? Object.entries(world).sort((a, b) => b[1].model.iou - a[1].model.iou) : [];
+    const mk = (id, name, iou, base, isLive) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'rk' + (isLive ? ' live' : '') + (id === (active || '') ? ' on' : '');
+      b.innerHTML = '<span class="rv"></span><span class="bar"><span class="fill"></span><span class="tick"></span></span><span class="rn"></span>';
+      b.querySelector('.rv').textContent = isLive ? '\u2013' : iou.toFixed(2); b.querySelector('.rn').textContent = name;
+      if (!isLive) { b.querySelector('.fill').style.height = Math.round(iou * 100) + '%'; b.querySelector('.tick').style.bottom = Math.round(base * 100) + '%'; } else { b.querySelector('.fill').remove(); b.querySelector('.tick').remove(); b.title = 'Live case: no reference score yet'; }
+      b.onclick = () => { selected = id === 'live' ? 'live' : id; if (id === 'live') showLive(); else showScene(id); };
+      host.appendChild(b);
+    };
+    mk('live', 'Morocco 2026', 0, 0, true);
+    items.forEach(([id, e]) => mk(id, dispName(id), e.model.iou, e.baseline_vh.iou, false));
+  }
+  document.querySelectorAll('#sseg button').forEach((b) => b.addEventListener('click', () => { document.querySelectorAll('#sseg button').forEach((x) => x.setAttribute('aria-checked', String(x === b))); applyScene(); }));
+  renderRank(null);
+  $('worldBtn').onclick = () => { selected = 'Bolivia'; showScene('Bolivia'); };
+  if (!world) $('worldBtn').style.display = 'none';
+
+  // ---------- NASA GIBS basemap (live imagery from NASA, no key needed) ----------
+  const TC_LAYER = 'MODIS_Terra_CorrectedReflectance_TrueColor', TC_DATES = { '2026-02-08': '8 Feb 2026', '2026-02-01': '1 Feb 2026' };
+  let tcDate = '2026-02-08';
+  const GIBS = {
+    bm: { url: () => 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg', nz: 8, credit: () => 'NASA Blue Marble' },
+    tc: { url: () => 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/' + TC_LAYER + '/default/' + tcDate + '/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpeg', nz: 9, credit: () => 'NASA MODIS Terra true colour, ' + TC_DATES[tcDate] }
+  };
+  let gibsLayer = null;
+  function setBasemap(key) {
+    basemapKey = key; if (gibsLayer) { map.removeLayer(gibsLayer); gibsLayer = null; } map.removeLayer(osmLayer);
+    if (key === 'osm') osmLayer.addTo(map);
+    else { const g = GIBS[key]; gibsLayer = L.tileLayer(g.url(), { pane: 'tilePane', maxNativeZoom: g.nz, maxZoom: 16, tileSize: 256 }).addTo(map); }
+    document.querySelectorAll('#bmseg button').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.bm === key)));
+    $('credit').innerHTML = (key === 'osm' ? 'Contains modified Copernicus Sentinel data (2026), ASF DAAC HyP3. Roads, places and basemap &copy; OpenStreetMap contributors.' : 'Contains modified Copernicus Sentinel data (2026), ASF DAAC HyP3. Roads and places &copy; OpenStreetMap contributors. Imagery: ' + GIBS[key].credit() + ', via NASA GIBS.');
+    $('cloudNote').hidden = key !== 'tc';
+  }
+  document.querySelectorAll('#bmseg button').forEach((b) => b.addEventListener('click', () => { setBasemap(b.dataset.bm); if (cloudMode) setCloud(false, true); }));
+
+  // ---------- cloud test: NASA's optical image of the flood day against our radar, one slider ----------
+  // Trust: the optical side is NASA's own layer (MODIS Terra, via GIBS). A second date with clear sky shows the layer is not blank,
+  // and a link opens the same layer and date in NASA Worldview so anyone can check it.
+  const CLOUD_MSG = {
+    '2026-02-08': 'NASA\u2019s optical satellite image of the flood day is covered by cloud: nothing to see. Sentinel-1 radar, on the other side of the line, sees the flooded land anyway. Drag the line.',
+    '2026-02-01': 'Same NASA layer on a clear day (1 Feb): you can see the land. So the white on 8 Feb is cloud, not missing data. The radar on the left is still the 8 Feb pass.'
+  };
+  const cloudMsgDefault = $('cloudMsg').textContent, cloudBtn = $('cloudBtn');
+  const setCloudDate = (d, redraw) => {
+    tcDate = d;
+    document.querySelectorAll('#cloudDates button').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.d === d)));
+    $('cloudVerify').href = 'https://worldview.earthdata.nasa.gov/?v=-7.4,34.3,-4.6,35.8&l=' + TC_LAYER + '&t=' + d;
+    if (cloudMode) { $('cloudMsg').textContent = CLOUD_MSG[d]; const parts = TC_DATES[d].split(' '); $('dBefore').textContent = parts[1] + ' ' + parts[0]; }
+    if (redraw) setBasemap('tc');
+  };
+  document.querySelectorAll('#cloudDates button').forEach((b) => b.addEventListener('click', () => setCloudDate(b.dataset.d, true)));
+  function setCloud(on, keepBasemap) {
+    if (on === cloudMode) return;
+    cloudMode = on; cloudBtn.setAttribute('aria-pressed', String(on));
+    cloudBtn.innerHTML = on ? '&larr; Back<span class="lg"> to the flood map</span>' : 'Cloud test<span class="lg">: NASA optical vs radar</span> &rarr;';
+    if (on) {
+      cloudPrev = { bm: basemapKey, roads: tog.roads.checked, villages: tog.villages.checked, radar: tog.radar.checked, change: tog.change.checked, dB: $('dBefore').textContent };
+      tog.roads.checked = false; tog.villages.checked = false; tog.radar.checked = true; tog.change.checked = true;
+      tcDate = '2026-02-08'; setBasemap('tc');
+      $('tagA').textContent = 'Radar'; $('tagB').textContent = 'NASA optical';
+      $('cloudSrc').hidden = false; setCloudDate('2026-02-08', false); $('cloudNote').hidden = false;
+      applyLayers(); showLine(); setRatio(0.04); animateTo(0.55);
+    } else if (cloudPrev) {
+      tog.roads.checked = cloudPrev.roads; tog.villages.checked = cloudPrev.villages; tog.radar.checked = cloudPrev.radar; tog.change.checked = cloudPrev.change;
+      $('tagA').textContent = 'After'; $('tagB').textContent = 'Before'; $('dBefore').textContent = cloudPrev.dB;
+      $('cloudMsg').textContent = cloudMsgDefault; $('cloudSrc').hidden = true;
+      const redo = tcDate !== '2026-02-08'; tcDate = '2026-02-08';
+      if (!keepBasemap) setBasemap(cloudPrev.bm); else { if (redo && basemapKey === 'tc') setBasemap('tc'); $('cloudNote').hidden = basemapKey !== 'tc'; }
+      applyLayers(); hideLine(600); cloudPrev = null;
+    }
+  }
+  cloudBtn.onclick = () => setCloud(!cloudMode);
+  let selected = 'live';
 
   // ================= Earth first screen =================
   const body2 = document.body, canvas = $('earth');
@@ -485,7 +749,7 @@
     const ctx = cv.getContext('2d'), mix = (a, b, t) => a + (b - a) * t;
     let W, H, Rh, cyH, Rc, cyC, stars;
     const small = innerWidth < 900;
-    const day = mips(tex.day, small ? [1024, 2048] : [1024, 2048, 4096]), night = mips(tex.night, small ? [1024, 2048] : [1024, 2048, 4096]), cloud = mips(tex.clouds, [512, 1024, 2048]);
+    const day = mips(tex.day, small ? [1024, 2048] : [1024, 2048, 4096]), night = mips(tex.night, small ? [1024, 2048] : [1024, 2048, 4096]), cloud = mips(tex.clouds, small ? [1024, 2048] : [1024, 2048, 4096]);
     function layout() {
       W = cv.width; H = cv.height; const portrait = W < H; Rh = portrait ? Math.min(H * 0.7, W * 1.4) : Math.min(H * 0.86, W * 1.05); cyH = H + (portrait ? 0.2 : 0.37) * Rh; Rc = Math.min(H * 0.385, W * 0.34); cyC = H * 0.52;
       stars = document.createElement('canvas'); stars.width = W; stars.height = H;
@@ -495,11 +759,12 @@
     layout();
     const norm3 = (x, y, z) => { const l = Math.hypot(x, y, z); return [x / l, y / l, z / l]; };
     const sun = norm3(-0.90, 0.22, 0.34), half = norm3(sun[0], sun[1], sun[2] + 1);
-    const REST = -8 * D2R;
-    const st = { lat0: REST, lon0: -14 * D2R, zoom: 1, b: 0, drag: false, idleAt: 0, fly: null, hold: false, last: 0, img: null, px32: null, marker: null };
+    const REST = -20 * D2R;
+    const st = { lat0: REST, lon0: 18 * D2R, zoom: 1, b: 0, drag: false, idleAt: 0, fly: null, hold: false, last: 0, img: null, px32: null, markers: [], hover: null };
     const buf = document.createElement('canvas'), bctx = buf.getContext('2d');
     const pick = (m, rbuf) => { const need = 2 * Math.PI * rbuf * 0.95; for (const x of m) if (x.w >= need) return x; return m[m.length - 1]; };
     const radius = () => mix(Rh, Rc, st.b) * st.zoom;
+    let qs = 0.8; // render scale, adapts to how fast this device draws
 
     function frame(t) {
       const dt = Math.min(0.1, Math.max(0, t - st.last)); st.last = t;
@@ -513,7 +778,7 @@
         st.lon0 += 0.075 * dt; st.lat0 += (REST - st.lat0) * Math.min(1, dt * 0.8);
       }
       const zoom = st.zoom, baseR = mix(Rh, Rc, st.b), R = baseR * zoom, gcx = W / 2, gcy = mix(cyH, cyC, st.b);
-      const s = zoom < 1.35 ? 0.62 : zoom < 2 ? 0.48 : 0.36;
+      const s = qs * (zoom < 1.35 ? 1 : zoom < 2 ? 0.8 : 0.62), tStart = performance.now();
       const bw = Math.round(W * s), bh = Math.round(H * s);
       if (buf.width !== bw || buf.height !== bh || !st.img) { buf.width = bw; buf.height = bh; st.img = bctx.createImageData(bw, bh); st.px32 = new Uint32Array(st.img.data.buffer); }
       const img = st.img, px32 = st.px32; px32.fill(0);
@@ -534,12 +799,12 @@
           const tc = dpx[((v * dh) | 0) * dw + iu]; let r = tc & 255, g = (tc >> 8) & 255, b = (tc >> 16) & 255;
           const isOcean = (b > g + 8) && (b > r + 28);
           let uc = u + cloudShift; uc -= uc | 0;
-          const ca = (cpx[((v * ch) | 0) * cw + (((uc * cw) | 0) % cw)] & 255) / 235;
+          const ca = ((cpx[((v * ch) | 0) * cw + (((uc * cw) | 0) % cw)] & 255) / 235) * 0.78;
           const ndl = nx * sx + ny * sy + nz * sz, lit = ndl > 0 ? ndl : 0, rt = 1 - nz, rim = rt * rt * Math.sqrt(rt);
           let d = (ndl + 0.10) / 0.34; d = d < 0 ? 0 : d > 1 ? 1 : d; d = d * d * (3 - 2 * d);
           const sh = 0.32 + 0.92 * lit; let dr = r * sh, dg = g * sh, db = b * sh;
           if (isOcean) { const hd = nx * hx + ny * hy + nz * hz; if (hd > 0.93) { const h2 = hd * hd, h4 = h2 * h2, h8 = h4 * h4, h16 = h8 * h8, h32 = h16 * h16, h64 = h32 * h32, h128 = h64 * h64; const sp = h128 * h32 * h8 * 0.30 * (1 - ca); dr += 255 * sp; dg += 255 * sp; db += 255 * sp; } }
-          const ac = ca * 0.9, cs = 190 + 60 * lit; dr = dr * (1 - ac) + cs * ac; dg = dg * (1 - ac) + cs * ac; db = db * (1 - ac) + (cs + 6) * ac;
+          const ac = ca, cs = 200 + 55 * lit; dr = dr * (1 - ac) + cs * ac; dg = dg * (1 - ac) + cs * ac; db = db * (1 - ac) + (cs + 6) * ac;
           let niu = (u * nw) | 0; if (niu >= nw) niu = nw - 1;
           const lt = (npx[((v * nh) | 0) * nw + niu] & 255) / 255 * (1 - ca * 0.8);
           let nr = r * 0.11 + 240 * lt, ng = g * 0.12 + 190 * lt, nb = b * 0.16 + 104 * lt;
@@ -557,24 +822,32 @@
       ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(gcx, gcy, R * 1.30, 0, 6.283); ctx.fill();
       ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(buf, 0, 0, W, H);
 
-      // marker for the event
-      const mla = MOR.lat * D2R, mlo = MOR.lon * D2R, mwx = Math.cos(mla) * Math.sin(mlo), mwy = Math.sin(mla), mwz = Math.cos(mla) * Math.cos(mlo);
-      const vx = mwx * Ex + mwz * Ez, vy = mwx * Nx + mwy * Ny + mwz * Nz, vz = mwx * Cx + mwy * Cy + mwz * Cz;
-      const mx = gcx + vx * R, my = gcy - vy * R; st.marker = null;
-      if (vz > 0.08 && mx > 0 && mx < W && my > 0 && my < H) {
-        st.marker = { x: mx, y: my };
-        const k0 = W / 1280, ph = (t * 0.8) % 1, fade = Math.min(1, (vz - 0.08) / 0.2);
+      // markers: the live case (orange) and the benchmark floods (white)
+      st.markers = [];
+      const k0 = Math.max(1, W / 1280);
+      for (const mk of hooks.markers()) {
+        const mla = mk.lat * D2R, mlo = mk.lon * D2R, mwx = Math.cos(mla) * Math.sin(mlo), mwy = Math.sin(mla), mwz = Math.cos(mla) * Math.cos(mlo);
+        const vx = mwx * Ex + mwz * Ez, vy = mwx * Nx + mwy * Ny + mwz * Nz, vz = mwx * Cx + mwy * Cy + mwz * Cz;
+        const mx = gcx + vx * R, my = gcy - vy * R;
+        if (!(vz > 0.08 && mx > 0 && mx < W && my > 0 && my < H)) continue;
+        st.markers.push({ id: mk.id, x: mx, y: my });
+        const live = mk.kind === 'live', sel = hooks.selected() === mk.id, hov = st.hover === mk.id, fade = Math.min(1, (vz - 0.08) / 0.2);
         ctx.save(); ctx.globalAlpha = fade;
-        ctx.strokeStyle = 'rgba(211,95,63,' + (0.75 * (1 - ph)) + ')'; ctx.lineWidth = 2 * Math.max(1, k0); ctx.beginPath(); ctx.arc(mx, my, (7 + 30 * ph) * Math.max(1, k0), 0, 6.283); ctx.stroke();
-        ctx.fillStyle = '#D35F3F'; ctx.beginPath(); ctx.arc(mx, my, 7 * Math.max(1, k0), 0, 6.283); ctx.fill(); ctx.lineWidth = 2.5 * Math.max(1, k0); ctx.strokeStyle = '#FFFFFF'; ctx.stroke();
-        if (stage !== 'map') {
-          const fs = 14 * Math.max(1, k0); ctx.font = '600 ' + fs + 'px Inter, system-ui, sans-serif'; const label = 'Ksar El Kebir, Morocco', tw = ctx.measureText(label).width + 22 * Math.max(1, k0), lx = mx + 20 * Math.max(1, k0), ly = my - 15 * Math.max(1, k0), ph2 = 30 * Math.max(1, k0);
+        const rad = (live ? 8 : 6.5) * k0 * (hov || sel ? 1.3 : 1);
+        if (live || sel) { const ph = (t * 0.8) % 1; ctx.strokeStyle = 'rgba(211,95,63,' + (0.75 * (1 - ph)) + ')'; ctx.lineWidth = 2 * k0; ctx.beginPath(); ctx.arc(mx, my, rad + 30 * ph * k0, 0, 6.283); ctx.stroke(); }
+        ctx.fillStyle = live ? '#D35F3F' : '#F4F8FF'; ctx.beginPath(); ctx.arc(mx, my, rad, 0, 6.283); ctx.fill();
+        ctx.lineWidth = 2.2 * k0; ctx.strokeStyle = live ? '#FFFFFF' : '#0E1728'; ctx.stroke();
+        const showLabel = stage !== 'map' && (hov || (stage === 'zoomed' ? sel : (live && !st.hover)));
+        if (showLabel) {
+          const fs = 14 * k0; ctx.font = '600 ' + fs + 'px Inter, system-ui, sans-serif';
+          const label = mk.label, tw = ctx.measureText(label).width + 22 * k0, lx = mx + 20 * k0, ly = my - 15 * k0, ph2 = 30 * k0;
           ctx.fillStyle = 'rgba(14,23,40,0.82)'; ctx.beginPath(); ctx.moveTo(lx + ph2 / 2, ly); ctx.arcTo(lx + tw, ly, lx + tw, ly + ph2, ph2 / 2); ctx.arcTo(lx + tw, ly + ph2, lx, ly + ph2, ph2 / 2); ctx.arcTo(lx, ly + ph2, lx, ly, ph2 / 2); ctx.arcTo(lx, ly, lx + tw, ly, ph2 / 2); ctx.closePath(); ctx.fill();
-          ctx.fillStyle = '#FFFFFF'; ctx.textBaseline = 'middle'; ctx.fillText(label, lx + 11 * Math.max(1, k0), ly + ph2 / 2 + 0.5);
+          ctx.fillStyle = '#FFFFFF'; ctx.textBaseline = 'middle'; ctx.fillText(label, lx + 11 * k0, ly + ph2 / 2 + 0.5);
         }
         ctx.restore();
       }
-      if (hooks && hooks.onFrame) hooks.onFrame(st.marker);
+      const ms = performance.now() - tStart; if (ms > 55) qs = Math.max(0.5, qs - 0.04); else if (ms < 28) qs = Math.min(1, qs + 0.02);
+      if (hooks && hooks.onFrame) hooks.onFrame(st.markers);
     }
     return {
       frame, st, radius,
@@ -590,7 +863,7 @@
     if (earth) return Promise.resolve(earth);
     if (earthLoading) return earthLoading;
     sizeCanvas();
-    earthLoading = Promise.all([loadTex('earth/day.jpg'), loadTex('earth/night.png'), loadTex('earth/clouds.png')]).then(([d, n, c]) => { earth = createEarth(canvas, { day: d, night: n, clouds: c }, { onFrame: positionCallout }); return earth; });
+    earthLoading = Promise.all([loadTex('earth/day.jpg'), loadTex('earth/night.png'), loadTex('earth/clouds.jpg')]).then(([d, n, c]) => { earth = createEarth(canvas, { day: d, night: n, clouds: c }, { onFrame: positionCallout, markers: () => MARKERS, selected: () => selected }); return earth; });
     return earthLoading;
   }
   function earthLoop(ms) { if (!earthRunning) return; if (ms - (earthLoop.last || 0) > 30) { earth.frame(ms / 1000); earthLoop.last = ms; } earthRaf = requestAnimationFrame(earthLoop); }
@@ -599,46 +872,69 @@
 
   // callout card follows the marker on wide screens
   const callout = $('callout');
-  function positionCallout(m) {
-    if (stage !== 'zoomed' || !m || innerWidth < 700) return;
+  function positionCallout(list) {
+    if (stage !== 'zoomed' || !list || innerWidth < 700) return;
+    const m = list.find((x) => x.id === selected); if (!m) return;
     const sc = canvas.width / innerWidth, mx = m.x / sc, my = m.y / sc;
     callout.style.left = Math.max(16, Math.min(mx + 44, innerWidth - 374)) + 'px';
     callout.style.top = Math.max(96, Math.min(my + 64, innerHeight - callout.offsetHeight - 24)) + 'px';
   }
 
-  // fill the Earth screen and the callout from the data
+  // the markers on the Earth
+  const MARKERS = [{ id: 'live', lat: MOR.lat, lon: MOR.lon, label: 'Ksar El Kebir, Morocco', kind: 'live' }];
+  if (world) Object.entries(world).forEach(([id, e]) => MARKERS.push({ id, lat: e.centre[0], lon: e.centre[1], label: dispName(id), kind: 'bench' }));
+
+  // Earth screen figures
   (function fillEarthText() {
     const s = meta.summary || {};
-    $('eArea').innerHTML = (s.flooded_area_km2 ?? 0).toFixed(1) + '<small>km&sup2;</small>';
-    $('eRoad').innerHTML = (s.road_km_affected ?? 0).toFixed(1) + '<small>km</small>';
-    $('ePlaces').textContent = String(s.villages_near_flood ?? 0);
-    $('cArea').textContent = (s.flooded_area_km2 ?? 0).toFixed(1); $('cRoad').textContent = (s.road_km_affected ?? 0).toFixed(1); $('cPlaces').textContent = String(s.villages_near_flood ?? 0);
-    $('cEyebrow').textContent = $('eyebrow').textContent; $('cTitle').textContent = $('place').textContent;
+    $('eArea').textContent = world ? String(Object.keys(world).length) : '1';
+    $('eRoad').innerHTML = '0.69<small>IoU</small>';
+    $('ePlaces').innerHTML = (s.flooded_area_km2 ?? 0).toFixed(1) + '<small>km&sup2;</small>';
   })();
-
-  const FLY_TARGET = { lat1: 31 * D2R, lon1: MOR.lon * D2R };
-  function goZoom() {
+  function fillCallout(id) {
+    const live = id === 'live', cf = $('callout').querySelector('.cf');
+    $('cloudCta').style.display = live ? '' : 'none';
+    if (live) {
+      const s = meta.summary || {};
+      $('cEyebrow').textContent = liveEyebrow; $('cTitle').textContent = livePlace;
+      $('callout').querySelector('.cp').textContent = 'Live case. Sentinel-1 radar from before and after the flood, and the roads and places near the new water.';
+      cf.innerHTML = '<span><b>' + (s.flooded_area_km2 ?? 0).toFixed(1) + '</b> km&sup2;</span><span><b>' + (s.road_km_affected ?? 0).toFixed(1) + '</b> km road</span><span><b>' + (s.villages_near_flood ?? 0) + '</b> places</span>';
+      $('openMapBtn').innerHTML = 'Open the flood map &rarr;';
+    } else {
+      const e = world[id];
+      $('cEyebrow').textContent = 'Benchmark flood \u00b7 Sentinel-1'; $('cTitle').textContent = dispName(id);
+      $('callout').querySelector('.cp').textContent = 'A real flood with hand-drawn water maps. We run the same model on it and score the result. ' + (e.split === 'bolivia' ? 'This flood was held out of training.' : 'These scenes were not used for training.');
+      cf.innerHTML = '<span><b>' + e.model.iou.toFixed(2) + '</b> model IoU</span><span><b>' + e.baseline_vh.iou.toFixed(2) + '</b> threshold</span><span><b>' + e.n_scenes + '</b> scenes</span>';
+      $('openMapBtn').innerHTML = 'Open this flood &rarr;';
+    }
+  }
+  const flyTo = (id) => { const m = MARKERS.find((x) => x.id === id) || MARKERS[0]; return { lat1: (m.lat - 4) * D2R, lon1: m.lon * D2R }; };
+  function goZoom(id) {
     if (stage !== 'earth' || !earth) return;
-    setStage('zoomed'); earth.fly({ ...FLY_TARGET, zoom: 2.3, b: 1, dur: REDUCE ? 0.01 : 1.6 });
+    selected = id || 'live'; fillCallout(selected);
+    setStage('zoomed'); earth.fly({ ...flyTo(selected), zoom: 2.3, b: 1, dur: REDUCE ? 0.01 : 1.6 });
   }
   function openMap() {
     if (stage === 'map') return;
+    if (selected === 'live') showLive(); else showScene(selected);
     const live = earth && earthRunning;
     setStage('map');
     if (!live) { canvas.style.visibility = 'hidden'; return; }
-    earth.fly({ ...FLY_TARGET, zoom: 6.5, b: 1, dur: REDUCE ? 0.01 : 1.2,
+    earth.fly({ ...flyTo(selected), zoom: 6.5, b: 1, dur: REDUCE ? 0.01 : 1.2,
       onProgress: (k) => { canvas.style.opacity = k < 0.45 ? 1 : Math.max(0, 1 - (k - 0.45) / 0.55); },
       onDone: () => { canvas.style.visibility = 'hidden'; stopEarth(); } });
   }
   async function backToEarth() {
     if (stage === 'earth') return;
+    setCloud(false);
     try { await ensureEarth(); } catch (e) { return; }
     canvas.style.visibility = 'visible'; canvas.style.opacity = 1; startEarth();
     setStage('earth');
-    earth.fly({ lat1: -8 * D2R, lon1: earth.st.lon0, zoom: 1, b: 0, dur: REDUCE ? 0.01 : 1.4, onDone: () => earth.release() });
+    earth.fly({ lat1: -20 * D2R, lon1: earth.st.lon0, zoom: 1, b: 0, dur: REDUCE ? 0.01 : 1.4, onDone: () => earth.release() });
   }
-  $('ctaExplore').onclick = goZoom; $('openMapBtn').onclick = openMap; $('backEarthBtn').onclick = backToEarth; $('navEarth').onclick = () => { closeSheet(); backToEarth(); };
-  window.addEventListener('hashchange', () => { if (location.hash === '#map' && stage !== 'map') openMap(); else if (!location.hash && stage === 'map') backToEarth(); });
+  window.__utc = { zoom: goZoom, open: openMap, back: backToEarth };
+  $('ctaExplore').onclick = () => goZoom('live'); $('openMapBtn').onclick = openMap; $('cloudCta').onclick = () => { openMap(); setTimeout(() => setCloud(true), 900); }; $('backEarthBtn').onclick = backToEarth; $('navEarth').onclick = () => { closeSheet(); backToEarth(); };
+  window.addEventListener('hashchange', () => { if (location.hash === '#map' && stage !== 'map') { selected = 'live'; openMap(); } else if (!location.hash && stage === 'map') backToEarth(); });
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && stage === 'zoomed') backToEarth(); });
 
   // pointer: drag to rotate, click the marker to zoom in, wheel to zoom, double-click to fly in
@@ -651,15 +947,21 @@
     earth.st.lon0 -= (e.clientX - down.lx) * sc * k; earth.st.lat0 = Math.max(-80 * D2R, Math.min(80 * D2R, earth.st.lat0 + (e.clientY - down.ly) * sc * k));
     down.lx = e.clientX; down.ly = e.clientY; earth.touch();
   });
+  const nearest = (cx, cy) => {
+    if (!earth) return null; const sc = canvas.width / innerWidth, k = Math.max(1, sc); let best = null, bd = 1e9;
+    for (const m of earth.st.markers) { const d = Math.hypot(cx * sc - m.x, cy * sc - m.y); if (d < bd) { bd = d; best = m; } }
+    return best && bd < 30 * k ? best.id : null;
+  };
+  canvas.addEventListener('pointermove', (e) => { if (down || !earth || stage === 'map') return; const id = nearest(e.clientX, e.clientY); earth.st.hover = id; canvas.style.cursor = id ? 'pointer' : 'grab'; });
   const endDown = (e) => {
     if (!down || !earth) return;
     earth.st.drag = false; earth.st.idleAt = earth.st.last; canvas.style.cursor = 'grab';
-    if (!down.moved && stage === 'earth') { const m = earth.st.marker, sc = canvas.width / innerWidth; if (m && Math.hypot(e.clientX * sc - m.x, e.clientY * sc - m.y) < 34 * Math.max(1, sc)) goZoom(); }
+    if (!down.moved && stage === 'earth') { const id = nearest(e.clientX, e.clientY); if (id) goZoom(id); }
     down = null;
   };
   canvas.addEventListener('pointerup', endDown); canvas.addEventListener('pointercancel', () => { down = null; if (earth) earth.st.drag = false; });
   canvas.addEventListener('wheel', (e) => { if (stage !== 'earth' || !earth) return; e.preventDefault(); earth.st.zoom = Math.max(0.7, Math.min(2.6, earth.st.zoom * Math.exp(-e.deltaY * 0.0012))); earth.touch(); }, { passive: false });
-  canvas.addEventListener('dblclick', () => goZoom());
+  canvas.addEventListener('dblclick', (e) => goZoom(nearest(e.clientX, e.clientY) || 'live'));
   let ert; window.addEventListener('resize', () => { clearTimeout(ert); ert = setTimeout(() => { if (earth) { sizeCanvas(); earth.resize(); } }, 150); });
 
   if (location.hash === '#map') { setStage('map'); canvas.style.visibility = 'hidden'; }

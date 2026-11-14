@@ -6,7 +6,11 @@ Built for the NASA Space Apps Challenge 2026 (Meknès, Morocco), challenge *"Dan
 
 > **Status: hackathon prototype.** The model is trained and scored on a public benchmark, and it has been run on a real flood in Morocco (the Loukkos plain near Ksar El Kebir, January to February 2026). There is **no accuracy score for the Moroccan event yet**, because we have no reference flood map for it. The Moroccan numbers below are model estimates, not verified measurements. Items marked **TBD** are not done.
 
-**Live map:** https://rabaaab.github.io/under-the-clouds/app/ opens on a spinning Earth. Click the marker, then "Open the flood map" to see the before/after slider with the real Ksar El Kebir result. Go straight to the map with https://rabaaab.github.io/under-the-clouds/app/#map
+**Live map:** https://rabaaab.github.io/under-the-clouds/app/ opens on a spinning Earth built from NASA Blue Marble and Black Marble imagery. Click the orange marker (live case: Morocco 2026) or any white marker (benchmark floods in 10 other countries). Go straight to the map with https://rabaaab.github.io/under-the-clouds/app/#map
+
+**Cloud test:** on the live map, press "Cloud test" to compare NASA's own optical satellite image of 8 Feb 2026 (MODIS Terra true colour, via NASA GIBS) with our Sentinel-1 radar and the flooded area the model finds. Over Ksar El Kebir the optical image is covered by cloud on that day, the radar is not. This is a visual comparison for one place and one date, not a measurement of how often clouds hide floods.
+
+**Radar change (not only floods):** the optional "Radar change" layer shows how much the radar brightness moved between the two dates (blue: darker, gold: brighter), for any kind of surface change. It is not a flood map and is not classified by the model: wind on open water, crops and building work also change it. Only the flood classifier is flood-specific. Other disasters (landslides, wildfire, oil spills, deforestation) are the roadmap, not built and not tested, because they need labelled examples we do not have.
 
 ---
 
@@ -97,6 +101,26 @@ How to read this:
 
 On the new event the U-Net is still the best method, but its lead shrinks: it is only 0.015 IoU above the naive per-scene VV threshold, and 15 scenes are too few to call that a real difference. The CNN is clearly better than the single global thresholds (+0.08 IoU over the best one). The global thresholds transfer badly to a new event, and the CNN transfers better.
 
+### Accuracy by flood, in 11 countries
+
+Same model, scored per flood on the Sen1Floods11 hand-labelled scenes (90 test scenes from 10 floods, plus the held-out Bolivia flood). The model beats the best simple threshold on every flood. Pakistan is the weakest.
+
+| Flood | Scenes | U-Net IoU | Best simple threshold IoU (VH) | U-Net F1 |
+|---|---|---|---|---|
+| Nigeria | 4 | 0.893 | 0.709 | 0.944 |
+| Sri Lanka | 9 | 0.838 | 0.705 | 0.912 |
+| Mekong Delta | 6 | 0.834 | 0.720 | 0.910 |
+| Spain | 6 | 0.735 | 0.638 | 0.848 |
+| India | 14 | 0.693 | 0.585 | 0.818 |
+| Paraguay | 14 | 0.651 | 0.469 | 0.788 |
+| Bolivia (held out of training) | 15 | 0.601 | 0.522 | 0.751 |
+| USA | 14 | 0.595 | 0.387 | 0.746 |
+| Somalia | 6 | 0.582 | 0.251 | 0.735 |
+| Ghana | 11 | 0.559 | 0.450 | 0.717 |
+| Pakistan | 6 | 0.274 | 0.148 | 0.430 |
+
+The test scenes come from the same floods as the training scenes (different pictures), so the held-out Bolivia flood is the fairer check. The simple threshold is one global VH cut-off (-23.75 dB) fitted on the training scenes. The web app shows a typical scene (the median-scoring one) for each flood, not the best one.
+
 ### Real event: the Loukkos floods near Ksar El Kebir, Morocco (no accuracy score yet)
 
 | Item | Value |
@@ -135,9 +159,40 @@ We say "road in flooded areas" and "places within 500 m of new water". We do not
 
 Further validation plan: score the result against a reference flood map for the same dates (`--truth` in `scripts/run_event.py`), or against a cloud-free optical water mask from a nearby date, and show failure cases. **TBD**, waiting for a reference map.
 
+### NISAR experiments (supplementary, not part of the main pipeline)
+
+We ran two additional experiments with real NISAR L-band data after the main pipeline was complete. Full details are in [`experiments/`](experiments/README.md) and in `NISAR_Experiment_and_Mozambique_Ikram.pdf`.
+
+**Experiment 1 — Ksar El Kebir, NISAR Oct 25 2026 (open-water workaround)**
+
+Feeding NISAR HH/HV directly to the U-Net (trained on Sentinel-1 C-band VV/VH) finds no water. The cause is the much smaller radar contrast of water in L-band: about 4 dB darker in NISAR HV, versus 13 dB in Sentinel-1 VH. Fix without retraining: replace VH with a synthetic channel derived from HH plus a constant level shift. With this input the model finds the reservoirs around Ksar El Kebir with IoU 0.63 versus OpenStreetMap water polygons.
+
+**Experiment 2 — Mozambique, Limpopo flood (Jan 2026), validated against Copernicus EMS**
+
+| Item | Value |
+|---|---|
+| Satellite | NISAR (L-band HH/HV, pre-calibration / early release) |
+| Before scene | 5 January 2026 |
+| During scene | 17 January 2026 |
+| Reference | Copernicus EMS EMSR857, AOI 06 (image date 18 Jan 2026) |
+| Workaround | HH + synthetic VH, settings from Ksar El Kebir, **not tuned on Mozambique** |
+
+| Metric | Value |
+|---|---|
+| Precision | **0.96** — almost everything the model marks as flood is confirmed by Copernicus |
+| Recall | ~0.33 — finds about one third of the total flood extent |
+| F1 | **0.51** |
+| IoU | **0.34** |
+
+Why recall is low: 11.5 km² of flood was already present on 5 January (change detection cannot recover it), and flooded vegetation is bright in L-band HV (not dark), so the model trained on C-band misses it.
+
+**Honest framing:** this is a validated workaround, not a full solution. The 96 % precision shows the model is not generating random false alarms on a new sensor and a new continent. The low recall shows it misses a large part of the flood. The next step is retraining or fine-tuning with L-band labelled scenes, including flooded-vegetation examples.
+
+> **Data note:** the NISAR products used here are early / pre-calibration releases. Absolute backscatter values may shift in the final product; treat these numbers as indicative.
+
 ## Limitations (stated up front)
 
-- Training labels come from **C-band** (Sentinel-1) data, while NISAR is **L-band**. Open water is dark in both, but **flooded vegetation** looks different in L-band, so results there may be weaker.
+- Training labels come from **C-band** (Sentinel-1) data, while NISAR is **L-band**. Open water is dark in both, but **flooded vegetation** is bright in L-band HV (double-bounce), so the model misses it. Tested on a real NISAR scene (Mozambique, Limpopo Jan 2026): precision 0.96 but recall only ~0.33. Full solution requires retraining on L-band labels. See [`experiments/`](experiments/README.md).
 - Radar shadow on steep terrain can look like water. We mask steep slopes, but errors remain.
 - Built during a hackathon (about 24 hours of build time), so scope is deliberately small: one event, one main model.
 - The impact layer uses OpenStreetMap, whose coverage varies by region.
@@ -178,6 +233,7 @@ under-the-clouds/
     earth/          # textures for the Earth first screen (generated from Natural Earth outlines)
   tests/
   docs/DATA.md      # how to get the real data (checklist)
+  experiments/      # supplementary NISAR experiments (Ikram): nisar_ksar/, nisar_mozambique/
   data/, outputs/   # not committed
 ```
 
@@ -250,6 +306,8 @@ AI tools were used during the project, as required by the NASA Space Apps submis
 - NISAR is a joint mission of NASA and ISRO. NISAR data is distributed through NASA Earthdata and the Alaska Satellite Facility (ASF) DAAC. We did not use NISAR data for the Moroccan event.
 - Contains modified Copernicus Sentinel data (2026), processed by ASF DAAC HyP3.
 - Land outline for the coastal mask: Natural Earth.
+- Earth textures and the optional basemaps: NASA Blue Marble (Next Generation, with bathymetry), VIIRS Black Marble 2016, VIIRS Suomi NPP true colour of 8 Feb 2026 (the cloud layer on the Earth) and MODIS Terra true colour, via NASA GIBS (Global Imagery Browse Services) and NASA Visible Earth. We acknowledge the use of imagery provided by services from NASA's GIBS, part of NASA's Earth Science Data and Information System (ESDIS).
+- Flood benchmark: Sen1Floods11 (Bonafilia et al., 2020), Sentinel-1 scenes with hand-labelled water.
 - NASADEM and HLS are NASA Earth science data products.
 - Road and village data: © OpenStreetMap contributors.
 - Created for the NASA Space Apps Challenge. This is an independent team project, not an official NASA product.
