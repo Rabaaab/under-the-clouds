@@ -9,7 +9,7 @@ from .change import flood_change
 from .impact import impact_summary
 from .io import mask_to_gdf
 from .metrics import evaluate
-from .postprocess import clean_change
+from .postprocess import clean_change, land_mask_for_grid
 from .preprocess import normalize_db
 
 
@@ -24,6 +24,8 @@ def run_pipeline(
     truth_new_water: np.ndarray | None = None,
     slope_deg: np.ndarray | None = None,
     min_size: int = 20,
+    coastal_margin_m: float | None = None,
+    thin_radius_px: int = 0,
     device: str = "cpu",
 ) -> dict:
     """Run baseline (always) and CNN (if a checkpoint is given) on a (2,H,W) VV/VH dB pair.
@@ -36,7 +38,10 @@ def run_pipeline(
 
     wb, t_before = water_mask_threshold(before_db[0])
     wa, t_after = water_mask_threshold(after_db[0])
-    methods = {"baseline": clean_change(flood_change(wb, wa)["new_water"], min_size, slope_deg)}
+    land_mask = None
+    if coastal_margin_m is not None:
+        land_mask = land_mask_for_grid(transform, wb.shape, crs, coastal_margin_m)
+    methods = {"baseline": clean_change(flood_change(wb, wa)["new_water"], min_size, slope_deg, land_mask=land_mask, thin_radius_px=thin_radius_px)}
 
     if checkpoint:
         from .infer import predict_scene
@@ -45,7 +50,7 @@ def run_pipeline(
         model = load_model(checkpoint, device)
         pb = predict_scene(model, normalize_db(before_db), device=device)
         pa = predict_scene(model, normalize_db(after_db), device=device)
-        methods["cnn"] = clean_change(flood_change(pb > 0.5, pa > 0.5)["new_water"], min_size, slope_deg)
+        methods["cnn"] = clean_change(flood_change(pb > 0.5, pa > 0.5)["new_water"], min_size, slope_deg, land_mask=land_mask, thin_radius_px=thin_radius_px)
 
     primary = "cnn" if "cnn" in methods else "baseline"
     metrics = {}
