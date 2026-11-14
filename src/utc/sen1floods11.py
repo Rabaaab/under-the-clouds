@@ -31,6 +31,8 @@ SPLIT_FILES = {
     "train": "flood_train_data.csv",
     "valid": "flood_valid_data.csv",
     "test": "flood_test_data.csv",
+    # 15 scenes from a flood event (Bolivia) that appears in none of the other splits: an out-of-event test.
+    "bolivia": "flood_bolivia_data.csv",
 }
 
 

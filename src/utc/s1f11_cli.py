@@ -11,7 +11,7 @@ import argparse
 import json
 from pathlib import Path
 
-from .sen1floods11 import Paths, download, evaluate_split, prepare_chips
+from .sen1floods11 import SPLIT_FILES, Paths, download, evaluate_split, prepare_chips
 
 
 def main(argv=None):
@@ -21,6 +21,10 @@ def main(argv=None):
     d = sub.add_parser("download", help="download split CSVs and chips (about 650 MB for everything)")
     d.add_argument("--root", default="data/sen1floods11")
     d.add_argument("--limit", type=int, default=None, help="only the first N pairs per split (quick test)")
+    d.add_argument(
+        "--splits", nargs="+", default=["train", "valid", "test"], choices=list(SPLIT_FILES),
+        help="which splits to download (add 'bolivia' for the out-of-event test)",
+    )
 
     pr = sub.add_parser("prepare", help="cut scenes into training chips, one folder per split")
     pr.add_argument("--root", default="data/sen1floods11")
@@ -29,7 +33,7 @@ def main(argv=None):
 
     e = sub.add_parser("evaluate", help="scene-level IoU/F1 for baselines and (optionally) the CNN")
     e.add_argument("--root", default="data/sen1floods11")
-    e.add_argument("--split", default="test", choices=["train", "valid", "test"])
+    e.add_argument("--split", default="test", choices=list(SPLIT_FILES))
     e.add_argument("--checkpoint", default=None)
     e.add_argument("--limit", type=int, default=None)
     e.add_argument("--device", default="cpu")
@@ -37,7 +41,7 @@ def main(argv=None):
 
     args = p.parse_args(argv)
     if args.cmd == "download":
-        download(args.root, limit=args.limit)
+        download(args.root, splits=tuple(args.splits), limit=args.limit)
     elif args.cmd == "prepare":
         print(json.dumps(prepare_chips(Paths.from_root(args.root), args.out, args.size), indent=2))
     else:

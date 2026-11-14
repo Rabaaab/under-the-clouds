@@ -67,14 +67,23 @@ before + after radar images
 
 ## Results
 
-**TBD.** Filled in after training and evaluation.
+**Water segmentation on the Sen1Floods11 hand-labelled test split (90 scenes, scored per pixel over valid pixels):**
 
-| Method | IoU | F1 | Notes |
-|---|---|---|---|
-| Threshold baseline | TBD | TBD | TBD |
-| U-Net (ResNet-34) | TBD | TBD | TBD |
+| Method | IoU | F1 | Precision | Recall |
+|---|---|---|---|---|
+| Otsu threshold per scene, VV (naive) | 0.306 | 0.469 | 0.355 | 0.691 |
+| Otsu threshold per scene, VH (naive) | 0.250 | 0.400 | 0.277 | 0.723 |
+| One tuned threshold, VV | 0.464 | 0.634 | 0.771 | 0.538 |
+| One tuned threshold, VH (**best simple baseline**) | 0.530 | 0.692 | 0.754 | 0.640 |
+| **U-Net (ResNet-34)** | **0.687** | **0.814** | **0.837** | **0.793** |
 
-Validation plan: compare against the baseline, against a cloud-free optical water mask from a nearby date (or official emergency maps where available), and show failure cases.
+How to read this:
+- The tuned thresholds (-16.75 dB for VV, -23.75 dB for VH) were fitted on the 252 training scenes. The naive Otsu method gave an implausible threshold in 33 (VV) and 10 (VH) of the 90 scenes, so a fixed value was used there.
+- **Caution:** the train, validation and test splits contain scenes from the same ten flood events, so this test is easier than a new region. An out-of-event test on the held-out Bolivia scenes is **TBD**.
+- Training settings of this run (epochs, best epoch): **TBD, team to fill in from the training log.**
+- This is water segmentation on a benchmark dataset. Results on a real Moroccan NISAR or Sentinel-1 event are **TBD**.
+
+Further validation plan: compare against a cloud-free optical water mask from a nearby date (or official emergency maps where available) for the real event, and show failure cases.
 
 ## Limitations (stated up front)
 
@@ -136,6 +145,10 @@ python scripts/train.py --train-dir data/chips/train --val-dir data/chips/valid 
 
 # 3. Compare the CNN with threshold baselines on the held-out test scenes
 python scripts/sen1floods11.py evaluate --root data/sen1floods11 --split test --checkpoint outputs/unet.pt
+
+# 3b. Harder test: a flood event (Bolivia) that is in none of train/valid/test
+python scripts/sen1floods11.py download --root data/sen1floods11 --splits bolivia
+python scripts/sen1floods11.py evaluate --root data/sen1floods11 --split bolivia --checkpoint outputs/unet.pt
 
 # 4. Roads and villages for the event area (needs internet and `pip install osmnx`)
 python scripts/fetch_osm.py --bbox WEST SOUTH EAST NORTH --out data/osm

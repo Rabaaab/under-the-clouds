@@ -10,12 +10,14 @@ from utc.synthetic import make_synthetic_event
 from utc.preprocess import to_db
 
 
-def build_fake_dataset(root, n_train=3, n_valid=1, n_test=1, size=256):
+def build_fake_dataset(root, n_train=3, n_valid=1, n_test=1, size=256, n_bolivia=0):
     """Create files with the same names, bands, units and label values as the real Sen1Floods11 hand-labelled set."""
     paths = Paths.from_root(root)
     for d in (paths.s1_dir, paths.label_dir, paths.splits_dir):
         d.mkdir(parents=True, exist_ok=True)
     plan = {"train": n_train, "valid": n_valid, "test": n_test}
+    if n_bolivia:
+        plan["bolivia"] = n_bolivia
     k = 0
     for split, n in plan.items():
         rows = []
@@ -89,6 +91,12 @@ def test_evaluate_survives_a_scene_with_no_valid_pixels(tmp_path):
     assert res["n_scenes"] == 2
     assert res["naive_baseline_fallback_scenes"]["vv"] >= 1  # the empty scene counts as a fallback
     assert 0.0 <= res["baseline_vv"]["iou"] <= 1.0
+
+
+def test_out_of_event_bolivia_split_can_be_evaluated(tmp_path):
+    paths = build_fake_dataset(tmp_path / "raw", n_bolivia=2)
+    res = evaluate_split(paths, "bolivia")
+    assert res["n_scenes"] == 2 and "tuned_vh" in res  # thresholds are still fitted on the training split
 
 
 def test_water_mask_threshold_handles_all_nan():
