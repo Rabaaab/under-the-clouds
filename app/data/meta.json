@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-11-13T21:53:49+00:00",
+  "bounds": [
+    [
+      30.0,
+      -5.6
+    ],
+    [
+      30.2,
+      -5.4
+    ]
+  ],
+  "primary_method": "baseline",
+  "thresholds_db": {
+    "before": -14.988712653517723,
+    "after": -16.001966268289834
+  },
+  "metrics": {
+    "baseline": {
+      "precision": 0.9997126092683511,
+      "recall": 0.9783209899690635,
+      "f1": 0.9889011288392974,
+      "iou": 0.978045923149016
+    }
+  },
+  "summary": {
+    "flooded_area_km2": 68.13262714661651,
+    "road_km_affected": 13.222959978728042,
+    "road_km_total": 73.271929596506,
+    "road_segments_affected": 3,
+    "villages_near_flood": 2,
+    "village_names": [
+      "Village A (near flood)",
+      "Village C (in lake)"
+    ],
+    "village_buffer_m": 500.0
+  },
+  "synthetic": true,
+  "event_name": "SYNTHETIC DEMO (not a real event)",
+  "note": "Simulated radar with a known flood. It shows the pipeline works; it says nothing about real accuracy."
+}

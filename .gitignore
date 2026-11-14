@@ -6,7 +6,7 @@ venv/
 .pytest_cache/
 
 # Large data and model files (do not commit)
-data/
+/data/
 cache/
 outputs/
 *.pt

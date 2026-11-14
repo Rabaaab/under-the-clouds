@@ -1,0 +1,1 @@
+{"type": "FeatureCollection", "features": [{"id": "0", "type": "Feature", "properties": {"name": "Village A (near flood)"}, "geometry": {"type": "Point", "coordinates": [-5.5, 30.105812499999992]}}, {"id": "2", "type": "Feature", "properties": {"name": "Village C (in lake)"}, "geometry": {"type": "Point", "coordinates": [-5.55, 30.040000000000003]}}]}
