@@ -1,17 +1,14 @@
 # Temporal-stack experiment: not done
 
-The current Moroccan event input has two Sentinel-1 dates: before (21 January 2026)
-and after (8 February 2026). A temporal-stack experiment has therefore not been
-run; there are only two dates.
+No temporal-stack experiment was run, and no temporal-stack accuracy is claimed.
 
-The existing model expects a two-channel VV/VH image. Stacking additional dates
-would change the model input and require a separately designed, trained, and
-validated experiment. No temporal-stack accuracy is claimed here.
+Why:
+- The Moroccan event has two processed Sentinel-1 dates so far: before (21 January 2026) and after (8 February 2026). A temporal stack needs 4 to 6 dates.
+- The existing model expects a two-channel VV/VH image from one date. Stacking dates would change the model input and need a separately designed, trained and validated model.
+- We have no labelled time series to train or check such a model. Sen1Floods11 has one image per place, and the Zenodo dataset has composites, not repeat passes.
 
-Any comparison against the Zenodo SAR Morocco masks must keep the limitations
-visible: the labels are semi-automatic HSBA+Otsu masks, not expert ground truth,
-may favour Otsu, cover only part of the scene, have unknown patch dates, and
-represent water masks rather than a flood-change map.
+What the team does instead (Step 5 of the plan): the same 2D U-Net is run on each Sentinel-1 pass to plot flooded area over time. This is a time-lapse of a single-date model, not a temporal-stack model. It is only shown if at least 6 passes are processed by Sunday 12:00.
 
-CNN not run on real data locally: `outputs/unet.pt` is on Drive and was not
-available in this checkout.
+Moroccan scoring (single date, 8 February 2026): the U-Net was run on the after scene in Colab and scored against the Zenodo reference (IoU 0.256, F1 0.407; Otsu baseline IoU 0.442, F1 0.613). The reference limitations are listed in the evaluation text.
+
+Future work: build a data cube from the repeat passes, make labels, train a 3D CNN or ConvLSTM, and compare it fairly with the 2D model. Claim it only if it wins.
