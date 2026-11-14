@@ -102,7 +102,7 @@
   });
   L.imageOverlay('data/before.png', bounds, { pane: 'beforePane' }).addTo(map);
   L.imageOverlay('data/after.png', bounds, { pane: 'afterPane' }).addTo(map);
-  // The detected change lives in the "after" pane, so it only shows on the after side of the slider.
+  // The detected change lives in the "after" pane: it shows left of the divider, growing as the slider moves to After.
   const change = L.imageOverlay('data/change.png', bounds, { pane: 'afterPane' }).addTo(map);
 
   const slider = $('slider'), divider = $('divider'), afterPane = map.getPane('afterPane');
@@ -111,7 +111,7 @@
     const nw = map.containerPointToLayerPoint([0, 0]);
     const se = map.containerPointToLayerPoint(map.getSize());
     const x = nw.x + (se.x - nw.x) * ratio;
-    afterPane.style.clip = 'rect(' + nw.y + 'px,' + se.x + 'px,' + se.y + 'px,' + x + 'px)';
+    afterPane.style.clip = 'rect(' + nw.y + 'px,' + x + 'px,' + se.y + 'px,' + nw.x + 'px)';
     divider.style.left = (ratio * 100) + '%';
   }
   slider.addEventListener('input', updateClip);
