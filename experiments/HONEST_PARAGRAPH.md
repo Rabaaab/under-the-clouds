@@ -1,35 +1,15 @@
-# Moroccan event evaluation
+## Moroccan event evaluation
 
-On the pixels covered by the available reference, the Otsu baseline has IoU
-**0.442415** and F1 **0.613436** (`experiments/event_metrics.json`). These are
-agreement scores against a partial reference, not independent accuracy. There
-is **no CNN accuracy for the Moroccan event**: the CNN was not scored there.
+On the pixels covered by the available reference (634,522 pixels, 26.33% of the scene), the Otsu baseline has IoU 0.442 and F1 0.613, and the U-Net has IoU 0.256 and F1 0.407 (`aya_experiments/event_metrics.json`). Precision is similar (0.480 for Otsu, 0.502 for the U-Net), but recall is very different (0.849 vs 0.343). These are agreement scores against a partial, semi-automatic reference, not independent accuracy. The U-Net does not beat the threshold on this reference, and we do not claim it does.
 
-The reference mask comes from the Zenodo SAR Morocco Flood Dataset and is
-semi-automatic (HSBA + Otsu), not expert ground truth. Its Otsu-derived labels
-may favour the Otsu baseline, so the baseline comparison is circular. The mask
-covers **26.33%** of the scene (`experiments/reference_mask_info.json`) and
-represents water, not a flood-change map.
+How the U-Net differs (`aya_experiments/diagnostics.json`): the water it shares with the reference has a median of -23.6 dB, while the reference water it missed has a median of -19.5 dB, so it finds the darkest water and misses medium-dark water. Its extra detections are also very dark (median -22.6 dB), so some may be water that the reference does not label. This is not confirmed. These numbers describe what the U-Net does, not why. Failure crops are in `failure_notes.md`.
 
-The reference dates are unverified. The dataset README for Zone 1 lists GRD
-10 m scenes from 27 January to 4 February 2026; the event scene is HyP3 RTC
-30 m from 8 February 2026. The patch metadata lists 103 patches, all 103
-without a readable date, so date agreement with the event scene cannot be
-confirmed. No temporal-stack experiment was run; only before and after dates
-are available.
+The reference mask comes from the Zenodo SAR Morocco Flood Dataset and is semi-automatic (HSBA + Otsu), not expert ground truth. 85.1% of its water pixels lie below the scene's Otsu threshold (about -14.4 dB), so it likely favours the Otsu baseline and the comparison is partly circular. The mask covers 26.33% of the scene (`reference_mask_info.json`) and represents water, not a flood-change map.
 
-For context only, not as Moroccan results: the model owner's summary reports
-test-split IoU **0.687** for the U-Net versus **0.530** for the best threshold,
-and Bolivia IoU **0.601** versus **0.586** for the naive threshold on 15 scenes.
-These are other-dataset results, not independently checked here: the named
-`eval_test.json` and `eval_bolivia.json` files were not present in this
-checkout. The same values appear in the repository `README.md`. The test split
-shares flood events with training; Bolivia is the fairer check, and its reported
-lead is small.
+The reference dates are unverified. The dataset README for Zone 1 lists GRD 10 m scenes from 27 January to 4 February 2026; the event scene is HyP3 RTC 30 m from 8 February 2026. The patch metadata lists 103 patches, all without a readable date, so date agreement with the event scene cannot be confirmed. No temporal-stack experiment was run; only before and after dates are available.
 
-The team also reports cleaned new-water area estimates of **51.2 km²** for the
-CNN and **46.0 km²** for the baseline. These are model estimates after coastal
-and thin-shape cleanup, not accuracy measurements.
+For context only, not as Moroccan results: the model owner's summary reports test-split IoU 0.687 for the U-Net versus 0.530 for the best threshold, and Bolivia IoU 0.601 versus 0.586 for the naive threshold on 15 scenes. These are other-dataset results, not independently checked here: the `eval_test.json` and `eval_bolivia.json` files were not present in this checkout. The same values appear in the repository `README.md`. The test split shares flood events with training; Bolivia is the fairer check, and its reported lead is small. On this Moroccan reference, the benchmark advantage did not carry over.
 
-Do not use `run_event.py --truth` with this reference: that command expects a
-new-water change mask and treats reference value 255 as positive.
+The scored U-Net output is a water-after map from `predict_water.py` (small-object removal at 20 pixels, no coastal clean-up). The team's cleaned new-water estimates of 51.2 km² for the CNN and 46.0 km² for the baseline come from `run_event.py`: they are after-minus-before change maps with coastal and thin-shape clean-up, and they are model estimates, not accuracy measurements. These are different outputs, so their numbers should not be compared with each other.
+
+Do not use `run_event.py --truth` with this reference: that command expects a new-water change mask and treats reference value 255 as positive.
