@@ -4,7 +4,9 @@
 
 Built for the NASA Space Apps Challenge 2026 (Meknès, Morocco), challenge *"Dancing with the SARs"* (observe changes on Earth's surface with radar data).
 
-> **Status: work in progress.** This README describes the plan and design. Items marked **TBD** are filled in as the project is built. Nothing here is a claimed result until it appears in the Results section with numbers.
+> **Status: hackathon prototype.** The model is trained and scored on a public benchmark, and it has been run on a real flood in Morocco (the Loukkos plain near Ksar El Kebir, January to February 2026). There is **no accuracy score for the Moroccan event yet**, because we have no reference flood map for it. The Moroccan numbers below are model estimates, not verified measurements. Items marked **TBD** are not done.
+
+**Live map:** https://rabaaab.github.io/under-the-clouds/app/ (the before/after slider with the real Ksar El Kebir result).
 
 ---
 
@@ -56,14 +58,14 @@ before + after radar images
 
 | Data | Use | Source |
 |---|---|---|
-| NISAR L-band radar | Core demo input | NASA Earthdata / ASF DAAC |
-| Sentinel-1 radar | Training and events before NISAR operated | ASF DAAC / Copernicus |
+| NISAR L-band radar | Planned input. **Not used for the Morocco event**: a search of ASF Vertex found no NISAR data for Jan to Feb 2026 | NASA Earthdata / ASF DAAC |
+| Sentinel-1 radar (IW GRD, VV+VH) | Training data (via Sen1Floods11) and the Morocco flood event, processed to RTC by ASF HyP3 | ASF DAAC / Copernicus (ESA) |
 | Sen1Floods11 (hand-labelled subset) | Labeled water masks for training and testing | Public Google Cloud bucket (Bonafilia et al., 2020; check the dataset's terms before reuse) |
 | Optical imagery (HLS / Sentinel-2) | Independent reference on cloud-free days | NASA Earthdata |
 | NASADEM | Slope mask to reduce false alarms | NASA Earthdata |
 | OpenStreetMap | Roads and villages for the impact layer | OpenStreetMap (not NASA data) |
 
-**Important data note:** NISAR began operating in mid-2025, so it has no images of earlier events. Older events use Sentinel-1. The chosen event(s) and exact scenes are **TBD**.
+**Important data note:** NISAR public data starts late in 2025, so it does not cover the January to February 2026 Moroccan flood. We therefore used Sentinel-1, which has the same VV and VH polarisations as our training data. The model has not been tested on real NISAR data.
 
 ## Results
 
@@ -81,7 +83,7 @@ How to read this:
 - The tuned thresholds (-16.75 dB for VV, -23.75 dB for VH) were fitted on the 252 training scenes. The naive Otsu method gave an implausible threshold in 33 (VV) and 10 (VH) of the 90 scenes, so a fixed value was used there.
 - **Caution:** the train, validation and test splits contain scenes from the same ten flood events, so this test is easier than a new region. The out-of-event Bolivia test below is the fairer check.
 - Training settings of this run: best checkpoint at epoch 29 (validation IoU about 0.68, read from the saved model file); learning rate 1e-4 and batch size 16 (the notebook defaults); trained for 30 epochs in total.
-- This is water segmentation on a benchmark dataset. Results on a real Moroccan NISAR or Sentinel-1 event are **TBD**.
+- This is water segmentation on a benchmark dataset. The Moroccan event is described further down; it has no accuracy score yet.
 
 **Out-of-event test: the held-out Bolivia flood (15 scenes, an event that appears in none of train, validation or test):**
 
@@ -93,9 +95,44 @@ How to read this:
 | One tuned threshold, VH | 0.522 | 0.686 | 0.873 | 0.565 |
 | **U-Net (ResNet-34)** | **0.601** | **0.751** | **0.837** | **0.681** |
 
-On the new event the U-Net is still the best method, but its lead shrinks: it is only 0.015 IoU above the naive per-scene VV threshold, and 15 scenes are too few to call that a real difference. The CNN is clearly better than the single global thresholds (+0.08 IoU over the best one). The global thresholds transfer badly to a new event, and the CNN transfers better. Results on a Moroccan event are **TBD**.
+On the new event the U-Net is still the best method, but its lead shrinks: it is only 0.015 IoU above the naive per-scene VV threshold, and 15 scenes are too few to call that a real difference. The CNN is clearly better than the single global thresholds (+0.08 IoU over the best one). The global thresholds transfer badly to a new event, and the CNN transfers better.
 
-Further validation plan: compare against a cloud-free optical water mask from a nearby date (or official emergency maps where available) for the real event, and show failure cases.
+### Real event: the Loukkos floods near Ksar El Kebir, Morocco (no accuracy score yet)
+
+| Item | Value |
+|---|---|
+| Satellite | Sentinel-1 IW GRD, VV+VH, ascending, path 147 / frame 110 |
+| Before | 21 January 2026 |
+| After | 8 February 2026 |
+| Processing | ASF HyP3 On Demand RTC (30 m, sigma0, power) |
+| Area | longitude -6.25 to -5.75, latitude 34.90 to 35.25 (Larache to Ksar El Kebir) |
+| Prepared scene | 1855 x 1299 pixels, EPSG:4326 |
+| Roads and villages | OpenStreetMap: 10,092 road segments, 321 places |
+
+Newly flooded area found by each method, and the effect of the clean-up step:
+
+| Clean-up step | Threshold baseline (km²) | U-Net (km²) |
+|---|---|---|
+| None (raw) | 55.1 | 66.7 |
+| Land mask with a 300 m coastal margin | 55.0 | 58.5 |
+| Land mask with a 1 km margin, plus removal of shapes below about 120 m (vector test) | 46.0 | 48.9 |
+| The same clean-up built into the pipeline (raster, below about 150 m) | - | 51.2 |
+
+Most of the U-Net's extra raw area was false water on the sea and the coastline, plus some straight lines where image tiles meet. After clean-up the two methods give similar totals. The U-Net maps the northern flooded fields as solid shapes, while the baseline finds more flooding in the south, near Ksar El Kebir. Without a reference map we cannot say which is closer to reality.
+
+Impact on roads and places (OpenStreetMap):
+
+| Flood used | New water | Road length in flooded areas | Places within 500 m |
+|---|---|---|---|
+| Baseline, cleaned (vector) | 46.0 km² | 32.2 km | 33 |
+| U-Net, cleaned (vector) | 48.9 km² | 21.3 km | 32 |
+| U-Net, cleaned in the pipeline (shown on the web map) | 51.2 km² | 22.9 km (60 segments) | 35 |
+
+We say "road in flooded areas" and "places within 500 m of new water". We do not say "roads cut" or "villages flooded", because we have not checked whether any road is actually impassable. About 1 to 2 of the 35 places sit next to known false alarms.
+
+**What these Moroccan numbers are not:** they are model outputs, not measured accuracy. Taking out thin shapes also removes some real narrow flooding (ditches and channels), so the true flooded area is probably between the cleaned and the raw values.
+
+Further validation plan: score the result against a reference flood map for the same dates (`--truth` in `scripts/run_event.py`), or against a cloud-free optical water mask from a nearby date, and show failure cases. **TBD**, waiting for a reference map.
 
 ## Limitations (stated up front)
 
@@ -103,6 +140,10 @@ Further validation plan: compare against a cloud-free optical water mask from a 
 - Radar shadow on steep terrain can look like water. We mask steep slopes, but errors remain.
 - Built during a hackathon (about 24 hours of build time), so scope is deliberately small: one event, one main model.
 - The impact layer uses OpenStreetMap, whose coverage varies by region.
+- **No accuracy score for Morocco.** The benchmark results above do not prove the same performance on the Moroccan flood.
+- **Known false alarms on the Moroccan map:** a small blob near the top-right corner (about 35.24 N, -5.77 E) and a short coastal line near Larache. The land mask uses Natural Earth, which is only accurate to a few hundred metres, so we use a 1 km coastal margin.
+- The clean-up settings (coastal margin and thin-shape removal) were chosen by looking at the result, not tuned against a reference.
+- Flooded vegetation and very shallow water look grey, not black, in radar, so both methods can miss them.
 
 ## Repository structure
 
@@ -183,24 +224,29 @@ We trained a U-Net with a ResNet-34 encoder (starting from ImageNet weights) on 
 
 ### What has and has not been verified
 
-- **Verified (29 unit tests pass):** preprocessing, threshold baselines, metrics, change logic, clean-up, the U-Net forward pass and loss, training, sliding-window prediction, the roads/villages impact layer, GeoTIFF reading, the web export, and the Sen1Floods11 chip and evaluation code.
+- **Verified (35 unit tests pass):** preprocessing, threshold baselines, metrics, change logic, clean-up, the U-Net forward pass and loss, training, sliding-window prediction, the roads/villages impact layer, GeoTIFF reading, the web export, and the Sen1Floods11 chip and evaluation code.
 - **Verified against the real dataset (small sample only):** the Sen1Floods11 file layout, units and label values were checked against the official repo and a few real chips. The downloader, chip preparation, a 2-epoch CPU training run and the evaluation script ran end to end on 3 real scenes per split. The numbers from that run are meaningless (tiny data, 2 epochs).
-- **Verified:** the OpenStreetMap download worked on one small area (roads and villages near Merzouga).
-- **Verified in a browser:** the web map loads the synthetic demo and the before/after slider works.
-- **Not yet done:** the full training run on a GPU, the pretrained-weights path (needs internet; it has not been run here), any real NISAR or Sentinel-1 event scene, and any real accuracy numbers. The synthetic demo numbers only show that the code runs.
+- **Verified:** the OpenStreetMap download worked on two areas (near Merzouga, and the Ksar El Kebir area for the Moroccan event).
+- **Verified:** the full training run on a Colab GPU, the benchmark and Bolivia scoring, and an end-to-end run on a real Sentinel-1 pair for the Moroccan flood. The web map shows that real result.
+- **Not yet done:** an accuracy score on the Moroccan event (needs a reference flood map), any test on real NISAR data, and a check of whether the flagged roads are actually impassable.
 
 ## Team
 
-TBD (names and roles).
+Team "Lunar", NASA Space Apps Challenge 2026, Meknès:
+
+- **Rabab** (repo owner): the model, training, evaluation, the pipeline and this documentation.
+- **Ikram**: the real Moroccan scenes, ASF processing, running the model on them, the coastal clean-up, the road and village impact, and the web map data.
+- **Aya**: the reference flood map for validation (in progress).
 
 ## AI tools disclosure
 
-AI tools were used during the project, as required by the NASA Space Apps submission form. Specifically: an AI assistant (Claude) was used for research on challenges, for planning and design discussion, and for drafting this README. **TBD:** list any further use (for example code assistance) accurately before submitting. All results, numbers and claims in this repository must be checked by the team.
+AI tools were used during the project, as required by the NASA Space Apps submission form. Claude (Anthropic) was used for: research on challenges and datasets, writing and debugging code and tests, the Colab training notebook, drafting documentation such as this README, and Claude Design for the logo and interface mockups. The team ran the code, trained the model on a Colab GPU, ran the Moroccan scenes and checked the results. No NASA logos, insignia or branding were used or generated. All results, numbers and claims in this repository must be checked by the team.
 
 ## Acknowledgements and data attribution
 
-- NISAR is a joint mission of NASA and ISRO. NISAR data is distributed through NASA Earthdata and the Alaska Satellite Facility (ASF) DAAC.
-- Contains modified Copernicus Sentinel data (**TBD**: add the year(s) used).
+- NISAR is a joint mission of NASA and ISRO. NISAR data is distributed through NASA Earthdata and the Alaska Satellite Facility (ASF) DAAC. We did not use NISAR data for the Moroccan event.
+- Contains modified Copernicus Sentinel data (2026), processed by ASF DAAC HyP3.
+- Land outline for the coastal mask: Natural Earth.
 - NASADEM and HLS are NASA Earth science data products.
 - Road and village data: © OpenStreetMap contributors.
 - Created for the NASA Space Apps Challenge. This is an independent team project, not an official NASA product.
