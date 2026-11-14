@@ -79,9 +79,21 @@ before + after radar images
 
 How to read this:
 - The tuned thresholds (-16.75 dB for VV, -23.75 dB for VH) were fitted on the 252 training scenes. The naive Otsu method gave an implausible threshold in 33 (VV) and 10 (VH) of the 90 scenes, so a fixed value was used there.
-- **Caution:** the train, validation and test splits contain scenes from the same ten flood events, so this test is easier than a new region. An out-of-event test on the held-out Bolivia scenes is **TBD**.
+- **Caution:** the train, validation and test splits contain scenes from the same ten flood events, so this test is easier than a new region. The out-of-event Bolivia test below is the fairer check.
 - Training settings of this run (epochs, best epoch): **TBD, team to fill in from the training log.**
 - This is water segmentation on a benchmark dataset. Results on a real Moroccan NISAR or Sentinel-1 event are **TBD**.
+
+**Out-of-event test: the held-out Bolivia flood (15 scenes, an event that appears in none of train, validation or test):**
+
+| Method | IoU | F1 | Precision | Recall |
+|---|---|---|---|---|
+| Otsu threshold per scene, VV (naive) | 0.586 | 0.739 | 0.691 | 0.793 |
+| Otsu threshold per scene, VH (naive) | 0.496 | 0.663 | 0.540 | 0.860 |
+| One tuned threshold, VV | 0.441 | 0.612 | 0.880 | 0.469 |
+| One tuned threshold, VH | 0.522 | 0.686 | 0.873 | 0.565 |
+| **U-Net (ResNet-34)** | **0.601** | **0.751** | **0.837** | **0.681** |
+
+On the new event the U-Net is still the best method, but its lead shrinks: it is only 0.015 IoU above the naive per-scene VV threshold, and 15 scenes are too few to call that a real difference. The CNN is clearly better than the single global thresholds (+0.08 IoU over the best one). The global thresholds transfer badly to a new event, and the CNN transfers better. Results on a Moroccan event are **TBD**.
 
 Further validation plan: compare against a cloud-free optical water mask from a nearby date (or official emergency maps where available) for the real event, and show failure cases.
 
@@ -106,6 +118,7 @@ under-the-clouds/
     dataset.py      # chips and the PyTorch dataset
     sen1floods11.py # download, chips, scene-level evaluation (CNN vs baselines)
     osm.py          # roads and villages from OpenStreetMap
+    prepare.py      # radar GeoTIFFs (e.g. HyP3) -> same-grid scenes for run_event
     train.py        # training loop
     infer.py        # sliding-window prediction over a scene
     change.py       # new water = after minus before
@@ -116,7 +129,7 @@ under-the-clouds/
     synthetic.py    # fake radar scenes with a known flood (for tests/demo)
     export_web.py   # writes the files the web map reads
     demo.py, event.py
-  scripts/          # run_demo.py, run_event.py, train.py, sen1floods11.py, fetch_osm.py
+  scripts/          # run_demo.py, run_event.py, train.py, sen1floods11.py, fetch_osm.py, prepare_scene.py
   notebooks/        # train_colab.ipynb (Colab / Kaggle GPU training)
   app/              # web map (before/after slider, change layer, impact panel)
   tests/
@@ -152,6 +165,10 @@ python scripts/sen1floods11.py evaluate --root data/sen1floods11 --split bolivia
 
 # 4. Roads and villages for the event area (needs internet and `pip install osmnx`)
 python scripts/fetch_osm.py --bbox WEST SOUTH EAST NORTH --out data/osm
+
+# 4b. Turn per-polarisation radar GeoTIFFs (e.g. ASF HyP3 RTC) into same-grid scenes
+python scripts/prepare_scene.py --before-vv B_VV.tif --before-vh B_VH.tif --after-vv A_VV.tif --after-vh A_VH.tif \
+    --bbox WEST SOUTH EAST NORTH --res 30 --unit power --out data/event
 
 # 5. Run an event
 python scripts/run_event.py --before before.tif --after after.tif --linear --checkpoint outputs/unet.pt \

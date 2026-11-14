@@ -27,6 +27,28 @@ so treat product names and file layouts as things to confirm.
 | Terrain | NASADEM | Used to mask steep slopes |
 | Roads and villages | OpenStreetMap | `python scripts/fetch_osm.py --bbox WEST SOUTH EAST NORTH --out data/osm` (worked on one small area; keep the box small and check coverage) |
 
+## 3b. Easiest route to Sentinel-1 scenes: ASF on-demand RTC (HyP3)
+
+Raw Sentinel-1 files need calibration and terrain correction before they are usable. ASF can do it for you
+(from its product pages; not yet tried by us, so confirm the details in Vertex):
+
+1. In Vertex, search Sentinel-1 (IW, VV+VH) over your area, with one scene **before** the event and one **after**,
+   from the **same orbit and track** so they match.
+2. Send both to the on-demand **RTC** processor (HyP3). Options listed by ASF: 10, 20 or 30 m pixels, gamma0 or
+   sigma0, power / amplitude / dB output. Pick 30 m and **power** to start.
+3. Download the results when they finish. **ASF keeps on-demand products for only 14 days.**
+4. You get one GeoTIFF per polarisation in a UTM zone. Turn them into pipeline-ready scenes:
+
+```bash
+python scripts/prepare_scene.py --before-vv B_VV.tif --before-vh B_VH.tif --after-vv A_VV.tif --after-vh A_VH.tif \
+    --bbox WEST SOUTH EAST NORTH --res 30 --unit power --out data/event
+```
+
+5. Then run the event with the command the script prints (`run_event.py ... --linear`).
+
+Keep the bbox small (tens of km). Check the "valid fraction" the script prints: a low value means the scene does
+not cover your box.
+
 ## 4. Important caveats
 
 - **Polarization mismatch.** The training data (Sen1Floods11) is Sentinel-1 **VV + VH**. NISAR scenes are often
