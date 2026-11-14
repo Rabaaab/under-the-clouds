@@ -44,6 +44,10 @@ def main(argv=None):
     p.add_argument("--event-name", default="TBD")
     p.add_argument("--note", default="")
     p.add_argument("--out", default="app/data")
+    p.add_argument("--coastal-margin-m", type=float, default=None,
+                   help="mask the sea plus this many metres of coast (e.g. 1000); default: off")
+    p.add_argument("--thin-px", type=int, default=0,
+                   help="remove shapes narrower than about 2*N+1 pixels (e.g. 2); default: off")
     args = p.parse_args(argv)
 
     b, tr_b, crs_b = read_geotiff(args.before)
@@ -64,6 +68,8 @@ def main(argv=None):
         villages=gpd.read_file(args.villages) if args.villages else None,
         checkpoint=args.checkpoint,
         truth_new_water=truth,
+        coastal_margin_m=args.coastal_margin_m,
+        thin_radius_px=args.thin_px,
     )
     meta = export_web(
         args.out,
