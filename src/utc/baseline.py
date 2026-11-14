@@ -41,6 +41,8 @@ def water_mask_threshold(
     For a VH band pass a lower range and fallback, for example sane_range=(-35, -15), fallback=-21.
     """
     vv_db = np.asarray(vv_db, dtype=np.float32)
+    if not np.isfinite(vv_db).any():  # a scene with no valid pixels at all: nothing can be water
+        return np.zeros(vv_db.shape, dtype=bool), float(fallback if threshold is None else threshold)
     if threshold is None:
         threshold = otsu_threshold(vv_db)
         lo, hi = sane_range

@@ -20,7 +20,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .baseline import water_mask_threshold
+from .baseline import FALLBACK_THRESHOLD_DB, SANE_RANGE_DB, otsu_threshold
 from .dataset import save_chips
 from .io import read_geotiff
 from .metrics import confusion, scores_from_counts
@@ -124,6 +124,21 @@ def prepare_chips(paths: Paths, out_dir, size: int = 256, splits=("train", "vali
 
 
 _BIN_EDGES = np.arange(-60.0, 20.25, 0.25)
+VH_SANE_RANGE_DB, VH_FALLBACK_DB = (-35.0, -15.0), -21.0
+
+
+def _naive_mask(band: np.ndarray, sane_range: tuple[float, float], fallback: float) -> tuple[np.ndarray, bool]:
+    """Per-scene Otsu water mask. Returns (mask, used_fallback).
+
+    If Otsu gives an implausible threshold (common when a scene has little water) a fixed one is used instead.
+    A scene with no valid pixels gives an empty mask. No warnings are printed: the caller counts fallbacks.
+    """
+    finite = np.isfinite(band)
+    if not finite.any():
+        return np.zeros(band.shape, dtype=bool), True
+    t = otsu_threshold(band)
+    fell_back = not (sane_range[0] <= t <= sane_range[1])
+    return finite & (band < (fallback if fell_back else t)), fell_back
 
 
 def fit_global_thresholds(paths: Paths, split: str = "train", limit: int | None = None) -> dict:
@@ -192,16 +207,18 @@ def evaluate_split(
 
     pairs = read_split_csv(paths.splits_dir / SPLIT_FILES[split])[:limit]
     n_scenes = 0
+    fallbacks = {"vv": 0, "vh": 0}
     for s1_name, label_name in pairs:
         s1_path, lab_path = paths.s1_dir / s1_name, paths.label_dir / label_name
         if not (s1_path.exists() and lab_path.exists()):
             continue
         db, y = load_scene(s1_path, lab_path)
         truth, valid = y == 1, y >= 0
-        preds = {
-            "baseline_vv": water_mask_threshold(db[0])[0],
-            "baseline_vh": water_mask_threshold(db[1], sane_range=(-35.0, -15.0), fallback=-21.0)[0],
-        }
+        vv_mask, vv_fb = _naive_mask(db[0], SANE_RANGE_DB, FALLBACK_THRESHOLD_DB)
+        vh_mask, vh_fb = _naive_mask(db[1], VH_SANE_RANGE_DB, VH_FALLBACK_DB)
+        fallbacks["vv"] += int(vv_fb)
+        fallbacks["vh"] += int(vh_fb)
+        preds = {"baseline_vv": vv_mask, "baseline_vh": vh_mask}
         if thresholds is not None:
             preds["tuned_vv"] = np.isfinite(db[0]) & (db[0] < thresholds["vv"])
             preds["tuned_vh"] = np.isfinite(db[1]) & (db[1] < thresholds["vh"])
@@ -214,6 +231,7 @@ def evaluate_split(
 
     out = {name: scores_from_counts(c) for name, c in counts.items()}
     out["n_scenes"] = n_scenes
+    out["naive_baseline_fallback_scenes"] = fallbacks  # scenes where Otsu was implausible and a fixed threshold was used
     if thresholds is not None:
         out["tuned_thresholds_db"] = {"vv": thresholds["vv"], "vh": thresholds["vh"], "fit_scenes": thresholds["n_scenes"]}
     return out

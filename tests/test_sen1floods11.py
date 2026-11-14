@@ -63,7 +63,9 @@ def test_evaluate_baseline_and_cnn_run_on_same_scenes(tmp_path):
     paths = build_fake_dataset(tmp_path / "raw")
     res = evaluate_split(paths, "test")
     assert res["n_scenes"] == 1
-    assert set(res) == {"baseline_vv", "baseline_vh", "tuned_vv", "tuned_vh", "n_scenes", "tuned_thresholds_db"}
+    assert set(res) == {
+        "baseline_vv", "baseline_vh", "tuned_vv", "tuned_vh", "n_scenes", "tuned_thresholds_db", "naive_baseline_fallback_scenes",
+    }
     assert res["baseline_vv"]["iou"] > 0.8  # easy synthetic scene; checks the plumbing, not real accuracy
     assert res["tuned_vv"]["iou"] > 0.8 and -22 < res["tuned_thresholds_db"]["vv"] < -10
 
@@ -71,6 +73,29 @@ def test_evaluate_baseline_and_cnn_run_on_same_scenes(tmp_path):
     save_checkpoint(tmp_path / "m.pt", model, "resnet34", 2)
     res = evaluate_split(paths, "test", checkpoint=str(tmp_path / "m.pt"))
     assert "cnn" in res and 0.0 <= res["cnn"]["iou"] <= 1.0
+
+
+def test_evaluate_survives_a_scene_with_no_valid_pixels(tmp_path):
+    """Regression: on the real test split one scene is all no-data, which used to crash with 'no finite values'."""
+    paths = build_fake_dataset(tmp_path / "raw", n_test=2)
+    s1_name, label_name = read_split_csv(paths.splits_dir / SPLIT_FILES["test"])[0]
+    ev = make_synthetic_event(size=256, seed=999)
+    write_geotiff(paths.s1_dir / s1_name, np.full((2, 256, 256), np.nan, dtype=np.float32), ev["transform"], ev["crs"])
+    write_geotiff(paths.label_dir / label_name, np.full((256, 256), -1, dtype=np.int16), ev["transform"], ev["crs"])
+
+    model = build_unet("resnet34", 2, pretrained=False)
+    save_checkpoint(tmp_path / "m.pt", model, "resnet34", 2)
+    res = evaluate_split(paths, "test", checkpoint=str(tmp_path / "m.pt"))
+    assert res["n_scenes"] == 2
+    assert res["naive_baseline_fallback_scenes"]["vv"] >= 1  # the empty scene counts as a fallback
+    assert 0.0 <= res["baseline_vv"]["iou"] <= 1.0
+
+
+def test_water_mask_threshold_handles_all_nan():
+    from utc.baseline import water_mask_threshold
+
+    mask, thr = water_mask_threshold(np.full((8, 8), np.nan, dtype=np.float32))
+    assert not mask.any() and thr == -18.0
 
 
 def test_cli_prepare_and_evaluate(tmp_path, capsys):
