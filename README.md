@@ -80,7 +80,7 @@ before + after radar images
 How to read this:
 - The tuned thresholds (-16.75 dB for VV, -23.75 dB for VH) were fitted on the 252 training scenes. The naive Otsu method gave an implausible threshold in 33 (VV) and 10 (VH) of the 90 scenes, so a fixed value was used there.
 - **Caution:** the train, validation and test splits contain scenes from the same ten flood events, so this test is easier than a new region. The out-of-event Bolivia test below is the fairer check.
-- Training settings of this run (epochs, best epoch): **TBD, team to fill in from the training log.**
+- Training settings of this run: best checkpoint at epoch 29 (validation IoU about 0.68, read from the saved model file); learning rate 1e-4 and batch size 16 (the notebook defaults); trained for 30 epochs in total.
 - This is water segmentation on a benchmark dataset. Results on a real Moroccan NISAR or Sentinel-1 event are **TBD**.
 
 **Out-of-event test: the held-out Bolivia flood (15 scenes, an event that appears in none of train, validation or test):**
@@ -177,7 +177,9 @@ python scripts/run_event.py --before before.tif --after after.tif --linear --che
 
 ### How the model is trained
 
-U-Net with an ImageNet-pretrained ResNet-34 encoder, two input channels (VV and VH in dB, scaled from -50..1 dB to 0..1), BCE + Dice loss, Adam (learning rate 1e-4 by default), flips and rotations as augmentation, 256 x 256 chips. The best checkpoint is chosen by validation IoU, and the test split is used once at the end. Results are scored per scene, pooled over valid pixels, against two baselines: an Otsu threshold per scene, and one global threshold fitted on the training scenes (the strongest simple baseline).
+We trained a U-Net with a ResNet-34 encoder (starting from ImageNet weights) on the public Sen1Floods11 dataset: 911 training chips of 256 x 256 pixels cut from 252 hand-labelled Sentinel-1 radar scenes, with the VV and VH radar bands as input and water / not-water labels as the target. Training ran for 30 epochs on a Google Colab GPU with the Adam optimiser (learning rate 1e-4, batch size 16), a combined cross-entropy and Dice loss to cope with the small share of water pixels, and flips and rotations as augmentation, and we kept the best checkpoint (epoch 29, validation IoU about 0.68). We then scored it on 90 held-out test scenes and on 15 scenes from a flood event it never saw (Bolivia), always against simple threshold baselines, and we report the results as they came out, including the smaller lead on the new event.
+
+**Details:** U-Net with an ImageNet-pretrained ResNet-34 encoder, two input channels (VV and VH in dB, scaled from -50..1 dB to 0..1), BCE + Dice loss, Adam (learning rate 1e-4 by default), flips and rotations as augmentation, 256 x 256 chips. The best checkpoint is chosen by validation IoU, and the test split is used once at the end. Results are scored per scene, pooled over valid pixels, against two baselines: an Otsu threshold per scene, and one global threshold fitted on the training scenes (the strongest simple baseline).
 
 ### What has and has not been verified
 
