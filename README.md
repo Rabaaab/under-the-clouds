@@ -6,7 +6,7 @@ Built for the NASA Space Apps Challenge 2026 (Meknès, Morocco), challenge *"Dan
 
 > **Status: hackathon prototype.** The model is trained and scored on a public benchmark, and it has been run on a real flood in Morocco (the Loukkos plain near Ksar El Kebir, January to February 2026). There is **no accuracy score for the Moroccan event yet**, because we have no reference flood map for it. The Moroccan numbers below are model estimates, not verified measurements. Items marked **TBD** are not done.
 
-**Live map:** https://rabaaab.github.io/under-the-clouds/app/ (the before/after slider with the real Ksar El Kebir result).
+**Live map:** https://rabaaab.github.io/under-the-clouds/app/ opens on a spinning Earth. Click the marker, then "Open the flood map" to see the before/after slider with the real Ksar El Kebir result. Go straight to the map with https://rabaaab.github.io/under-the-clouds/app/#map
 
 ---
 
@@ -175,6 +175,7 @@ under-the-clouds/
   notebooks/        # train_colab.ipynb (Colab / Kaggle GPU training)
   app/              # web map: before/after slider, Sentinel-1 timeline, flood layer, roads and places
     data/baseline/  # threshold-baseline result for the "Threshold baseline" view
+    earth/          # textures for the Earth first screen (generated from Natural Earth outlines)
   tests/
   docs/DATA.md      # how to get the real data (checklist)
   data/, outputs/   # not committed

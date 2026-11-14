@@ -30,7 +30,7 @@
   .leaflet-tooltip { background: rgba(14,23,40,.96); color: var(--text); border: 1px solid var(--glass-edge); border-radius: 10px; box-shadow: 0 6px 22px rgba(0,0,0,.45); padding: 6px 11px; font: 600 13px var(--sans); }
   .leaflet-tooltip::before { display: none; }
   .leaflet-tooltip .ar { display: block; color: var(--muted); font-weight: 400; }
-  .scrim { position: fixed; left: 0; right: 0; top: 0; height: 150px; background: linear-gradient(rgba(14,23,40,.8), rgba(14,23,40,0)); z-index: 500; pointer-events: none; }
+  .scrim { position: fixed; left: 0; right: 0; top: 0; height: 150px; background: linear-gradient(rgba(14,23,40,.8), rgba(14,23,40,0)); z-index: 660; pointer-events: none; }
   .ui { position: fixed; z-index: 700; }
 
   /* header */
@@ -125,6 +125,38 @@
   .sheet th { color: var(--muted); font-weight: 600; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
   #err { display: none; position: fixed; z-index: 3000; left: 20px; right: 20px; top: 90px; padding: 14px 18px; border-radius: 14px; background: #2A1520; border: 1px solid var(--red); }
 
+
+  /* ---------- Earth first screen and stages ---------- */
+  #earth { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 650; touch-action: none; cursor: grab; background: radial-gradient(900px 620px at 60% 30%, #243A5C 0%, #152641 55%, #0C172A 100%); }
+  body[data-stage=map] #earth { pointer-events: none; }
+  body:not([data-stage=map]) #map { pointer-events: none; }
+  .mapui { transition: opacity .7s ease, visibility 0s linear 0s; }
+  body:not([data-stage=map]) .mapui { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s ease, visibility 0s linear .3s; }
+  .earthui { transition: opacity .6s ease, visibility 0s linear 0s; }
+  body:not([data-stage=earth]) .earthui { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s ease, visibility 0s linear .3s; }
+  body[data-stage=earth] #navEarth { display: none; }
+  body[data-stage=map] #navResults { background: rgba(255,255,255,.1); color: var(--text); }
+  .hero { left: 0; right: 0; top: 96px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 20px; pointer-events: none; }
+  .hero h1 { margin: 16px 0 0; font: 600 clamp(36px, 5.5vw, 70px)/1.05 var(--display); letter-spacing: -.03em; }
+  .hero p { margin: 16px 0 0; max-width: 640px; font-size: clamp(16px, 1.5vw, 19px); line-height: 1.5; color: #C9D6E6; }
+  .hero .cta { display: flex; gap: 14px; margin-top: 26px; flex-wrap: wrap; justify-content: center; pointer-events: auto; }
+  .pri { font: 600 15px var(--sans); color: var(--ground); background: var(--text); height: 50px; border-radius: 999px; padding: 0 26px; }
+  .pri:hover { background: #fff; }
+  .sec { font: 600 15px var(--sans); color: var(--text); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); height: 50px; border-radius: 999px; padding: 0 26px; }
+  .sec:hover { background: rgba(255,255,255,.14); }
+  .efoot { left: 0; right: 0; bottom: 34px; display: flex; flex-direction: column; align-items: center; gap: 10px; pointer-events: none; padding: 0 12px; }
+  .efigs { display: flex; gap: 16px; }
+  .efoot .micro { text-align: center; }
+  .callout { position: fixed; z-index: 720; width: 350px; border-radius: 22px; padding: 22px 24px; left: 50%; top: 50%; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .5s ease, visibility 0s linear .5s; }
+  body[data-stage=zoomed] .callout { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity .5s ease; }
+  .callout .ct { margin-top: 8px; font: 600 34px/1.05 var(--display); letter-spacing: -.025em; }
+  .callout .cp { margin: 10px 0 0; font-size: 14.5px; line-height: 1.5; color: #C9D6E6; }
+  .callout .cf { margin-top: 16px; display: flex; gap: 16px; font: 400 13px var(--sans); color: var(--muted); }
+  .callout .cf b { font: 500 22px var(--display); color: var(--text); margin-right: 3px; }
+  .callout .cb { margin-top: 18px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+  .callout .lnk { font: 600 13px var(--sans); color: var(--muted); padding: 4px 0; }
+  .callout .lnk:hover { color: var(--text); }
+
   @media (max-width: 860px) {
     .brand { left: 14px; top: 16px; } .brand b { font-size: 19px; }
     .nav { display: none; } .menubtn { display: block; }
@@ -139,6 +171,12 @@
     .tlbar { left: 22px; right: 22px; } .tlline { top: 58px; } .tlband { top: 52px; } .tk { top: 58px; width: 30px; margin-left: -15px; font-size: 10px; } .tk:not(.on) span { display: none; } .tkl { top: 38px; font-size: 9px; }
     .credit { display: none; } .tlnote { display: none; } .timeline .row .micro { font-size: 10px; }
     .zoom { display: none; }
+
+    .hero { top: 74px; } .hero p { display: none; } .hero .cta { margin-top: 18px; } .pri, .sec { height: 46px; padding: 0 20px; }
+    .efoot { bottom: 18px; } .efigs { gap: 8px; width: 100%; } .efigs .chip { flex: 1; padding: 10px 12px; border-radius: 14px; } .efigs .chip .v { font-size: 22px; } .efigs .chip .l { font-size: 11px; }
+    .efoot .micro { font-size: 10px; }
+    .callout { left: 12px !important; right: 12px; top: auto !important; bottom: 14px; width: auto; padding: 18px 18px 16px; }
+    .callout .ct { font-size: 28px; }
     .placespanel { max-height: 36vh; }
   }
 </style>
@@ -148,22 +186,41 @@
 <div class="scrim"></div>
 <div id="err"></div>
 
-<div id="divider">
+<canvas id="earth" aria-label="Interactive Earth. Drag to rotate, scroll to zoom, click the marker to explore Ksar El Kebir."></canvas>
+<div class="ui hero earthui">
+  <div class="eyeb">NASA Space Apps 2026 &middot; Dancing with the SARs</div>
+  <h1>Radar sees what clouds hide.</h1>
+  <p>Satellite radar and AI map new floods under cloud, and show which roads and places lie in or near the water.</p>
+  <div class="cta"><button class="pri" id="ctaExplore">Explore Ksar El Kebir</button><button class="sec" data-open="how">How it works</button></div>
+</div>
+<div class="ui efoot earthui">
+  <div class="efigs"><div class="chip gl"><span class="v out" id="eArea">&ndash;</span><span class="l">new flooding found</span></div><div class="chip gl"><span class="v out" id="eRoad">&ndash;</span><span class="l">road in flooded areas</span></div><div class="chip gl"><span class="v out" id="ePlaces">&ndash;</span><span class="l">places within 500 m of new water</span></div></div>
+  <div class="micro" style="color:#C9D6E6;text-shadow:0 1px 6px rgba(0,0,0,.7)">Model estimate &middot; no reference map yet &middot; drag the Earth, click the marker</div>
+</div>
+<div class="callout gl" id="callout" role="region" aria-label="Ksar El Kebir">
+  <div class="eyeb" id="cEyebrow">Flood map</div>
+  <div class="ct out" id="cTitle">Ksar El Kebir</div>
+  <p class="cp">Sentinel-1 radar from before and after the flood. New flooding found by a neural network.</p>
+  <div class="cf"><span><b id="cArea">&ndash;</b> km&sup2;</span><span><b id="cRoad">&ndash;</b> km road</span><span><b id="cPlaces">&ndash;</b> places</span></div>
+  <div class="cb"><button class="pri" id="openMapBtn">Open the flood map &rarr;</button><button class="lnk" id="backEarthBtn">Back to the Earth</button></div>
+</div>
+
+<div id="divider" class="mapui">
   <div class="tag a gl">After<i id="dAfter"></i></div>
   <div class="tag b gl">Before<i id="dBefore"></i></div>
   <div id="handle" role="slider" tabindex="0" aria-label="Before and after comparison" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5L3 11l5 6M14 5l5 6-5 6"/></svg></div>
 </div>
 
 <div class="ui brand"><svg role="img" aria-label="Under the Clouds, orbit with a small satellite" width="58" height="41" viewBox="-14 -12 160 112"><g fill="#F4F8FF"><circle cx="-7.4" cy="36.4" r="0.7"/><circle cx="-4.1" cy="30.2" r="0.8"/><circle cx="-0.2" cy="24.3" r="0.9"/><circle cx="4.3" cy="18.8" r="1.0"/><circle cx="9.3" cy="13.8" r="1.1"/><circle cx="14.9" cy="9.4" r="1.1"/><circle cx="20.8" cy="5.5" r="1.2"/><circle cx="27.1" cy="2.3" r="1.3"/><circle cx="33.7" cy="-0.3" r="1.4"/><circle cx="40.5" cy="-2.3" r="1.5"/><circle cx="47.5" cy="-3.5" r="1.6"/><circle cx="54.5" cy="-4.0" r="1.7"/><circle cx="61.6" cy="-3.8" r="1.8"/><circle cx="68.6" cy="-2.9" r="1.9"/><circle cx="75.5" cy="-1.2" r="2.0"/><circle cx="82.2" cy="1.1" r="2.0"/><circle cx="88.6" cy="4.1" r="2.1"/><circle cx="94.7" cy="7.7" r="2.2"/><circle cx="100.4" cy="11.9" r="2.3"/><circle cx="105.7" cy="16.7" r="2.4"/><circle cx="110.4" cy="21.9" r="2.5"/><circle cx="114.6" cy="27.7" r="2.6"/></g><g fill="#F4F8FF" transform="translate(126 35) rotate(-28) scale(0.82)"><rect x="-4.2" y="-4.2" width="8.4" height="8.4" rx="1.5"/><rect x="-8.7" y="-0.7" width="4.5" height="1.4"/><rect x="-15.899999999999999" y="-3.8" width="7.2" height="7.6"/><rect x="-24.099999999999998" y="-3.8" width="7.2" height="7.6"/><rect x="4.2" y="-0.7" width="4.5" height="1.4"/><rect x="8.7" y="-3.8" width="7.2" height="7.6"/><rect x="16.9" y="-3.8" width="7.2" height="7.6"/></g><path fill="#F4F8FF" d="M31.8 14.7a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM40 14.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 14.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60.4 14.7a4.6 4.6 0 1 0 9.2 0a4.6 4.6 0 1 0 -9.2 0zM73.2 14.7a1.8 1.8 0 1 0 3.7 0a1.8 1.8 0 1 0 -3.7 0zM22.3 24.5a2.7 2.7 0 1 0 5.5 0a2.7 2.7 0 1 0 -5.5 0zM30 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM21.3 34.3a3.7 3.7 0 1 0 7.4 0a3.7 3.7 0 1 0 -7.4 0zM30 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80.2 34.3a4.8 4.8 0 1 0 9.7 0a4.8 4.8 0 1 0 -9.7 0zM92 34.3a3 3 0 1 0 5.9 0a3 3 0 1 0 -5.9 0zM10.1 44.1a4.9 4.9 0 1 0 9.7 0a4.9 4.9 0 1 0 -9.7 0zM20 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM103 44.1a2 2 0 1 0 3.9 0a2 2 0 1 0 -3.9 0zM10 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM20 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM103.2 53.9a1.8 1.8 0 1 0 3.7 0a1.8 1.8 0 1 0 -3.7 0zM10.7 63.7a4.3 4.3 0 1 0 8.5 0a4.3 4.3 0 1 0 -8.5 0zM20 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90.7 63.7a4.3 4.3 0 1 0 8.5 0a4.3 4.3 0 1 0 -8.5 0z"/><g fill="#E5546A" transform="translate(55 89.4)"><rect x="-4.7" y="-4.7" width="9.4" height="9.4"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" transform="rotate(45)"/></g></svg><b>under the clouds</b></div>
-<div class="ui nav" role="navigation" aria-label="Sections"><button data-open="how">How it works</button><button data-open="method">Method</button><button class="on" id="navResults">Results</button><button data-open="about">About</button></div>
+<div class="ui nav" role="navigation" aria-label="Sections"><button id="navEarth">Earth</button><button data-open="how">How it works</button><button data-open="method">Method</button><button id="navResults">Results</button><button data-open="about">About</button></div>
 <button class="ui menubtn gl" data-open="how">Menu</button>
 
-<div class="ui title gl">
+<div class="ui title gl mapui">
   <div class="eyeb" id="eyebrow">Flood map</div>
   <div class="t" id="place">Loading</div>
 </div>
 
-<div class="ui side">
+<div class="ui side mapui">
   <div class="legend gl">
     <label class="lay"><input type="checkbox" id="tChange" checked><span class="sw"><i class="sq"></i></span><span class="t">New flooding</span><span class="ck"></span></label>
     <label class="lay"><input type="checkbox" id="tRoads" checked><span class="sw"><i class="ln"></i></span><span class="t">Road in flooded areas</span><span class="ck"></span></label>
@@ -175,15 +232,15 @@
   </div>
 </div>
 
-<div class="ui method gl" id="seg" role="radiogroup" aria-label="Detection method" hidden></div>
-<div class="ui chips">
+<div class="ui method gl mapui" id="seg" role="radiogroup" aria-label="Detection method" hidden></div>
+<div class="ui chips mapui">
   <div class="chip gl"><span class="v out"><span id="nArea">0</span><small>km&sup2;</small></span><span class="l">new flooding found</span></div>
   <div class="chip gl"><span class="v out"><span id="nRoad">0</span><small>km</small></span><span class="l">road in flooded areas</span></div>
   <button class="chip gl" id="placesBtn" type="button" aria-expanded="false" aria-controls="placesPanel"><span class="v out"><span id="nPlaces">0</span></span><span class="l" id="lPlaces">places within 500 m &middot; show list</span></button>
 </div>
-<div class="ui zoom gl"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">&minus;</button></div>
+<div class="ui zoom gl mapui"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">&minus;</button></div>
 
-<div class="ui timeline gl">
+<div class="ui timeline gl mapui">
   <div class="row"><span class="micro" id="tlTitle" style="color:#C9D6E6">Sentinel-1 passes &middot; one every 6 days</span><span class="micro" id="badge" style="color:var(--gold)">Model estimate &middot; no reference map yet</span></div>
   <div class="tlbar" id="tlbar"></div>
   <div class="credit" id="credit">Contains modified Copernicus Sentinel data (2026), ASF DAAC HyP3. Roads and places &copy; OpenStreetMap contributors.</div>
@@ -410,7 +467,204 @@
   sheetWrap.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => openSheet(b.dataset.tab)));
   $('closeSheet').onclick = closeSheet; sheetWrap.addEventListener('click', (e) => { if (e.target === sheetWrap) closeSheet(); });
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeSheet(); setPanel(false); } });
-  $('navResults').onclick = closeSheet;
+  $('navResults').onclick = () => { closeSheet(); openMap(); };
+
+  // ================= Earth first screen =================
+  const body2 = document.body, canvas = $('earth');
+  const REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const D2R = Math.PI / 180, MOR = { lat: 35.07, lon: -6.0 };
+  let stage = 'earth', earth = null, earthRunning = false, earthRaf = 0, earthLoading = null;
+  const setStage = (s) => { stage = s; body2.dataset.stage = s; try { history.replaceState(null, '', s === 'map' ? '#map' : location.pathname + location.search); } catch (e) { /* ignore */ } };
+  const sizeCanvas = () => { const a = innerWidth / innerHeight, budget = 973000 * (innerWidth < 900 ? 0.85 : 1), h = Math.round(Math.sqrt(budget / a)); canvas.height = h; canvas.width = Math.round(a * h); };
+
+  function mips(im, widths) {
+    return widths.map((w) => { const h = w >> 1, c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high'; x.drawImage(im, 0, 0, w, h); return { w, h, px: new Uint32Array(x.getImageData(0, 0, w, h).data.buffer) }; });
+  }
+
+  function createEarth(cv, tex, hooks) {
+    const ctx = cv.getContext('2d'), mix = (a, b, t) => a + (b - a) * t;
+    let W, H, Rh, cyH, Rc, cyC, stars;
+    const small = innerWidth < 900;
+    const day = mips(tex.day, small ? [1024, 2048] : [1024, 2048, 4096]), night = mips(tex.night, small ? [1024, 2048] : [1024, 2048, 4096]), cloud = mips(tex.clouds, [512, 1024, 2048]);
+    function layout() {
+      W = cv.width; H = cv.height; const portrait = W < H; Rh = portrait ? Math.min(H * 0.7, W * 1.4) : Math.min(H * 0.86, W * 1.05); cyH = H + (portrait ? 0.2 : 0.37) * Rh; Rc = Math.min(H * 0.385, W * 0.34); cyC = H * 0.52;
+      stars = document.createElement('canvas'); stars.width = W; stars.height = H;
+      const sc = stars.getContext('2d'); let seed = 4242; const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+      for (let i = 0; i < Math.round(420 * W * H / 973000); i++) { const x = rnd() * W, y = rnd() * H, r = 0.3 + rnd() * rnd() * 1.4, a = 0.15 + rnd() * 0.75; sc.fillStyle = 'rgba(225,230,236,' + a + ')'; sc.beginPath(); sc.arc(x, y, r, 0, 6.283); sc.fill(); }
+    }
+    layout();
+    const norm3 = (x, y, z) => { const l = Math.hypot(x, y, z); return [x / l, y / l, z / l]; };
+    const sun = norm3(-0.90, 0.22, 0.34), half = norm3(sun[0], sun[1], sun[2] + 1);
+    const REST = -8 * D2R;
+    const st = { lat0: REST, lon0: -14 * D2R, zoom: 1, b: 0, drag: false, idleAt: 0, fly: null, hold: false, last: 0, img: null, px32: null, marker: null };
+    const buf = document.createElement('canvas'), bctx = buf.getContext('2d');
+    const pick = (m, rbuf) => { const need = 2 * Math.PI * rbuf * 0.95; for (const x of m) if (x.w >= need) return x; return m[m.length - 1]; };
+    const radius = () => mix(Rh, Rc, st.b) * st.zoom;
+
+    function frame(t) {
+      const dt = Math.min(0.1, Math.max(0, t - st.last)); st.last = t;
+      if (st.fly) {
+        const f = st.fly; if (f.t0 === null) f.t0 = t;
+        const k = Math.min(1, (t - f.t0) / f.dur), e = k * k * (3 - 2 * k);
+        st.lat0 = mix(f.lat0, f.lat1, e); st.lon0 = mix(f.lon0, f.lon1, e); st.zoom = mix(f.z0, f.z1, e); st.b = mix(f.b0, f.b1, e);
+        if (f.onProgress) f.onProgress(k);
+        if (k >= 1) { st.fly = null; st.hold = true; if (f.onDone) f.onDone(); }
+      } else if (!st.drag && !st.hold && t - st.idleAt > 1.5) {
+        st.lon0 += 0.075 * dt; st.lat0 += (REST - st.lat0) * Math.min(1, dt * 0.8);
+      }
+      const zoom = st.zoom, baseR = mix(Rh, Rc, st.b), R = baseR * zoom, gcx = W / 2, gcy = mix(cyH, cyC, st.b);
+      const s = zoom < 1.35 ? 0.62 : zoom < 2 ? 0.48 : 0.36;
+      const bw = Math.round(W * s), bh = Math.round(H * s);
+      if (buf.width !== bw || buf.height !== bh || !st.img) { buf.width = bw; buf.height = bh; st.img = bctx.createImageData(bw, bh); st.px32 = new Uint32Array(st.img.data.buffer); }
+      const img = st.img, px32 = st.px32; px32.fill(0);
+      const rr = R * s, cx = gcx * s, cy = gcy * s, invR = 1 / rr;
+      const dM = pick(day, rr), nM = pick(night, rr), cM = pick(cloud, rr), p0 = st.lat0, l0 = st.lon0;
+      const Cx = Math.cos(p0) * Math.sin(l0), Cy = Math.sin(p0), Cz = Math.cos(p0) * Math.cos(l0), Ex = Math.cos(l0), Ez = -Math.sin(l0);
+      const Nx = -Math.sin(p0) * Math.sin(l0), Ny = Math.cos(p0), Nz = -Math.sin(p0) * Math.cos(l0), cloudShift = t * 0.003;
+      const y0 = Math.max(0, Math.floor(cy - rr - 2)), y1 = Math.min(bh - 1, Math.ceil(cy + rr + 2)), x0 = Math.max(0, Math.floor(cx - rr - 2)), x1 = Math.min(bw - 1, Math.ceil(cx + rr + 2));
+      const sx = sun[0], sy = sun[1], sz = sun[2], hx = half[0], hy = half[1], hz = half[2], INV2PI = 1 / (2 * Math.PI), INVPI = 1 / Math.PI;
+      const dw = dM.w, dh = dM.h, dpx = dM.px, nw = nM.w, nh = nM.h, npx = nM.px, cw = cM.w, ch = cM.h, cpx = cM.px;
+      for (let y = y0; y <= y1; y++) {
+        const ny = (cy - y) * invR;
+        for (let x = x0; x <= x1; x++) {
+          const nx = (x - cx) * invR, r2 = nx * nx + ny * ny; if (r2 >= 1) continue;
+          const nz = Math.sqrt(1 - r2), wx = nx * Ex + ny * Nx + nz * Cx, wy = ny * Ny + nz * Cy, wz = nx * Ez + ny * Nz + nz * Cz;
+          let u = Math.atan2(wx, wz) * INV2PI + 0.5, v = 0.5 - Math.asin(wy) * INVPI; if (v < 0) v = 0; else if (v > 0.9999) v = 0.9999;
+          let iu = (u * dw) | 0; if (iu >= dw) iu = dw - 1;
+          const tc = dpx[((v * dh) | 0) * dw + iu]; let r = tc & 255, g = (tc >> 8) & 255, b = (tc >> 16) & 255;
+          const isOcean = (b > g + 8) && (b > r + 28);
+          let uc = u + cloudShift; uc -= uc | 0;
+          const ca = (cpx[((v * ch) | 0) * cw + (((uc * cw) | 0) % cw)] & 255) / 235;
+          const ndl = nx * sx + ny * sy + nz * sz, lit = ndl > 0 ? ndl : 0, rt = 1 - nz, rim = rt * rt * Math.sqrt(rt);
+          let d = (ndl + 0.10) / 0.34; d = d < 0 ? 0 : d > 1 ? 1 : d; d = d * d * (3 - 2 * d);
+          const sh = 0.32 + 0.92 * lit; let dr = r * sh, dg = g * sh, db = b * sh;
+          if (isOcean) { const hd = nx * hx + ny * hy + nz * hz; if (hd > 0.93) { const h2 = hd * hd, h4 = h2 * h2, h8 = h4 * h4, h16 = h8 * h8, h32 = h16 * h16, h64 = h32 * h32, h128 = h64 * h64; const sp = h128 * h32 * h8 * 0.30 * (1 - ca); dr += 255 * sp; dg += 255 * sp; db += 255 * sp; } }
+          const ac = ca * 0.9, cs = 190 + 60 * lit; dr = dr * (1 - ac) + cs * ac; dg = dg * (1 - ac) + cs * ac; db = db * (1 - ac) + (cs + 6) * ac;
+          let niu = (u * nw) | 0; if (niu >= nw) niu = nw - 1;
+          const lt = (npx[((v * nh) | 0) * nw + niu] & 255) / 255 * (1 - ca * 0.8);
+          let nr = r * 0.11 + 240 * lt, ng = g * 0.12 + 190 * lt, nb = b * 0.16 + 104 * lt;
+          const nc = ca * 0.30; nr = nr * (1 - nc) + 24 * nc; ng = ng * (1 - nc) + 36 * nc; nb = nb * (1 - nc) + 62 * nc;
+          r = nr + (dr - nr) * d; g = ng + (dg - ng) * d; b = nb + (db - nb) * d;
+          const ra = rim * (0.30 + 0.95 * d); r += 66 * ra; g += 108 * ra; b += 178 * ra;
+          const rad = Math.sqrt(r2); let al = 255; if (rad > 0.992) al = Math.max(0, (1 - rad) / 0.008) * 255;
+          px32[y * bw + x] = (al << 24) | ((b > 255 ? 255 : b) << 16) | ((g > 255 ? 255 : g) << 8) | (r > 255 ? 255 : r);
+        }
+      }
+      bctx.putImageData(img, 0, 0);
+      ctx.clearRect(0, 0, W, H); ctx.drawImage(stars, 0, 0);
+      const gl = ctx.createRadialGradient(gcx, gcy, R * 0.97, gcx, gcy, R * 1.30);
+      gl.addColorStop(0, 'rgba(112,150,210,0.46)'); gl.addColorStop(0.35, 'rgba(84,120,184,0.16)'); gl.addColorStop(1, 'rgba(51,74,115,0)');
+      ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(gcx, gcy, R * 1.30, 0, 6.283); ctx.fill();
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high'; ctx.drawImage(buf, 0, 0, W, H);
+
+      // marker for the event
+      const mla = MOR.lat * D2R, mlo = MOR.lon * D2R, mwx = Math.cos(mla) * Math.sin(mlo), mwy = Math.sin(mla), mwz = Math.cos(mla) * Math.cos(mlo);
+      const vx = mwx * Ex + mwz * Ez, vy = mwx * Nx + mwy * Ny + mwz * Nz, vz = mwx * Cx + mwy * Cy + mwz * Cz;
+      const mx = gcx + vx * R, my = gcy - vy * R; st.marker = null;
+      if (vz > 0.08 && mx > 0 && mx < W && my > 0 && my < H) {
+        st.marker = { x: mx, y: my };
+        const k0 = W / 1280, ph = (t * 0.8) % 1, fade = Math.min(1, (vz - 0.08) / 0.2);
+        ctx.save(); ctx.globalAlpha = fade;
+        ctx.strokeStyle = 'rgba(211,95,63,' + (0.75 * (1 - ph)) + ')'; ctx.lineWidth = 2 * Math.max(1, k0); ctx.beginPath(); ctx.arc(mx, my, (7 + 30 * ph) * Math.max(1, k0), 0, 6.283); ctx.stroke();
+        ctx.fillStyle = '#D35F3F'; ctx.beginPath(); ctx.arc(mx, my, 7 * Math.max(1, k0), 0, 6.283); ctx.fill(); ctx.lineWidth = 2.5 * Math.max(1, k0); ctx.strokeStyle = '#FFFFFF'; ctx.stroke();
+        if (stage !== 'map') {
+          const fs = 14 * Math.max(1, k0); ctx.font = '600 ' + fs + 'px Inter, system-ui, sans-serif'; const label = 'Ksar El Kebir, Morocco', tw = ctx.measureText(label).width + 22 * Math.max(1, k0), lx = mx + 20 * Math.max(1, k0), ly = my - 15 * Math.max(1, k0), ph2 = 30 * Math.max(1, k0);
+          ctx.fillStyle = 'rgba(14,23,40,0.82)'; ctx.beginPath(); ctx.moveTo(lx + ph2 / 2, ly); ctx.arcTo(lx + tw, ly, lx + tw, ly + ph2, ph2 / 2); ctx.arcTo(lx + tw, ly + ph2, lx, ly + ph2, ph2 / 2); ctx.arcTo(lx, ly + ph2, lx, ly, ph2 / 2); ctx.arcTo(lx, ly, lx + tw, ly, ph2 / 2); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = '#FFFFFF'; ctx.textBaseline = 'middle'; ctx.fillText(label, lx + 11 * Math.max(1, k0), ly + ph2 / 2 + 0.5);
+        }
+        ctx.restore();
+      }
+      if (hooks && hooks.onFrame) hooks.onFrame(st.marker);
+    }
+    return {
+      frame, st, radius,
+      touch() { st.hold = false; st.idleAt = st.last; st.fly = null; },
+      release() { st.hold = false; st.idleAt = st.last; },
+      resize() { layout(); st.img = null; },
+      fly(o) { st.fly = { t0: null, lat0: st.lat0, lon0: st.lon0, z0: st.zoom, b0: st.b, lat1: o.lat1 ?? st.lat0, lon1: o.lon1 ?? st.lon0, z1: o.zoom ?? st.zoom, b1: o.b ?? st.b, dur: o.dur ?? 1.4, onProgress: o.onProgress, onDone: o.onDone }; st.hold = true; }
+    };
+  }
+
+  const loadTex = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('texture failed: ' + src)); i.src = src; });
+  function ensureEarth() {
+    if (earth) return Promise.resolve(earth);
+    if (earthLoading) return earthLoading;
+    sizeCanvas();
+    earthLoading = Promise.all([loadTex('earth/day.jpg'), loadTex('earth/night.png'), loadTex('earth/clouds.png')]).then(([d, n, c]) => { earth = createEarth(canvas, { day: d, night: n, clouds: c }, { onFrame: positionCallout }); return earth; });
+    return earthLoading;
+  }
+  function earthLoop(ms) { if (!earthRunning) return; if (ms - (earthLoop.last || 0) > 30) { earth.frame(ms / 1000); earthLoop.last = ms; } earthRaf = requestAnimationFrame(earthLoop); }
+  const startEarth = () => { if (!earthRunning && earth) { earthRunning = true; earthRaf = requestAnimationFrame(earthLoop); } };
+  const stopEarth = () => { earthRunning = false; cancelAnimationFrame(earthRaf); };
+
+  // callout card follows the marker on wide screens
+  const callout = $('callout');
+  function positionCallout(m) {
+    if (stage !== 'zoomed' || !m || innerWidth < 700) return;
+    const sc = canvas.width / innerWidth, mx = m.x / sc, my = m.y / sc;
+    callout.style.left = Math.max(16, Math.min(mx + 44, innerWidth - 374)) + 'px';
+    callout.style.top = Math.max(96, Math.min(my + 64, innerHeight - callout.offsetHeight - 24)) + 'px';
+  }
+
+  // fill the Earth screen and the callout from the data
+  (function fillEarthText() {
+    const s = meta.summary || {};
+    $('eArea').innerHTML = (s.flooded_area_km2 ?? 0).toFixed(1) + '<small>km&sup2;</small>';
+    $('eRoad').innerHTML = (s.road_km_affected ?? 0).toFixed(1) + '<small>km</small>';
+    $('ePlaces').textContent = String(s.villages_near_flood ?? 0);
+    $('cArea').textContent = (s.flooded_area_km2 ?? 0).toFixed(1); $('cRoad').textContent = (s.road_km_affected ?? 0).toFixed(1); $('cPlaces').textContent = String(s.villages_near_flood ?? 0);
+    $('cEyebrow').textContent = $('eyebrow').textContent; $('cTitle').textContent = $('place').textContent;
+  })();
+
+  const FLY_TARGET = { lat1: 31 * D2R, lon1: MOR.lon * D2R };
+  function goZoom() {
+    if (stage !== 'earth' || !earth) return;
+    setStage('zoomed'); earth.fly({ ...FLY_TARGET, zoom: 2.3, b: 1, dur: REDUCE ? 0.01 : 1.6 });
+  }
+  function openMap() {
+    if (stage === 'map') return;
+    const live = earth && earthRunning;
+    setStage('map');
+    if (!live) { canvas.style.visibility = 'hidden'; return; }
+    earth.fly({ ...FLY_TARGET, zoom: 6.5, b: 1, dur: REDUCE ? 0.01 : 1.2,
+      onProgress: (k) => { canvas.style.opacity = k < 0.45 ? 1 : Math.max(0, 1 - (k - 0.45) / 0.55); },
+      onDone: () => { canvas.style.visibility = 'hidden'; stopEarth(); } });
+  }
+  async function backToEarth() {
+    if (stage === 'earth') return;
+    try { await ensureEarth(); } catch (e) { return; }
+    canvas.style.visibility = 'visible'; canvas.style.opacity = 1; startEarth();
+    setStage('earth');
+    earth.fly({ lat1: -8 * D2R, lon1: earth.st.lon0, zoom: 1, b: 0, dur: REDUCE ? 0.01 : 1.4, onDone: () => earth.release() });
+  }
+  $('ctaExplore').onclick = goZoom; $('openMapBtn').onclick = openMap; $('backEarthBtn').onclick = backToEarth; $('navEarth').onclick = () => { closeSheet(); backToEarth(); };
+  window.addEventListener('hashchange', () => { if (location.hash === '#map' && stage !== 'map') openMap(); else if (!location.hash && stage === 'map') backToEarth(); });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && stage === 'zoomed') backToEarth(); });
+
+  // pointer: drag to rotate, click the marker to zoom in, wheel to zoom, double-click to fly in
+  let down = null;
+  canvas.addEventListener('pointerdown', (e) => { if (stage === 'map' || !earth) return; down = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, moved: false }; earth.st.drag = true; earth.touch(); canvas.setPointerCapture(e.pointerId); canvas.style.cursor = 'grabbing'; });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!down || !earth) return;
+    if (Math.hypot(e.clientX - down.x, e.clientY - down.y) > 5) down.moved = true;
+    const sc = canvas.width / innerWidth, k = 1 / earth.radius();
+    earth.st.lon0 -= (e.clientX - down.lx) * sc * k; earth.st.lat0 = Math.max(-80 * D2R, Math.min(80 * D2R, earth.st.lat0 + (e.clientY - down.ly) * sc * k));
+    down.lx = e.clientX; down.ly = e.clientY; earth.touch();
+  });
+  const endDown = (e) => {
+    if (!down || !earth) return;
+    earth.st.drag = false; earth.st.idleAt = earth.st.last; canvas.style.cursor = 'grab';
+    if (!down.moved && stage === 'earth') { const m = earth.st.marker, sc = canvas.width / innerWidth; if (m && Math.hypot(e.clientX * sc - m.x, e.clientY * sc - m.y) < 34 * Math.max(1, sc)) goZoom(); }
+    down = null;
+  };
+  canvas.addEventListener('pointerup', endDown); canvas.addEventListener('pointercancel', () => { down = null; if (earth) earth.st.drag = false; });
+  canvas.addEventListener('wheel', (e) => { if (stage !== 'earth' || !earth) return; e.preventDefault(); earth.st.zoom = Math.max(0.7, Math.min(2.6, earth.st.zoom * Math.exp(-e.deltaY * 0.0012))); earth.touch(); }, { passive: false });
+  canvas.addEventListener('dblclick', () => goZoom());
+  let ert; window.addEventListener('resize', () => { clearTimeout(ert); ert = setTimeout(() => { if (earth) { sizeCanvas(); earth.resize(); } }, 150); });
+
+  if (location.hash === '#map') { setStage('map'); canvas.style.visibility = 'hidden'; }
+  else { setStage('earth'); ensureEarth().then(() => { earth.st.idleAt = 0; startEarth(); }).catch(() => { setStage('map'); canvas.style.visibility = 'hidden'; }); }
+
 
   showMethod(methods[0]);
 })();
