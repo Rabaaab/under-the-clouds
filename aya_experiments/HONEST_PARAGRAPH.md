@@ -1,0 +1,3 @@
+# Honest paragraph (draft, edit it)
+
+Only the threshold baseline could be scored so far (IoU 0.442, F1 0.613); the CNN is not scored yet. These numbers are limited: the reference masks come from Otsu/HSBA thresholding plus visual checks, so they are not expert ground truth and may favour the threshold baseline; they are water masks from nearby dates, not a flood-change map; and the patches cover only part of the study area. Known failure types to describe from the saved crops: false water on the sea and coast, thin lines at tile seams, and missed flooded vegetation (grey, not black, in radar).

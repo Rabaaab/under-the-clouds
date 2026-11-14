@@ -1,0 +1,15 @@
+{
+  "reference": "Zenodo SAR Morocco Flood Dataset (semi-automatic masks)",
+  "after_date": "2026-02-08",
+  "otsu_threshold_db": -14.368677139282227,
+  "baseline": {
+    "iou": 0.4420114894679877,
+    "f1": 0.6130484988452656,
+    "precision": 0.4790478596693857,
+    "recall": 0.8511286392202129,
+    "tp": 26545,
+    "fp": 28867,
+    "fn": 4643,
+    "pixels_scored": 634522
+  }
+}

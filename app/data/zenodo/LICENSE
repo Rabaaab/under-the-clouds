@@ -1,0 +1,129 @@
+Attribution 4.0 International (CC BY 4.0)
+
+=======================================================================
+
+Copyright (c) 2026 Marwane Kzadri, Ahlame Begdouri, Khalid El Fazazy,
+Hassan Qjidaa, Mohammed Ouazzani Jamil, Hamid Tairi, Jamal Riffi
+
+Affiliations:
+- Laboratory of Computer Science, Innovation and Artificial Intelligence (L3IA),
+  Faculty of Sciences Dhar El Mahraz (FSDM), Sidi Mohamed Ben Abdellah
+  University (USMBA), Fez, Morocco
+- Intelligent Systems, Energy and Sustainable Development Laboratory (SIEDD),
+  Universite Privee de Fes (UPF), Fez, Morocco
+- Intelligent Systems and Applications Laboratory (LISA),
+  Faculty of Sciences and Techniques (FST-Fez), USMBA, Fez, Morocco
+
+Corresponding author: Marwane Kzadri <marwane.kzadri@usmba.ac.ma>
+
+=======================================================================
+
+This work is licensed under the Creative Commons Attribution 4.0
+International License (CC BY 4.0).
+
+You are free to:
+
+  * Share  - copy and redistribute the material in any medium or format
+             for any purpose, even commercially.
+  * Adapt  - remix, transform, and build upon the material for any
+             purpose, even commercially.
+
+The licensor cannot revoke these freedoms as long as you follow the
+license terms.
+
+Under the following terms:
+
+  * Attribution - You must give appropriate credit, provide a link to
+                  the license, and indicate if changes were made. You
+                  may do so in any reasonable manner, but not in any
+                  way that suggests the licensor endorses you or your
+                  use.
+
+  * No additional restrictions - You may not apply legal terms or
+                                 technological measures that legally
+                                 restrict others from doing anything
+                                 the license permits.
+
+=======================================================================
+
+Suggested attribution:
+
+  Kzadri, M., Begdouri, A., El Fazazy, K., Qjidaa, H., Ouazzani Jamil, M.,
+  Tairi, H., & Riffi, J. (2026). SAR Morocco Flood Dataset:
+  A georeferenced Sentinel-1 SAR dataset for water and flood
+  segmentation in five Moroccan hydrological zones (2024-2026)
+  [Data set]. Zenodo. https://doi.org/10.5281/zenodo.22964153
+
+=======================================================================
+
+Notices:
+
+  * You do not have to comply with the license for elements of the
+    material in the public domain or where your use is permitted by
+    an applicable exception or limitation.
+
+  * No warranties are given. The license may not give you all of the
+    permissions necessary for your intended use. For example, other
+    rights such as publicity, privacy, or moral rights may limit how
+    you use the material.
+
+=======================================================================
+
+Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Human-readable summary: https://creativecommons.org/licenses/by/4.0/
+
+=======================================================================
+
+THIRD-PARTY COMPONENTS INCLUDED IN THIS DATASET
+
+The dataset is derived from and includes references to third-party data
+provided under their own licenses. Users must comply with the terms of
+these licenses when using the corresponding parts of the dataset.
+
+-----------------------------------------------------------------------
+
+1. Sentinel-1 GRD IW imagery (Copernicus Programme)
+
+The Sentinel-1 SAR data used to produce the composites and water masks
+are provided by the European Space Agency (ESA) under the free, full
+and open Copernicus data policy, as defined in the Legal Notice on the
+use of Copernicus Sentinel Data and Service Information:
+
+  https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice
+
+Required attribution when using or redistributing this dataset
+(including our processed derivatives) - as specified by the EU legal
+notice:
+
+  "Contains modified Copernicus Sentinel data 2024-2026, processed
+   by Kzadri M., Begdouri A., El Fazazy K., Qjidaa H., Ouazzani Jamil M.,
+   Tairi H., and Riffi J."
+
+Users must also cite the dataset itself (see Suggested attribution
+above) and, when applicable, the associated Data in Brief article.
+
+-----------------------------------------------------------------------
+
+2. JRC Global Surface Water occurrence layer (auxiliary reference)
+
+The auxiliary Global Surface Water occurrence layer included in this
+dataset for contextual reference is derived from the JRC Global
+Surface Water dataset, provided by the European Commission Joint
+Research Centre (JRC) under an open license.
+
+  Copyright (c) European Union, 1984-2021.
+
+  Original reference:
+    Pekel, J.-F., Cottam, A., Gorelick, N., & Belward, A. S. (2016).
+    High-resolution mapping of global surface water and its long-term
+    changes. Nature 540, 418-422.
+    https://doi.org/10.1038/nature20584
+
+  Dataset access:
+    https://global-surface-water.appspot.com
+
+This layer was included as contextual information only and was not
+used to create or validate the Sentinel-1 water masks.
+
+=======================================================================
