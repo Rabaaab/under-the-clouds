@@ -1,0 +1,8 @@
+{
+  "status": "not run on real data",
+  "reason": "dataset directory does not exist: C:\\Users\\ayadr\\OneDrive\\Downloads\\NASA\\under-the-clouds\\data\\SAR_Morocco",
+  "reference_limitation": "Zenodo labels are semi-automatic HSBA+Otsu masks, not expert ground truth; they may favour Otsu, cover only part of the scene, have unknown patch dates, and represent water, not a change map.",
+  "otsu_circularity": "The reference masks were produced using HSBA plus Otsu and morphological cleaning. Otsu is therefore not an independent comparator and may agree with the labels by construction; these are not expert-ground-truth scores.",
+  "cnn_status": "not scored locally: outputs/unet.pt is on Drive",
+  "zones": {}
+}
