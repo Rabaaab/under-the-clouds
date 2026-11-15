@@ -8,9 +8,9 @@ Built for the NASA Space Apps Challenge 2026 (Meknès, Morocco), challenge *"Dan
 
 **Live map:** https://rabaaab.github.io/under-the-clouds/app/ opens on a spinning Earth built from NASA Blue Marble and Black Marble imagery. Click the orange marker (live case: Morocco 2026) or any white marker (benchmark floods in 10 other countries). Go straight to the map with https://rabaaab.github.io/under-the-clouds/app/#map
 
-**Time machine:** on the live map, "Time machine" shows the model's water on each Sentinel-1 pass over Ksar El Kebir, with a curve and a play button. Orange is water the U-Net finds on that date that is not water on every date (sea, rivers and reservoirs are removed). The lowest value, on the dry date, is the model's false-alarm floor. It currently has five passes (22 Dec, 15 Jan, 2 Feb, 14 Feb, 20 Feb); more are added as their radar files are processed. This is a space-time use of our 2D model, not a trained 3D CNN, and the values are model estimates.
+**Time machine:** on the live map, "Time machine" shows the model's water on each Sentinel-1 pass over Ksar El Kebir, with a curve and a play button. Orange is water the U-Net finds on that date that is not water on at least 80% of the dates (sea, rivers and reservoirs are removed). The lowest value, on the dry date, is the model's false-alarm floor. It has all eleven passes (22 Dec to 20 Feb, including the 21 Jan and 8 Feb pair of the main map). Before February the curve sits between 4 and 12 km2 on dry dates, which is the model's false-alarm floor; it peaks at 58 km2 on 8 February, then falls to 39 km2 on 14 February and 22 km2 on 20 February. This is a space-time use of our 2D model, not a trained 3D CNN, and the values are model estimates.
 
-**Evidence and NISAR windows:** the "Evidence" tab lists the five checks we ran (11-flood benchmark, held-out Bolivia flood, Morocco against Zenodo masks, Morocco against NASA's optical image of 14 Feb, NISAR on the Mozambique flood), each with what it shows and what it does not. The "NISAR" tab shows the NISAR L-band radar over Ksar El Kebir (also available as a map layer) and the Mozambique test.
+**Evidence and NISAR windows:** the "Evidence" tab lists the five checks we ran (11-flood benchmark, held-out Bolivia flood, Morocco against Zenodo masks, Morocco against a Sentinel-2 water map of the same day, 14 Feb, NISAR on the Mozambique flood), each with what it shows and what it does not. The "NISAR" tab shows the NISAR L-band radar over Ksar El Kebir (also available as a map layer) and the Mozambique test.
 
 **Guided tour:** press "60-second tour" on the first screen for a five-step walk-through: the flood, NASA's cloud-covered image, the radar, what the water reaches, and how far to trust it.
 
@@ -210,17 +210,16 @@ Why recall is low: 11.5 km² of flood was already present on 5 January (change d
 
 > **Data note:** the NISAR products used here are early / pre-calibration releases. Absolute backscatter values may shift in the final product; treat these numbers as indicative.
 
-### Same-day optical sanity check, 14 February (modest, not a validation)
+### Same-day Sentinel-2 check, 14 February (first optical reference for Morocco)
 
-Sentinel-1 passed over Ksar El Kebir on 14 February 2026. On the same day NASA MODIS Aqua (bands 7-2-1, 250 m, via NASA GIBS) was about half covered by scattered cloud, with clear gaps over the flood plain. In the cloud-free, non-sea blocks (46% of the scene) we rebuilt water from the optical image with a physical rule (low shortwave infrared, blue brighter than green) and compared it with the U-Net water mapped on the radar of the same day, at 250 m.
+Sentinel-2 imaged the Ksar El Kebir plain on 14 February 2026 at 11:11 UTC (NASA HLS granule HLS.S30.T29SQU.2026045T111151.v2.0, the best of 12 granules from 12 to 16 February). Sentinel-1 passed at 18:26 UTC the same day. We built a water map from the optical image (MNDWI = (green - shortwave infrared) / (green + shortwave infrared) above 0) and scored the U-Net water on the radar against it. Only clear pixels are scored (cloud, near-cloud and shadow removed by the HLS Fmask: 44% of the scene), and the sea and about 1 km of coast are removed.
 
-| Check (14 Feb, clear blocks only) | Result |
-|---|---|
-| Optical water blocks also marked by the U-Net | 165 of 208 (79%) |
-| U-Net water blocks confirmed by the optical image | 165 of 518 (precision 0.32) |
-| Same recall for the simple threshold | 81% |
+| Method, 14 Feb, 1,067,448 clear land pixels | Precision | Recall | IoU | F1 |
+|---|---|---|---|---|
+| U-Net | 0.988 | 0.336 | 0.335 | 0.502 |
+| Best simple threshold (VV below -16.75 dB) | 0.990 | 0.341 | 0.340 | 0.507 |
 
-How to read it: most of the water the optical image shows is also marked by the model, but the model marks about 2.5 times more than the coarse optical image can confirm, and the simple threshold scores the same, so this check does **not** separate the two methods. It should not be read as an accuracy score: 250 m pixels cannot see narrow or shallow water or flooded vegetation, cloud shadow is dark, and half of the scene is hidden. The first optical rule we tried (dark in both infrared bands) gave IoU 0.14 because it picked up cloud shadows; we then used the physical rule above and report both attempts. Figure: [`docs/optical_check_14feb.png`](docs/optical_check_14feb.png) (left: clear blocks; middle: optical water; right: U-Net water).
+How to read it: 99% of the pixels the radar methods mark as water are water in the optical image too, so what they find is real. But they find only about a third of what the optical image calls water: the thin river corridor, shallow edges and flooded vegetation are missed. The simple threshold scores the same, so this check does **not** separate the model from the threshold. Limits: MNDWI above 0 is a lenient rule (wet fields can pass), the optical image is 7 hours earlier than the radar, and 56% of the scene is not scored. Taking permanent water out makes no difference (IoU 0.334). Figure: [`docs/hls_check_14feb.png`](docs/hls_check_14feb.png). An earlier, cruder check with 250 m MODIS imagery of the same day gave a similar picture (79% of the water it saw was also marked) and is superseded by this one.
 
 ## Limitations (stated up front)
 
@@ -233,7 +232,7 @@ How to read it: most of the water the optical image shows is also marked by the 
 - The clean-up settings (coastal margin and thin-shape removal) were chosen by looking at the result, not tuned against a reference.
 - Flooded vegetation and very shallow water look grey, not black, in radar, so both methods can miss them.
 
-- **Floods only.** Landslides, earthquakes, wildfire, oil spills and deforestation are the roadmap, not built and not tested: each needs labelled examples we do not have. The "Radar change" layer shows any change in radar brightness, but it is not classified by the model. The change-and-impact steps of the pipeline are not flood-specific; only the classifier is.
+- **Floods only.** The app's "Other disasters" page shows which pipeline steps are general and what each next hazard (earthquake, wildfire, landslide, oil spill, deforestation) would need; it is a plan and shows no results. Landslides, earthquakes, wildfire, oil spills and deforestation are the roadmap, not built and not tested: each needs labelled examples we do not have. The "Radar change" layer shows any change in radar brightness, but it is not classified by the model. The change-and-impact steps of the pipeline are not flood-specific; only the classifier is.
 
 ## Repository structure
 
