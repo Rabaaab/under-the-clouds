@@ -8,6 +8,8 @@ Built for the NASA Space Apps Challenge 2026 (Meknès, Morocco), challenge *"Dan
 
 **Live map:** https://rabaaab.github.io/under-the-clouds/app/ opens on a spinning Earth built from NASA Blue Marble and Black Marble imagery. Click the orange marker (live case: Morocco 2026) or any white marker (benchmark floods in 10 other countries). Go straight to the map with https://rabaaab.github.io/under-the-clouds/app/#map
 
+**Guided tour:** press "60-second tour" on the first screen for a five-step walk-through: the flood, NASA's cloud-covered image, the radar, what the water reaches, and how far to trust it.
+
 **Cloud test:** on the live map, press "Cloud test" to compare NASA's own optical satellite image of 8 Feb 2026 (MODIS Terra true colour, via NASA GIBS) with our Sentinel-1 radar and the flooded area the model finds. Over Ksar El Kebir the optical image is covered by cloud on that day, the radar is not. This is a visual comparison for one place and one date, not a measurement of how often clouds hide floods.
 
 **Radar change (not only floods):** the optional "Radar change" layer shows how much the radar brightness moved between the two dates (blue: darker, gold: brighter), for any kind of surface change. It is not a flood map and is not classified by the model: wind on open water, crops and building work also change it. Only the flood classifier is flood-specific. Other disasters (landslides, wildfire, oil spills, deforestation) are the roadmap, not built and not tested, because they need labelled examples we do not have.
@@ -158,16 +160,16 @@ We say "road in flooded areas" and "places within 500 m of new water". We do not
 
 **What these Moroccan numbers are not:** they are model outputs, not measured accuracy. Taking out thin shapes also removes some real narrow flooding (ditches and channels), so the true flooded area is probably between the cleaned and the raw values.
 
-### Independent check in Morocco (preliminary, unfavourable to the model)
+### Independent check in Morocco (unfavourable to the model)
 
 Aya scored our results against the Zenodo SAR Morocco Flood Dataset (semi-automatic water masks made with HSBA and Otsu thresholding). These masks are not expert ground truth, they may favour a threshold method, they cover only part of the scene, their dates are unknown, and they are water masks rather than change maps. 634,522 pixels were scored.
 
 | Method | IoU | Precision | Recall |
 |---|---|---|---|
 | Threshold baseline (Otsu, about -14.4 dB) | 0.442 | 0.48 | 0.85 |
-| U-Net (derived from the per-class pixel counts in `aya_experiments/diagnostics.json`: TP 10,682, FP 10,611, FN 20,506) | about 0.26 | about 0.50 | about 0.34 |
+| U-Net (TP 10,682, FP 10,611, FN 20,506; see `experiments/morocco_check.md`) | 0.256 | 0.502 | 0.343 |
 
-**What this means:** the threshold wins on this reference. The reference itself is close to a threshold map (85 % of its water is below the Otsu line and 95 % of its non-water is above it), and the model misses water that is only moderately dark (median about -19.5 dB). The model score is **preliminary**: the band order and units of the Zenodo patches are still being checked. We report both numbers and do not call the Moroccan result validated. On the 11 hand-labelled benchmark floods, where the reference is not threshold-made, the model beats the best simple threshold on every flood.
+**What this means:** the threshold wins on this reference. The reference itself is close to a threshold map (85 % of its water is below the Otsu line and 95 % of its non-water is above it), and the model misses water that is only moderately dark (median about -19.5 dB). Aya re-scored the model from `experiments/water_after_cnn.tif` and the numbers match (units were detected as linear power and converted). One caveat remains: the patch dates are not readable, and the dataset's own README lists scenes from 27 January to 4 February 2026 while our scene is from 8 February, so the reference may not match the flood day. We report both numbers and do not call the Moroccan result validated. On the 11 hand-labelled benchmark floods, where the reference is not threshold-made, the model beats the best simple threshold on every flood.
 
 ### NISAR experiments (supplementary, not part of the main pipeline)
 
@@ -185,7 +187,9 @@ Feeding NISAR HH/HV directly to the U-Net (trained on Sentinel-1 C-band VV/VH) f
 | Before scene | 5 January 2026 |
 | During scene | 17 January 2026 |
 | Reference | Copernicus EMS EMSR857, AOI 06 (image date 18 Jan 2026) |
-| Workaround | HH + synthetic VH, settings from Ksar El Kebir, **not tuned on Mozambique** |
+| Workaround | HH + synthetic VH. The synthetic-VH relation and the shift rule come from Ksar El Kebir. The level shift is computed from the radar only: shift = -9.7 dB (median Sentinel-1 VV of our Ksar scene) minus the median NISAR HH of the before image (5 Jan), which gives +0.6 dB here (+1.8 dB at Ksar). The Copernicus map was used only to score the result, never to choose a setting. |
+
+Scored on all water of 17 January against the Copernicus flood (new water only, 17 Jan minus 5 Jan: IoU 0.275, precision 0.96, recall 0.28):
 
 | Metric | Value |
 |---|---|
@@ -199,6 +203,18 @@ Why recall is low: 11.5 km² of flood was already present on 5 January (change d
 **Honest framing:** this is a validated workaround, not a full solution. The 96 % precision shows the model is not generating random false alarms on a new sensor and a new continent. The low recall shows it misses a large part of the flood. The next step is retraining or fine-tuning with L-band labelled scenes, including flooded-vegetation examples.
 
 > **Data note:** the NISAR products used here are early / pre-calibration releases. Absolute backscatter values may shift in the final product; treat these numbers as indicative.
+
+### Same-day optical sanity check, 14 February (modest, not a validation)
+
+Sentinel-1 passed over Ksar El Kebir on 14 February 2026. On the same day NASA MODIS Aqua (bands 7-2-1, 250 m, via NASA GIBS) was about half covered by scattered cloud, with clear gaps over the flood plain. In the cloud-free, non-sea blocks (46% of the scene) we rebuilt water from the optical image with a physical rule (low shortwave infrared, blue brighter than green) and compared it with the U-Net water mapped on the radar of the same day, at 250 m.
+
+| Check (14 Feb, clear blocks only) | Result |
+|---|---|
+| Optical water blocks also marked by the U-Net | 165 of 208 (79%) |
+| U-Net water blocks confirmed by the optical image | 165 of 518 (precision 0.32) |
+| Same recall for the simple threshold | 81% |
+
+How to read it: most of the water the optical image shows is also marked by the model, but the model marks about 2.5 times more than the coarse optical image can confirm, and the simple threshold scores the same, so this check does **not** separate the two methods. It should not be read as an accuracy score: 250 m pixels cannot see narrow or shallow water or flooded vegetation, cloud shadow is dark, and half of the scene is hidden. The first optical rule we tried (dark in both infrared bands) gave IoU 0.14 because it picked up cloud shadows; we then used the physical rule above and report both attempts. Figure: [`docs/optical_check_14feb.png`](docs/optical_check_14feb.png) (left: clear blocks; middle: optical water; right: U-Net water).
 
 ## Limitations (stated up front)
 

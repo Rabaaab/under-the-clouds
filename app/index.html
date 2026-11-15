@@ -185,6 +185,26 @@
   body[data-cmp] .tag i { display: none; }
   body[data-view=live] .sceneonly { display: none !important; }
   .sw .rd { width: 14px; height: 10px; border-radius: 3px; background: linear-gradient(90deg, #36607E, #F0ECD8); }
+  .tour { left: 50%; bottom: 40px; transform: translateX(-50%); width: min(660px, calc(100vw - 24px)); border-radius: 26px; padding: 20px 26px; z-index: 760; background: rgba(14,23,40,.84); }
+  .tour[hidden] { display: none; }
+  .tour .top { display: flex; align-items: center; justify-content: space-between; }
+  .tour .stp { display: flex; gap: 6px; }
+  .tour .stp i { display: block; width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.28); }
+  .tour .stp i.on { width: 26px; border-radius: 5px; background: var(--text); }
+  .tour h2 { margin: 10px 0 0; font: 600 28px/1.1 var(--display); letter-spacing: -.02em; }
+  .tour p { margin: 8px 0 0; font: 400 15px/1.5 var(--sans); color: #B7C6DA; }
+  .tour .row { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .tour .bts { display: flex; gap: 10px; }
+  .tour .tb { font: 600 14px var(--sans); height: 44px; border-radius: 999px; padding: 0 20px; }
+  .tour .tb.p { background: var(--text); color: var(--ground); }
+  .tour .tb.s { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); color: var(--text); }
+  .tour .skip { font: 600 13px var(--sans); color: #C9D6E6; padding: 6px; }
+  body.touring .timeline, body.touring .method, body.touring .callout, body.touring .title .links { display: none !important; }
+  body.touring:not([data-ts="3"]) .chips { display: none; }
+  body[data-ts="1"] #divider { visibility: hidden; }
+  body.touring[data-ts="4"] .rank { bottom: 12px; } body.touring[data-ts="4"] .schips { display: none; }
+  body.touring[data-ts="4"] .tour { left: auto; right: 44px; transform: none; width: 390px; bottom: 196px; }
+  body.touring .chips { bottom: 262px; } body.touring .rank { bottom: 262px; } body.touring .schips { bottom: 440px; }
   .bm { display: flex; flex-direction: column; gap: 6px; padding: 8px 0 2px; border-top: 1px solid rgba(255,255,255,.1); margin-top: 6px; }
   .bmseg, .sseg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; background: rgba(255,255,255,.07); font: 600 12px var(--sans); }
   .bmseg button, .sseg button { padding: 5px 9px; border-radius: 999px; color: var(--muted); white-space: nowrap; }
@@ -246,6 +266,9 @@
     .schips { left: 12px; right: 12px; bottom: 222px; gap: 8px; } .schips .chip { flex: 1; padding: 10px 12px; border-radius: 14px; } .schips .chip .v { font-size: 22px; } .schips .chip .l { font-size: 11px; }
     .rank { left: 12px; right: 12px; bottom: 12px; padding: 12px 14px 10px; border-radius: 20px; } .rank .rnote { display: none; } .rk { min-width: 56px; } .rk .bar { height: 48px; }
     .bm { display: none; }
+    .tour { left: 12px; right: 12px; bottom: 12px; transform: none; width: auto; padding: 16px 18px; } .tour h2 { font-size: 22px; } .tour p { font-size: 13.5px; }
+    body.touring .chips { bottom: 300px; } body.touring .rank { display: none; } body.touring .schips { bottom: 300px; }
+    body.touring[data-ts="4"] .tour { left: 12px; right: 12px; width: auto; bottom: 12px; }
   }
 </style>
 </head>
@@ -259,7 +282,7 @@
   <div class="eyeb">NASA Space Apps 2026 &middot; Dancing with the SARs</div>
   <h1>Radar sees what clouds hide.</h1>
   <p>A global flood mapper for satellite radar. A neural network finds flooded land through cloud, checked on 11 floods in 11 countries, with a live case in Morocco.</p>
-  <div class="cta"><button class="pri" id="ctaExplore">Explore Morocco 2026</button><button class="sec" data-open="how">How it works</button></div>
+  <div class="cta"><button class="pri" id="ctaExplore">Explore Morocco 2026</button><button class="sec" id="ctaTour">60-second tour</button><button class="sec" data-open="how">How it works</button></div>
 </div>
 <div class="ui efoot earthui">
   <div class="efigs"><div class="chip gl"><span class="v out" id="eArea">&ndash;</span><span class="l">floods in 11 countries, checked</span></div><div class="chip gl"><span class="v out" id="eRoad">&ndash;</span><span class="l">on 90 held-out scenes</span></div><div class="chip gl"><span class="v out" id="ePlaces">&ndash;</span><span class="l">live case, Morocco 2026</span></div></div>
@@ -271,6 +294,12 @@
   <p class="cp">Sentinel-1 radar from before and after the flood. New flooding found by a neural network.</p>
   <div class="cf"><span><b id="cArea">&ndash;</b> km&sup2;</span><span><b id="cRoad">&ndash;</b> km road</span><span><b id="cPlaces">&ndash;</b> places</span></div>
   <div class="cb"><button class="pri" id="openMapBtn">Open the flood map &rarr;</button><button class="lnk" id="cloudCta" style="color:var(--gold)">See the cloud test: optical vs radar</button><button class="lnk" id="backEarthBtn">Back to the Earth</button></div>
+</div>
+
+<div class="ui tour gl" id="tour" role="dialog" aria-label="Guided tour" hidden>
+  <div class="top"><span class="micro" id="tourStep">Step 1 of 5</span><div class="stp" id="tourDots"></div></div>
+  <h2 id="tourTitle"></h2><p id="tourText"></p>
+  <div class="row"><div class="bts"><button type="button" class="tb s" id="tourBack">Back</button><button type="button" class="tb p" id="tourNext">Next</button></div><button type="button" class="skip" id="tourSkip">Skip the tour</button></div>
 </div>
 
 <div id="divider" class="mapui">
@@ -739,7 +768,7 @@
     if (redraw) setBasemap('tc');
   };
   document.querySelectorAll('#cloudDates button').forEach((b) => b.addEventListener('click', () => setCloudDate(b.dataset.d, true)));
-  function setCloud(on, keepBasemap) {
+  function setCloud(on, keepBasemap, to) {
     if (on === cloudMode) return;
     cloudMode = on; cloudBtn.setAttribute('aria-pressed', String(on));
     cloudBtn.innerHTML = on ? '&larr; Back<span class="lg"> to the flood map</span>' : 'Cloud test<span class="lg">: NASA optical vs radar</span> &rarr;';
@@ -749,7 +778,7 @@
       tcDate = '2026-02-08'; setBasemap('tc');
       $('tagA').textContent = 'Radar'; $('tagB').textContent = 'NASA optical';
       $('cloudSrc').hidden = false; setCloudDate('2026-02-08', false); $('cloudNote').hidden = false;
-      applyLayers(); showLine(); setRatio(0.04); animateTo(0.55);
+      applyLayers(); showLine(); setRatio(0.04); animateTo(to == null ? 0.55 : to);
     } else if (cloudPrev) {
       tog.roads.checked = cloudPrev.roads; tog.villages.checked = cloudPrev.villages; tog.radar.checked = cloudPrev.radar; tog.change.checked = cloudPrev.change;
       $('tagA').textContent = 'After'; $('tagB').textContent = 'Before'; $('dBefore').textContent = cloudPrev.dB;
@@ -996,6 +1025,52 @@
   if (location.hash === '#map') { setStage('map'); canvas.style.visibility = 'hidden'; }
   else { setStage('earth'); ensureEarth().then(() => { earth.st.idleAt = 0; startEarth(); }).catch(() => { setStage('map'); canvas.style.visibility = 'hidden'; }); }
 
+
+  // ---------- guided tour: five steps, each sets the whole view, so Back and Next always land in the right state ----------
+  const wait = (ms) => new Promise((r) => setTimeout(r, REDUCE ? 30 : ms));
+  const liveZoom = () => map.getBoundsZoom(L.latLngBounds(bounds), true);
+  async function toLiveMap() {
+    if (view === 'scene') { selected = 'live'; showLive(); }
+    if (stage !== 'map') { selected = 'live'; openMap(); await wait(1500); }
+  }
+  const TOUR = [
+    { name: 'Where', title: 'Heavy rain, and a river that overflowed.', next: 'Look from space',
+      text: 'In January and February 2026 floods hit northern Morocco. The Loukkos river overflowed around Ksar El Kebir. What can a satellite see?',
+      run: async () => { setCloud(false); if (view === 'scene') showLive(); if (stage === 'map') await backToEarth(); if (stage === 'earth') goZoom('live'); } },
+    { name: 'The flood day', title: 'On 8 February, NASA\u2019s camera sees only cloud.', next: 'Switch to radar',
+      text: 'This is NASA\u2019s own satellite picture of the flood day. A storm covers the whole region, so an optical satellite cannot see the water.',
+      run: async () => { await toLiveMap(); if (!cloudMode) setCloud(true, false, 0); else animateTo(0); map.setMaxBounds(null); map.setMinZoom(5); map.flyTo(centre, 6.4, { duration: REDUCE ? 0 : 1.6 }); setCloudDate('2026-02-08', true); $('cloudMsg').textContent = 'NASA\u2019s own image, MODIS Terra. Switch to 1 Feb to see the same layer on a clear day: the white is cloud, not missing data.'; } },
+    { name: 'The cloud test', title: 'The radar sees the flood anyway.', next: 'What did it reach',
+      text: 'Sentinel-1 sends its own radio pulses, so cloud does not stop it. Drag the line: clouds on one side, the flooded land on the other.',
+      run: async () => { await toLiveMap(); cover(); if (!cloudMode) setCloud(true, false, 0); setCloudDate('2026-02-08', tcDate !== '2026-02-08'); map.flyTo(centre, liveZoom(), { duration: REDUCE ? 0 : 1.4 }); setTimeout(() => animateTo(0.55), REDUCE ? 30 : 1300); } },
+    { name: 'What it reaches', title: 'About 51 km\u00b2 of new water, and what it touches.', next: 'Can we trust it',
+      text: 'Model estimate: 51.2 km\u00b2 of new flooding, 22.9 km of road in flooded areas and 35 places within 500 m. Not independently verified.',
+      run: async () => { await toLiveMap(); cover(); setCloud(false); tog.roads.checked = tog.villages.checked = tog.change.checked = true; tog.radar.checked = false; if (basemapKey !== 'osm') setBasemap('osm'); applyLayers(); map.flyTo(centre, liveZoom(), { duration: REDUCE ? 0 : 1.2 }); animateTo(1); } },
+    { name: 'Trust', title: 'We show where it works, and where it does not.', next: 'Explore the map',
+      text: 'On 11 hand-labelled floods the model beats the best simple threshold every time, and Pakistan is the weakest. On Morocco a first check favours the simple threshold, so we call that result an estimate.',
+      run: async () => { await toLiveMap(); cover(); setCloud(false); showScene('Bolivia'); } }
+  ];
+  const tour = { on: false, i: 0, busy: false };
+  function drawTour() {
+    const t = TOUR[tour.i];
+    $('tourStep').textContent = 'Step ' + (tour.i + 1) + ' of ' + TOUR.length + ' \u00b7 ' + t.name; $('tourTitle').textContent = t.title; $('tourText').textContent = t.text;
+    $('tourNext').textContent = tour.i === TOUR.length - 1 ? 'Explore the map' : t.next; $('tourBack').style.visibility = tour.i ? 'visible' : 'hidden';
+    $('tourDots').innerHTML = TOUR.map((_, k) => '<i class="' + (k === tour.i ? 'on' : '') + '"></i>').join('');
+  }
+  async function tourGo(i) {
+    if (tour.busy) return; tour.busy = true; tour.i = i; document.body.dataset.ts = String(i); drawTour();
+    try { await TOUR[i].run(); } catch (e) { /* keep going */ } finally { tour.busy = false; }
+  }
+  function startTour() { tour.on = true; document.body.classList.add('touring'); $('tour').hidden = false; try { closeSheet(); } catch (e) { /* none */ } tourGo(0); }
+  function endTour(final) {
+    tour.on = false; document.body.classList.remove('touring'); delete document.body.dataset.ts; $('tour').hidden = true; cover();
+    if (final) { setCloud(false); if (view === 'scene') showLive(); }
+  }
+  $('tourNext').onclick = () => { if (tour.i < TOUR.length - 1) tourGo(tour.i + 1); else endTour(true); };
+  $('tourBack').onclick = () => { if (tour.i > 0) tourGo(tour.i - 1); };
+  $('tourSkip').onclick = () => endTour(false);
+  $('ctaTour').onclick = startTour;
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && tour.on) endTour(false); });
 
   showMethod(methods[0]);
 })();
