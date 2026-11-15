@@ -1,0 +1,209 @@
+# CHANGELOG.md
+# Changelog
+
+All notable changes to the **SAR Morocco Flood Dataset** are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [1.0.0] — 2026-09-27
+
+### Initial release
+
+**Version 1.0.0** is the first public release of the SAR Morocco Flood Dataset,
+associated with the Data in Brief manuscript:
+
+> Kzadri M., Begdouri A., El Fazazy K., Qjidaa H., Ouazzani Jamil M., Tairi H.,
+> & Riffi J. (2026). *A georeferenced Sentinel-1 SAR dataset for water
+> and flood segmentation in five Moroccan hydrological zones (2024–2026)*.
+> Data in Brief, [manuscript in preparation].
+
+### Added
+
+- **1,497 georeferenced Sentinel-1 SAR patches** (256 × 256 pixels, dual-polarization VV+VH)
+  distributed across five hydrological zones in northern-central Morocco.
+- **1,497 binary water masks** (256 × 256 pixels, uint8) co-registered with the SAR patches.
+- **Per-zone metadata CSV files** with 25 standardized fields per patch
+  (Zone 2 includes two additional columns: `source_image` and `season` to distinguish
+  the Summer 2024 and Winter 2025 acquisitions).
+- **Consolidated metadata_global.csv** containing all 1,497 patches.
+- **Per-zone README Markdown files** documenting acquisition dates, hydrological context,
+  and processing parameters.
+- **Raw Sentinel-1 GRD median composites** (VV+VH) and full-scene water masks per zone.
+- **Auxiliary JRC Global 
+
+# README.md
+# SAR Morocco Flood Dataset
+
+**A georeferenced Sentinel-1 SAR dataset for water and flood segmentation in five Moroccan hydrological zones (2024–2026)**
+
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.22964153-blue.svg)](https://doi.org/10.5281/zenodo.22964153)
+[![Data in Brief](https://img.shields.io/badge/Article-Data%20in%20Brief-orange.svg)]()
+
+---
+
+## Overview
+
+The **SAR Morocco Flood Dataset** is a curated collection of **1,497 georeferenced Sentinel-1 SAR patches** (256 × 256 pixels, dual-polarization VV+VH) with corresponding **binary water masks**, distributed across **five hydrological zones** in northern-central Morocco. It captures recent hydrological events documented between September 2024 and April 2026, including major floods, reservoir states at contrasting seasons, and a post-drought reservoir filling.
+
+The dataset was developed to support the training and evaluation of deep learning models targeting SAR-based water body and flood segmentation in Mediterranean and North African contexts, addressing the current under-representation of this region in publicly available flood datasets such as Sen1Floods11 and S1S2-Water.
+
+## Highlights
+
+- **1,497 co-registered patches** (256 × 256 pixels)
+- **Dual-polarization Sentinel-1** imagery (VV + VH, in decibels)
+- **Binary water masks** aligned pixel-per-pixel with SAR patches
+
+
+# README.md
+# Zone 1 — Ksar El Kebir (Loukkos basin)
+
+**January–February 2026 flood event**
+
+---
+
+## Overview
+
+This subfolder contains the Sentinel-1 SAR patches and binary water masks for **Zone 1 — Ksar El Kebir**, located in the Loukkos hydrological basin in northern Morocco. The zone covers the flooded plain around the city of Ksar El Kebir during the intense rainfall event of January–February 2026.
+
+## Geographic context
+
+| Attribute | Value |
+|-----------|-------|
+| Location | Ksar El Kebir, Larache Province, Morocco |
+| Basin | Loukkos |
+| AOI bounds | [-6.0201°, -5.7899°] E, [34.9000°, 35.1001°] N |
+| AOI size | ~25.6 × 22.2 km |
+| Central coordinates | 5.905°W, 35.000°N |
+
+## Hydrological event
+
+The Loukkos basin experienced sustained heavy rainfall during late January and early February 2026, leading to the overflow of the Loukkos river and its tributaries. The Ksar El Kebir plain, historically prone to flooding due to its low elevation and proximity to the Atlantic coast, was one of the most affected areas.
+
+## Sentinel-1 acquisition parameters
+
+| Parameter | Value |
+|-----------|-------|
+| Platforms | Sentinel-1A + Sentinel-1C |
+| Number of scenes | 9 |
+| Acquisition window | 27 January – 4 February 2026 |
+| Product type | GRD (Ground Range Detected) |
+| Mode | IW (Interferometric Wide swath) |
+| Polarizations | VV, VH |
+| Relative orbits (Asc) | 74, 147 |
+| Relative orbits (Desc) | 81, 154 |
+| Incidence angle range | 30.5° – 30.8° |
+| Nominal pixel spacing | 10 m |
+
+Note: Th
+
+# README.md
+# Zone 2 — Al Wahda reservoir (Sebou basin)
+
+**Summer 2024 + Winter 2025 — two contrasting seasonal states**
+
+---
+
+## Overview
+
+This subfolder contains the Sentinel-1 SAR patches and binary water masks for **Zone 2 — Al Wahda reservoir**, the largest dam in Morocco, located in the Sebou hydrological basin. Zone 2 is unique in the dataset because it captures the same area at **two contrasting seasonal states**:
+
+- **Summer 2024** (September–October 2024): reservoir at lower filling after the dry season.
+- **Winter 2025** (February–March 2025): reservoir at higher filling after winter rainfall.
+
+This dual acquisition allows model evaluation on temporal variations of the same water body under different hydrological regimes.
+
+## Geographic context
+
+| Attribute | Value |
+|-----------|-------|
+| Location | Al Wahda reservoir, Ouazzane / Taounate Provinces, Morocco |
+| Basin | Sebou |
+| AOI bounds | [-5.3200°, -4.9999°] E, [34.5000°, 34.7001°] N |
+| AOI size | ~35.5 × 22.2 km |
+| Central coordinates | 5.160°W, 34.600°N |
+
+## Hydrological event
+
+Al Wahda is Morocco's largest reservoir by capacity (~3.7 billion m³), created by the Al Wahda dam on the Ouergha river (a major tributary of the Sebou). The reservoir plays a central role in flood regulation, agricultural irrigation, and hydropower generation in the Sebou basin. Its filling level varies substantially between seasons, making it an ideal target for benchmarking water segmentation models across contrasting conditions.
+
+## Senti
+
+# README.md
+# Zone 3 — Sidi Mohammed Ben Abdellah reservoir (Bouregreg basin)
+
+**March 2026 post-drought filling event**
+
+---
+
+## Overview
+
+This subfolder contains the Sentinel-1 SAR patches and binary water masks for **Zone 3 — Sidi Mohammed Ben Abdellah (SMBA) reservoir**, located in the Bouregreg hydrological basin approximately 60 km southeast of Rabat. Zone 3 captures the reservoir at high filling during the March 2026 recovery period, following several years of drought in central Morocco.
+
+## Geographic context
+
+| Attribute | Value |
+|-----------|-------|
+| Location | SMBA reservoir, Khemisset Province, Morocco |
+| Basin | Bouregreg |
+| AOI bounds | [-6.8001°, -6.4500°] E, [33.7800°, 34.0502°] N |
+| AOI size | ~38.9 × 30.0 km |
+| Central coordinates | 6.625°W, 33.915°N |
+
+## Hydrological event
+
+The SMBA reservoir is a strategic water infrastructure supplying drinking water to the Rabat-Casablanca metropolitan area. Central Morocco experienced severe drought conditions from 2022 to 2025, leading to critically low filling levels at SMBA. The winter 2025–2026 rainfall season brought partial recovery, and Zone 3 captures the reservoir at post-drought filling during the March 2026 acquisition window.
+
+## Sentinel-1 acquisition parameters
+
+| Parameter | Value |
+|-----------|-------|
+| Platforms | Sentinel-1A + Sentinel-1C |
+| Number of scenes | 6 |
+| Acquisition window | 22 March – 4 April 2026 |
+| Product type | GRD (Ground Range Detected) |
+| Mode | IW (Interferometric Wide swath) |
+| 
+
+# README.md
+# Zone 4 — Gharb plain (Sebou basin, lower)
+
+**February 2026 flood — largest event covered in the dataset**
+
+---
+
+## Overview
+
+This subfolder contains the Sentinel-1 SAR patches and binary water masks for **Zone 4 — Gharb plain**, located in the lower Sebou basin between Kenitra and Sidi Kacem in northwestern Morocco. Zone 4 covers the largest hydrological event in the dataset: the extensive Gharb flood of February 2026, which affected approximately 85,000 hectares of agricultural land in the region (Moroccan Ministry of Agriculture, 27 February 2026).
+
+Zone 4 is the largest zone in the dataset both in geographic extent (~88.8 × 44.5 km) and in number of patches (887 out of 1,497 total).
+
+## Geographic context
+
+| Attribute | Value |
+|-----------|-------|
+| Location | Gharb plain, Kenitra / Sidi Kacem Provinces, Morocco |
+| Basin | Sebou (lower) |
+| AOI bounds | [-6.5501°, -5.7499°] E, [34.1999°, 34.6007°] N |
+| AOI size | ~88.8 × 44.5 km |
+| Central coordinates | 6.150°W, 34.400°N |
+
+## Hydrological event
+
+The Gharb plain is a low-lying alluvial region drained by the Sebou river and its tributaries, historically prone to flooding due to its low elevation, poor drainage, and dense hydrographic network. The rainfall event of late January – early February 2026 caused the Sebou river to overflow, submerging extensive agricultural areas including rice fields, sugar beet plantations, and vegetable crops. According to the Moroccan Ministry of Agriculture (statement of 27 February 20
+
+# CSV metadata_zone1.csv (102, 27)
+['patch_id', 'zone_id', 'zone_name', 'basin', 'country', 'event', 'acquisition_date', 'satellite', 'product', 'polarization', 'mode', 'resolution_m', 'patch_width_px', 'patch_height_px', 'center_lon', 'center_lat', 'bounds_west', 'bounds_east', 'bounds_south', 'bounds_north', 'n_water_pixels', 'n_total_pixels', 'water_fraction', 'water_class', 'annotation_method', 'image_path', 'mask_path']
+
+# CSV z1_component_analysis.csv (78, 7)
+['patch_id', 'n_components', 'water_fraction', 'largest_comp_size', 'largest_comp_sar', 'max_sar_comp_size', 'max_sar_comp_db']
+
+# CSV metadata_zone2.csv (292, 29)
+['patch_id', 'zone_id', 'zone_name', 'basin', 'country', 'event', 'source_image', 'season', 'acquisition_date', 'satellite', 'product', 'polarization', 'mode', 'resolution_m', 'patch_width_px', 'patch_height_px', 'center_lon', 'center_lat', 'bounds_west', 'bounds_east', 'bounds_south', 'bounds_north', 'n_water_pixels', 'n_total_pixels', 'water_fraction', 'water_class', 'annotation_method', 'image_path', 'mask_path']
+
+{'file': 'Zone1_KsarElKebir_patch_0000.tif', 'crs': 'EPSG:4326', 'bounds': (-6.0201, 35.0599, -5.9971, 35.0829), 'bands': 2, 'dtype': 'float64', 'size': (256, 256), 'min': -26.221237182617188, 'max': 3.7679567337036133, 'mean': -10.649608612060547}
+
+{'file': 'Zone1_KsarElKebir_patch_0000.tif', 'crs': 'EPSG:4326', 'bounds': (-6.0201, 35.0599, -5.9971, 35.0829), 'bands': 1, 'dtype': 'uint8', 'size': (256, 256), 'min': 0.0, 'max': 1.0, 'mean': 0.1839141845703125}

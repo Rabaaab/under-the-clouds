@@ -1,0 +1,30 @@
+{
+  "otsu_threshold_db": -14.37,
+  "TP_cnn_and_reference_water": {
+    "pixels": 10682,
+    "median_db": -23.6,
+    "p10_db": -25.72,
+    "p90_db": -20.55
+  },
+  "FP_cnn_only": {
+    "pixels": 10611,
+    "median_db": -22.62,
+    "p10_db": -25.1,
+    "p90_db": -17.56
+  },
+  "FN_reference_only_cnn_missed": {
+    "pixels": 20506,
+    "median_db": -19.47,
+    "p10_db": -25.32,
+    "p90_db": -12.34
+  },
+  "TN_neither": {
+    "pixels": 592723,
+    "median_db": -9.54,
+    "p10_db": -11.52,
+    "p90_db": -7.41
+  },
+  "share_of_reference_water_below_otsu": 0.851,
+  "share_of_reference_nonwater_above_otsu": 0.952,
+  "share_of_missed_water_below_otsu": 0.774
+}

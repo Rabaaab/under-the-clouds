@@ -1,0 +1,73 @@
+Structure du dossier pour le volume Windows-SSD
+Le numéro de série du volume est 10C6-ECB9
+C:.
+|   .gitignore
+|   pytest.ini
+|   README.md
+|   requirements.txt
+|   
++---app
+|   |   index.html
+|   |   
+|   \---data
+|           after.png
+|           before.png
+|           change.png
+|           flood.geojson
+|           meta.json
+|           roads_affected.geojson
+|           villages_near.geojson
+|           
++---aya_flood_task
+|   |   project_structure.txt
+|   |   
+|   +---experiments
+|   +---reports
+|   +---results
+|   \---tests
++---docs
+|       DATA.md
+|       
++---notebooks
+|       train_colab.ipynb
+|       
++---scripts
+|       fetch_osm.py
+|       prepare_scene.py
+|       run_demo.py
+|       run_event.py
+|       sen1floods11.py
+|       train.py
+|       
++---src
+|   \---utc
+|           baseline.py
+|           change.py
+|           dataset.py
+|           demo.py
+|           event.py
+|           export_web.py
+|           impact.py
+|           infer.py
+|           io.py
+|           metrics.py
+|           model.py
+|           osm.py
+|           pipeline.py
+|           postprocess.py
+|           prepare.py
+|           preprocess.py
+|           s1f11_cli.py
+|           sen1floods11.py
+|           synthetic.py
+|           train.py
+|           __init__.py
+|           
+\---tests
+        test_core.py
+        test_event_cli.py
+        test_osm.py
+        test_pipeline.py
+        test_prepare.py
+        test_sen1floods11.py
+        

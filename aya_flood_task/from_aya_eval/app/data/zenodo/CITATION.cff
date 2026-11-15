@@ -1,0 +1,121 @@
+# =============================================================================
+# CITATION.cff - Machine-readable citation for the SAR Morocco Flood Dataset
+# =============================================================================
+#
+# Zenodo deposit: 10.5281/zenodo.22964153
+# URL: https://zenodo.org/records/22964153
+#
+# This file follows the Citation File Format v1.2.0 specification:
+# https://citation-file-format.github.io/
+# =============================================================================
+
+cff-version: 1.2.0
+message: "If you use this dataset, please cite it as below."
+type: dataset
+
+title: "SAR Morocco Flood Dataset: A georeferenced Sentinel-1 SAR dataset for water and flood segmentation in five Moroccan hydrological zones (2024-2026)"
+
+authors:
+  - family-names: "Kzadri"
+    given-names: "Marwane"
+    affiliation: "Laboratory of Computer Science, Innovation and Artificial Intelligence (L3IA), Faculty of Sciences Dhar El Mahraz (FSDM), Sidi Mohamed Ben Abdellah University (USMBA), Fez, Morocco; Intelligent Systems, Energy and Sustainable Development Laboratory (SIEDD), Université Privée de Fès (UPF), Fez, Morocco"
+    email: "marwane.kzadri@usmba.ac.ma"
+    orcid: "https://orcid.org/0009-0007-1307-0242"
+  - family-names: "Begdouri"
+    given-names: "Ahlame"
+    affiliation: "Intelligent Systems and Applications Laboratory (LISA), Faculty of Sciences and Techniques (FST-Fez), Sidi Mohamed Ben Abdellah University, Fez, Morocco"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: "El Fazazy"
+    given-names: "Khalid"
+    affiliation: "Laboratory of Computer Science, Innovation and Artificial Intelligence (L3IA), Faculty of Sciences Dhar El Mahraz (FSDM), Sidi Mohamed Ben Abdellah University (USMBA), Fez, Morocco"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: "Qjidaa"
+    given-names: "Hassan"
+    affiliation: "Intelligent Systems, Energy and Sustainable Development Laboratory (SIEDD), Université Privée de Fès (UPF), Fez, Morocco"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: "Ouazzani Jamil"
+    given-names: "Mohammed"
+    affiliation: "Intelligent Systems, Energy and Sustainable Development Laboratory (SIEDD), Université Privée de Fès (UPF), Fez, Morocco"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: "Tairi"
+    given-names: "Hamid"
+    affiliation: "Laboratory of Computer Science, Innovation and Artificial Intelligence (L3IA), Faculty of Sciences Dhar El Mahraz (FSDM), Sidi Mohamed Ben Abdellah University (USMBA), Fez, Morocco"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+  - family-names: "Riffi"
+    given-names: "Jamal"
+    affiliation: "Laboratory of Computer Science, Innovation and Artificial Intelligence (L3IA), Faculty of Sciences Dhar El Mahraz (FSDM), Sidi Mohamed Ben Abdellah University (USMBA), Fez, Morocco; Intelligent Systems, Energy and Sustainable Development Laboratory (SIEDD), Université Privée de Fès (UPF), Fez, Morocco"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"
+
+version: "1.0.0"
+date-released: "2026-09-27"
+
+# DOI and URL from Zenodo deposit
+doi: "10.5281/zenodo.22964153"
+url: "https://zenodo.org/records/22964153"
+
+license: "CC-BY-4.0"
+
+keywords:
+  - "Sentinel-1"
+  - "Synthetic Aperture Radar"
+  - "SAR"
+  - "flood mapping"
+  - "water segmentation"
+  - "semantic segmentation"
+  - "deep learning"
+  - "Morocco"
+  - "HSBA"
+  - "Otsu thresholding"
+  - "remote sensing"
+  - "Copernicus"
+  - "Google Earth Engine"
+  - "benchmark dataset"
+
+abstract: >-
+  The SAR Morocco Flood Dataset provides 1,497 co-registered Sentinel-1 SAR
+  patches (256 x 256 pixels, dual-polarization VV+VH) and corresponding binary
+  water masks distributed across five hydrological zones in northern-central
+  Morocco. The dataset covers recent hydrological events documented between
+  September 2024 and April 2026, including the Ksar El Kebir flood
+  (January-February 2026), the Gharb plain flood (February 2026), reservoir
+  states at contrasting seasons (Al Wahda, summer 2024 and winter 2025), the
+  SMBA post-drought filling (March 2026), and the Bin El Ouidane reservoir at
+  high winter filling (winter 2026). Water masks were generated
+  semi-automatically using the Hierarchical Split-Based Approach (HSBA)
+  combined with Otsu thresholding and morphological post-processing, followed
+  by two-pass visual quality control. All data are provided as georeferenced
+  GeoTIFF files with per-patch CSV metadata and zone-level Markdown
+  documentation. The dataset supports training and evaluation of deep learning
+  models for SAR-based flood mapping in Mediterranean and North African
+  contexts.
+
+preferred-citation:
+  type: article
+  title: "A georeferenced Sentinel-1 SAR dataset for water and flood segmentation in five Moroccan hydrological zones (2024-2026)"
+  authors:
+    - family-names: "Kzadri"
+      given-names: "Marwane"
+      affiliation: "L3IA, FSDM, USMBA, Fez, Morocco; SIEDD, UPF, Fez, Morocco"
+      email: "marwane.kzadri@usmba.ac.ma"
+      orcid: "https://orcid.org/0009-0007-1307-0242"
+    - family-names: "Begdouri"
+      given-names: "Ahlame"
+      affiliation: "LISA, FST-Fez, USMBA, Morocco"
+    - family-names: "El Fazazy"
+      given-names: "Khalid"
+      affiliation: "L3IA, FSDM, USMBA, Fez, Morocco"
+    - family-names: "Qjidaa"
+      given-names: "Hassan"
+      affiliation: "SIEDD, UPF, Fez, Morocco"
+    - family-names: "Ouazzani Jamil"
+      given-names: "Mohammed"
+      affiliation: "SIEDD, UPF, Fez, Morocco"
+    - family-names: "Tairi"
+      given-names: "Hamid"
+      affiliation: "L3IA, FSDM, USMBA, Fez, Morocco"
+    - family-names: "Riffi"
+      given-names: "Jamal"
+      affiliation: "L3IA, FSDM, USMBA, Fez, Morocco; SIEDD, UPF, Fez, Morocco"
+  journal: "Data in Brief"
+  year: 2026
+  status: "in-preparation"

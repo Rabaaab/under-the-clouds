@@ -1,0 +1,9 @@
+{
+  "patches_used": 103,
+  "date_window_days": 6,
+  "after_date": "2026-02-08",
+  "date_filter_dropped": false,
+  "patches_without_date": 103,
+  "covered_percent": 26.3325925603149,
+  "label_source": "Zenodo 10.5281/zenodo.22964153 (HSBA + Otsu, semi-automatic)"
+}
