@@ -181,6 +181,8 @@
 
   /* ---------- world view ---------- */
   body[data-view=scene] .liveonly { display: none !important; }
+  body[data-view=scene]:not([data-cmp]) #divider { display: none; }
+  body[data-cmp] .tag i { display: none; }
   body[data-view=live] .sceneonly { display: none !important; }
   .sw .rd { width: 14px; height: 10px; border-radius: 3px; background: linear-gradient(90deg, #36607E, #F0ECD8); }
   .bm { display: flex; flex-direction: column; gap: 6px; padding: 8px 0 2px; border-top: 1px solid rgba(255,255,255,.1); margin-top: 6px; }
@@ -271,7 +273,7 @@
   <div class="cb"><button class="pri" id="openMapBtn">Open the flood map &rarr;</button><button class="lnk" id="cloudCta" style="color:var(--gold)">See the cloud test: optical vs radar</button><button class="lnk" id="backEarthBtn">Back to the Earth</button></div>
 </div>
 
-<div id="divider" class="mapui liveonly">
+<div id="divider" class="mapui">
   <div class="dline"></div>
   <div class="tag a gl"><span id="tagA">After</span><i id="dAfter"></i></div>
   <div class="tag b gl"><span id="tagB">Before</span><i id="dBefore"></i></div>
@@ -324,7 +326,7 @@
 <div class="ui zoom gl mapui"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">&minus;</button></div>
 
 <div class="ui timeline gl mapui liveonly">
-  <div class="row"><span class="micro" id="tlTitle" style="color:#C9D6E6">Sentinel-1 passes &middot; one every 6 days</span><span class="micro" id="badge" style="color:var(--gold)">Model estimate &middot; no reference map yet</span></div>
+  <div class="row"><span class="micro" id="tlTitle" style="color:#C9D6E6">Sentinel-1 passes &middot; one every 6 days</span><span class="micro" id="badge" style="color:var(--gold)">Model estimate &middot; not independently verified</span></div>
   <div class="tlbar" id="tlbar"></div>
   <div class="credit" id="credit">Contains modified Copernicus Sentinel data (2026), ASF DAAC HyP3. Roads, places and basemap &copy; OpenStreetMap contributors.</div>
   <div class="tlnote" id="tlnote">Filled: processed. Open: radar available, not processed.</div>
@@ -332,7 +334,7 @@
 
 <div class="ui sidescene mapui sceneonly gl" id="sceneLegend">
   <div class="micro">Show</div>
-  <div class="sseg" id="sseg" role="radiogroup" aria-label="Layers"><button type="button" role="radio" aria-checked="true" data-s="model">Model</button><button type="button" role="radio" aria-checked="false" data-s="truth">Hand-labelled</button><button type="button" role="radio" aria-checked="false" data-s="both">Both</button></div>
+  <div class="sseg" id="sseg" role="radiogroup" aria-label="Layers"><button type="button" role="radio" aria-checked="true" data-s="compare">Compare</button><button type="button" role="radio" aria-checked="false" data-s="model">Model</button><button type="button" role="radio" aria-checked="false" data-s="truth">Labelled</button><button type="button" role="radio" aria-checked="false" data-s="both">Both</button></div>
   <div class="leg2"><span><i class="sq2"></i>Model: water</span><span><i class="sq3"></i>Hand-labelled water</span></div>
 </div>
 <div class="ui schips mapui sceneonly">
@@ -373,7 +375,7 @@
   const dm0 = /\(([A-Za-z]+ \d+)\s*[-–]\s*([A-Za-z]+ \d+),\s*(\d{4})\)/.exec(eventName);
   $('eyebrow').textContent = em ? em[1] + (dm0 ? ' · ' + dm0[1] + ' – ' + dm0[2] + ', ' + dm0[3] : '') : 'Flood map';
   const hasMetrics = Object.keys(meta.metrics || {}).length > 0;
-  $('badge').textContent = meta.synthetic ? 'Synthetic demo data' : (hasMetrics ? 'Scored against a reference mask' : 'Model estimate · no reference map yet');
+  $('badge').textContent = meta.synthetic ? 'Synthetic demo data' : (hasMetrics ? 'Scored against a reference mask' : 'Model estimate · not independently verified');
   const dm = /\(([A-Za-z]+ \d+)\s*[-–]\s*([A-Za-z]+ \d+),\s*(\d{4})\)/.exec(eventName);
   if (dm) { $('dBefore').textContent = dm[1]; $('dAfter').textContent = dm[2]; }
 
@@ -464,13 +466,19 @@
   }
 
   // ---------- compare: After image (and the flood) shows left of the divider ----------
-  let ratio = 0.5;
+  let ratio = 0.5, cmpMode = false, fitRatio = 0.5;
   const divider = $('divider'), handle = $('handle');
   const clipped = [map.getPane('afterPane'), map.getPane('changePane')];
   function updateClip() {
     const nw = map.containerPointToLayerPoint([0, 0]), se = map.containerPointToLayerPoint(map.getSize());
     const x = nw.x + (se.x - nw.x) * ratio;
-    clipped.forEach((p) => { p.style.clip = 'rect(' + nw.y + 'px,' + x + 'px,' + se.y + 'px,' + nw.x + 'px)'; });
+    if (cmpMode) {   // benchmark flood: the model's water on the left of the line, the hand-labelled water on the right
+      map.getPane('sModel').style.clip = 'rect(' + nw.y + 'px,' + x + 'px,' + se.y + 'px,' + nw.x + 'px)';
+      map.getPane('sTruth').style.clip = 'rect(' + nw.y + 'px,' + se.x + 'px,' + se.y + 'px,' + x + 'px)';
+    } else {
+      clipped.forEach((p) => { p.style.clip = 'rect(' + nw.y + 'px,' + x + 'px,' + se.y + 'px,' + nw.x + 'px)'; });
+      map.getPane('sModel').style.clip = ''; map.getPane('sTruth').style.clip = '';
+    }
     divider.style.left = (ratio * 100) + '%'; handle.setAttribute('aria-valuenow', String(Math.round(ratio * 100)));
   }
   const setRatio = (r) => { ratio = Math.max(0, Math.min(1, r)); updateClip(); };
@@ -480,7 +488,7 @@
   const moveTo = (ev) => setRatio(ev.clientX / window.innerWidth);
   let hideT = 0, dragging = false;
   const showLine = () => { clearTimeout(hideT); divider.classList.add('show'); };
-  const hideLine = (ms) => { clearTimeout(hideT); hideT = setTimeout(() => { if (!dragging && !cloudMode) divider.classList.remove('show'); }, ms); };
+  const hideLine = (ms) => { clearTimeout(hideT); hideT = setTimeout(() => { if (!dragging && !cloudMode && !cmpMode) divider.classList.remove('show'); }, ms); };
   handle.addEventListener('pointerenter', showLine); handle.addEventListener('pointerleave', () => hideLine(900));
   handle.addEventListener('focus', showLine); handle.addEventListener('blur', () => hideLine(300));
   handle.addEventListener('pointerdown', (ev) => { dragging = true; showLine(); cancelAnimationFrame(anim); handle.setPointerCapture(ev.pointerId); map.dragging.disable(); moveTo(ev); });
@@ -600,7 +608,7 @@
       '<table><tr><th>Check</th><th>Model IoU</th><th>Best simple threshold</th></tr><tr><td>Test split, 90 scenes from 10 floods</td><td>0.687</td><td>0.530</td></tr><tr><td>Bolivia flood, held out, 15 scenes</td><td>0.601</td><td>0.586*</td></tr></table>' +
       '<p>*Naive per-scene threshold; against the single tuned threshold the model leads by 0.08.</p>' +
       (world ? '<table><tr><th>Flood</th><th>Scenes</th><th>Model IoU</th><th>Threshold IoU</th></tr>' + worldRows() + '</table>' : '') +
-      '<p>The test scenes come from the same floods as the training scenes but are different pictures, so the Bolivia row is the fairer check. Morocco 2026 has no accuracy score yet, because we have no reference flood map for those dates.</p>' +
+      '<p>The test scenes come from the same floods as the training scenes but are different pictures, so the Bolivia row is the fairer check. Morocco 2026 is not verified: we have no expert flood map for those dates, and a first check against threshold-made water masks (Zenodo) favours the simple threshold, not the model.</p>' +
       '<p>For the Morocco map, the sea and a 1 km coastal strip are masked and tiny shapes are removed. That also removes some real narrow flooding, so the true area is probably between the cleaned and raw values.</p>',
     about: () => '<h2>About</h2><p>An independent team project for the NASA Space Apps Challenge 2026, challenge Dancing with the SARs. Built by Rabab, Ikram and Aya. Not an official NASA product.</p><ul>' +
       li('Model output, not a flood map', 'Road and place counts show what lies in or near detected water. They do not mean a road is impassable or a village is flooded.') +
@@ -631,7 +639,7 @@
   }
   function clearScene() { sceneLayers.forEach((l) => map.removeLayer(l)); sceneLayers = []; }
   function showLive() {
-    clearScene(); view = 'live'; sceneId = null; bodyEl.dataset.view = 'live';
+    clearScene(); cmpMode = false; delete bodyEl.dataset.cmp; $('tagA').textContent = 'After'; $('tagB').textContent = 'Before'; view = 'live'; sceneId = null; bodyEl.dataset.view = 'live';
     applyLayers();
     $('eyebrow').textContent = liveEyebrow; $('place').textContent = livePlace;
     viewBounds = bounds; map._covered = false; cover();
@@ -642,8 +650,13 @@
     const mode = document.querySelector('#sseg [aria-checked=true]').dataset.s;
     const [radar, truth, model] = sceneLayers;
     if (!radar) return;
-    map.getPane('sTruth').style.display = (mode === 'truth' || mode === 'both') ? '' : 'none';
-    map.getPane('sModel').style.display = (mode === 'model' || mode === 'both') ? '' : 'none';
+    const was = cmpMode; cmpMode = mode === 'compare';
+    map.getPane('sTruth').style.display = (mode === 'truth' || mode === 'both' || cmpMode) ? '' : 'none';
+    map.getPane('sModel').style.display = (mode === 'model' || mode === 'both' || cmpMode) ? '' : 'none';
+    if (cmpMode) {
+      bodyEl.dataset.cmp = 'on'; $('tagA').textContent = 'Model'; $('tagB').textContent = 'Hand-labelled'; showLine();
+      if (!was) { setRatio(0.04); animateTo(fitRatio); } else updateClip();
+    } else { delete bodyEl.dataset.cmp; $('tagA').textContent = 'After'; $('tagB').textContent = 'Before'; updateClip(); }
   }
   function showScene(id) {
     const e = world && world[id]; if (!e) return;
@@ -656,6 +669,22 @@
     $('sIou').textContent = e.model.iou.toFixed(2); $('sBase').textContent = e.baseline_vh.iou.toFixed(2); $('sN').textContent = String(e.n_scenes);
     $('rankNote').textContent = (e.model.precision > 0.6 && e.model.recall < 0.4) ? 'Hardest flood: finds only ' + Math.round(e.model.recall * 100) + '% of the water, but what it marks is right (' + Math.round(e.model.precision * 100) + '%)' : (e.split === 'bolivia' ? 'Held-out flood: not in training' : 'Same flood, different scenes than training');
     viewBounds = e.bounds; map._covered = false; cover(); renderRank(id);
+    fitRatio = 0.5; fitSplit(id, e);
+  }
+  // show the whole radar scene; the compare line goes through the middle of the hand-labelled water (model on its left, labelled water on its right)
+  async function fitSplit(id, e) {
+    if (sceneId !== id) return;
+    const narrow = window.innerWidth < 860;
+    map.fitBounds(e.bounds, { animate: false, paddingTopLeft: [narrow ? 12 : 60, narrow ? 190 : 110], paddingBottomRight: [narrow ? 12 : 60, narrow ? 330 : 260] });
+    fitRatio = 0.5;
+    try {
+      const im = await loadImg('data/world/' + id + '/truth.png'); if (sceneId !== id) return;
+      const w = 160, h = Math.max(1, Math.round(im.naturalHeight * 160 / im.naturalWidth)), c = document.createElement('canvas'); c.width = w; c.height = h;
+      const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(im, 0, 0, w, h); const d = x.getImageData(0, 0, w, h).data;
+      let sx = 0, n = 0; for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) if (d[(j * w + i) * 4 + 3] > 40) { sx += i; n++; }
+      if (n) { const lon = e.bounds[0][1] + (sx / n / w) * (e.bounds[1][1] - e.bounds[0][1]); fitRatio = Math.max(0.2, Math.min(0.8, map.latLngToContainerPoint([(e.bounds[0][0] + e.bounds[1][0]) / 2, lon]).x / map.getSize().x)); }
+    } catch (err) { /* keep the middle */ }
+    if (cmpMode) { setRatio(0.04); animateTo(fitRatio); } else updateClip();
   }
   function renderRank(active) {
     const host = $('rankCols'); if (!host) return; host.textContent = '';
@@ -664,7 +693,7 @@
       const b = document.createElement('button'); b.type = 'button'; b.className = 'rk' + (isLive ? ' live' : '') + (id === (active || '') ? ' on' : '');
       b.innerHTML = '<span class="rv"></span><span class="bar"><span class="fill"></span><span class="tick"></span></span><span class="rn"></span>';
       b.querySelector('.rv').textContent = isLive ? '\u2013' : iou.toFixed(2); b.querySelector('.rn').textContent = name;
-      if (!isLive) { b.querySelector('.fill').style.height = Math.round(iou * 100) + '%'; b.querySelector('.tick').style.bottom = Math.round(base * 100) + '%'; } else { b.querySelector('.fill').remove(); b.querySelector('.tick').remove(); b.title = 'Live case: no reference score yet'; }
+      if (!isLive) { b.querySelector('.fill').style.height = Math.round(iou * 100) + '%'; b.querySelector('.tick').style.bottom = Math.round(base * 100) + '%'; } else { b.querySelector('.fill').remove(); b.querySelector('.tick').remove(); b.title = 'Live case: not independently verified'; }
       b.onclick = () => { selected = id === 'live' ? 'live' : id; if (id === 'live') showLive(); else showScene(id); };
       host.appendChild(b);
     };

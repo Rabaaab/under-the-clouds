@@ -4,7 +4,7 @@
 
 Built for the NASA Space Apps Challenge 2026 (Meknès, Morocco), challenge *"Dancing with the SARs"* (observe changes on Earth's surface with radar data).
 
-> **Status: hackathon prototype.** The model is trained and scored on a public benchmark, and it has been run on a real flood in Morocco (the Loukkos plain near Ksar El Kebir, January to February 2026). There is **no accuracy score for the Moroccan event yet**, because we have no reference flood map for it. The Moroccan numbers below are model estimates, not verified measurements. Items marked **TBD** are not done.
+> **Status: hackathon prototype.** The model is trained and scored on a public benchmark, and it has been run on a real flood in Morocco (the Loukkos plain near Ksar El Kebir, January to February 2026). We have no expert flood map for the Moroccan event. A first, **preliminary** check against independent but threshold-made water masks is unfavourable to the model (see "Independent check in Morocco"), so the Moroccan numbers below are model estimates, not verified measurements. Items marked **TBD** are not done.
 
 **Live map:** https://rabaaab.github.io/under-the-clouds/app/ opens on a spinning Earth built from NASA Blue Marble and Black Marble imagery. Click the orange marker (live case: Morocco 2026) or any white marker (benchmark floods in 10 other countries). Go straight to the map with https://rabaaab.github.io/under-the-clouds/app/#map
 
@@ -43,7 +43,7 @@ before + after radar images
         |
   change = water after, minus water before
         |
-  clean-up (slope mask from NASADEM, remove tiny blobs)
+  clean-up (land/sea mask, remove tiny blobs; the code supports a slope mask, which we did not use)
         |
   intersect with OpenStreetMap roads and villages
         |
@@ -62,14 +62,15 @@ before + after radar images
 
 | Data | Use | Source |
 |---|---|---|
-| NISAR L-band radar | Planned input. **Not used for the Morocco event**: a search of ASF Vertex found no NISAR data for Jan to Feb 2026 | NASA Earthdata / ASF DAAC |
+| NISAR L-band radar | Supplementary experiments only (see "NISAR experiments"), not part of the main pipeline. **Not used for the Morocco Jan to Feb flood**: ASF Vertex has no NISAR data for those dates | NASA Earthdata / ASF DAAC |
 | Sentinel-1 radar (IW GRD, VV+VH) | Training data (via Sen1Floods11) and the Morocco flood event, processed to RTC by ASF HyP3 | ASF DAAC / Copernicus (ESA) |
 | Sen1Floods11 (hand-labelled subset) | Labeled water masks for training and testing | Public Google Cloud bucket (Bonafilia et al., 2020; check the dataset's terms before reuse) |
-| Optical imagery (HLS / Sentinel-2) | Independent reference on cloud-free days | NASA Earthdata |
-| NASADEM | Slope mask to reduce false alarms | NASA Earthdata |
+| NASA true-colour imagery (MODIS Terra, VIIRS) | Display only: the cloud test and the basemaps. **Not** a model input and **not** a reference | NASA GIBS |
+| Zenodo SAR Morocco Flood Dataset | Independent, semi-automatic water masks used for a preliminary check (CC BY 4.0, DOI 10.5281/zenodo.22964153) | Zenodo |
+| NASADEM | **Not used.** The code can take a slope mask; we did not use one | NASA Earthdata |
 | OpenStreetMap | Roads and villages for the impact layer | OpenStreetMap (not NASA data) |
 
-**Important data note:** NISAR public data starts late in 2025, so it does not cover the January to February 2026 Moroccan flood. We therefore used Sentinel-1, which has the same VV and VH polarisations as our training data. The model has not been tested on real NISAR data.
+**Important data note:** NISAR public data starts late in 2025, so it does not cover the January to February 2026 Moroccan flood. We therefore used Sentinel-1, which has the same VV and VH polarisations as our training data. The main pipeline uses Sentinel-1 only. Separate NISAR experiments (Ksar El Kebir, and a real flood in Mozambique) are reported below.
 
 ## Results
 
@@ -157,7 +158,16 @@ We say "road in flooded areas" and "places within 500 m of new water". We do not
 
 **What these Moroccan numbers are not:** they are model outputs, not measured accuracy. Taking out thin shapes also removes some real narrow flooding (ditches and channels), so the true flooded area is probably between the cleaned and the raw values.
 
-Further validation plan: score the result against a reference flood map for the same dates (`--truth` in `scripts/run_event.py`), or against a cloud-free optical water mask from a nearby date, and show failure cases. **TBD**, waiting for a reference map.
+### Independent check in Morocco (preliminary, unfavourable to the model)
+
+Aya scored our results against the Zenodo SAR Morocco Flood Dataset (semi-automatic water masks made with HSBA and Otsu thresholding). These masks are not expert ground truth, they may favour a threshold method, they cover only part of the scene, their dates are unknown, and they are water masks rather than change maps. 634,522 pixels were scored.
+
+| Method | IoU | Precision | Recall |
+|---|---|---|---|
+| Threshold baseline (Otsu, about -14.4 dB) | 0.442 | 0.48 | 0.85 |
+| U-Net (derived from the per-class pixel counts in `aya_experiments/diagnostics.json`: TP 10,682, FP 10,611, FN 20,506) | about 0.26 | about 0.50 | about 0.34 |
+
+**What this means:** the threshold wins on this reference. The reference itself is close to a threshold map (85 % of its water is below the Otsu line and 95 % of its non-water is above it), and the model misses water that is only moderately dark (median about -19.5 dB). The model score is **preliminary**: the band order and units of the Zenodo patches are still being checked. We report both numbers and do not call the Moroccan result validated. On the 11 hand-labelled benchmark floods, where the reference is not threshold-made, the model beats the best simple threshold on every flood.
 
 ### NISAR experiments (supplementary, not part of the main pipeline)
 
@@ -193,10 +203,10 @@ Why recall is low: 11.5 km² of flood was already present on 5 January (change d
 ## Limitations (stated up front)
 
 - Training labels come from **C-band** (Sentinel-1) data, while NISAR is **L-band**. Open water is dark in both, but **flooded vegetation** is bright in L-band HV (double-bounce), so the model misses it. Tested on a real NISAR scene (Mozambique, Limpopo Jan 2026): precision 0.96 but recall only ~0.33. Full solution requires retraining on L-band labels. See [`experiments/`](experiments/README.md).
-- Radar shadow on steep terrain can look like water. We mask steep slopes, but errors remain.
+- Radar shadow on steep terrain can look like water. The code supports a slope mask, but we did not use one for the Moroccan run, so such errors are not removed.
 - Built during a hackathon (about 24 hours of build time), so scope is deliberately small: one event, one main model.
 - The impact layer uses OpenStreetMap, whose coverage varies by region.
-- **No accuracy score for Morocco.** The benchmark results above do not prove the same performance on the Moroccan flood.
+- **No verified accuracy for Morocco.** The benchmark results above do not prove the same performance on the Moroccan flood, and the preliminary independent check (below) is unfavourable to the model.
 - **Known false alarms on the Moroccan map:** a small blob near the top-right corner (about 35.24 N, -5.77 E) and a short coastal line near Larache. The land mask uses Natural Earth, which is only accurate to a few hundred metres, so we use a 1 km coastal margin.
 - The clean-up settings (coastal margin and thin-shape removal) were chosen by looking at the result, not tuned against a reference.
 - Flooded vegetation and very shallow water look grey, not black, in radar, so both methods can miss them.
@@ -287,7 +297,7 @@ We trained a U-Net with a ResNet-34 encoder (starting from ImageNet weights) on 
 - **Verified against the real dataset (small sample only):** the Sen1Floods11 file layout, units and label values were checked against the official repo and a few real chips. The downloader, chip preparation, a 2-epoch CPU training run and the evaluation script ran end to end on 3 real scenes per split. The numbers from that run are meaningless (tiny data, 2 epochs).
 - **Verified:** the OpenStreetMap download worked on two areas (near Merzouga, and the Ksar El Kebir area for the Moroccan event).
 - **Verified:** the full training run on a Colab GPU, the benchmark and Bolivia scoring, and an end-to-end run on a real Sentinel-1 pair for the Moroccan flood. The web map shows that real result.
-- **Not yet done:** an accuracy score on the Moroccan event (needs a reference flood map), any test on real NISAR data, and a check of whether the flagged roads are actually impassable.
+- **Not yet done:** a verified accuracy score on the Moroccan event against an expert flood map, a confirmed re-run of the model on the Zenodo patches (band order and units to be checked), training on NISAR L-band labels, and a check of whether the flagged roads are actually impassable.
 
 ## Team
 
@@ -295,7 +305,7 @@ Team "Lunar", NASA Space Apps Challenge 2026, Meknès:
 
 - **Rabab** (repo owner): the model, training, evaluation, the pipeline and this documentation.
 - **Ikram**: the real Moroccan scenes, ASF processing, running the model on them, the coastal clean-up, the road and village impact, and the web map data.
-- **Aya**: the reference flood map for validation (in progress).
+- **Aya**: the independent reference masks and the first check of the threshold baseline and the model against them.
 
 ## AI tools disclosure
 
@@ -303,12 +313,13 @@ AI tools were used during the project, as required by the NASA Space Apps submis
 
 ## Acknowledgements and data attribution
 
-- NISAR is a joint mission of NASA and ISRO. NISAR data is distributed through NASA Earthdata and the Alaska Satellite Facility (ASF) DAAC. We did not use NISAR data for the Moroccan event.
+- NISAR is a joint mission of NASA and ISRO. NISAR data is distributed through NASA Earthdata and the Alaska Satellite Facility (ASF) DAAC. NISAR was not available for the Moroccan Jan to Feb event; it is used only in the supplementary experiments.
 - Contains modified Copernicus Sentinel data (2026), processed by ASF DAAC HyP3.
 - Land outline for the coastal mask: Natural Earth.
 - Earth textures and the optional basemaps: NASA Blue Marble (Next Generation, with bathymetry), VIIRS Black Marble 2016, VIIRS Suomi NPP true colour of 8 Feb 2026 (the cloud layer on the Earth) and MODIS Terra true colour, via NASA GIBS (Global Imagery Browse Services) and NASA Visible Earth. We acknowledge the use of imagery provided by services from NASA's GIBS, part of NASA's Earth Science Data and Information System (ESDIS).
 - Flood benchmark: Sen1Floods11 (Bonafilia et al., 2020), Sentinel-1 scenes with hand-labelled water.
-- NASADEM and HLS are NASA Earth science data products.
+- Zenodo SAR Morocco Flood Dataset (CC BY 4.0), DOI 10.5281/zenodo.22964153: independent semi-automatic water masks used for a preliminary check.
+- Mozambique flood reference: Copernicus Emergency Management Service (© 2026 European Union), activation EMSR857.
 - Road and village data: © OpenStreetMap contributors.
 - Created for the NASA Space Apps Challenge. This is an independent team project, not an official NASA product.
 
@@ -322,4 +333,4 @@ AI tools were used during the project, as required by the NASA Space Apps submis
 
 ## License
 
-**TBD.** MIT is a simple choice for a hackathon project. Add a `LICENSE` file before submission.
+MIT. See the [`LICENSE`](LICENSE) file.
