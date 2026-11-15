@@ -78,7 +78,7 @@ before + after radar images
 | NASADEM | **Not used.** The code can take a slope mask; we did not use one | NASA Earthdata |
 | OpenStreetMap | Roads and villages for the impact layer | OpenStreetMap (not NASA data) |
 
-**Important data note:** NISAR public data starts late in 2025, so it does not cover the January to February 2026 Moroccan flood. We therefore used Sentinel-1, which has the same VV and VH polarisations as our training data. The main pipeline uses Sentinel-1 only. Separate NISAR experiments (Ksar El Kebir, and a real flood in Mozambique) are reported below.
+**Important data note:** the public NISAR archive (ASF Vertex) has no scene over Ksar El Kebir for the January to February 2026 flood dates. We therefore used Sentinel-1, which has the same VV and VH polarisations as our training data. The main pipeline uses Sentinel-1 only. Separate NISAR experiments (Ksar El Kebir, and a real flood in Mozambique) are reported below.
 
 ## Results
 
