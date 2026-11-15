@@ -8,7 +8,13 @@ Built for the NASA Space Apps Challenge 2026 (Meknès, Morocco), challenge *"Dan
 
 **Live map:** https://rabaaab.github.io/under-the-clouds/app/ opens on a spinning Earth built from NASA Blue Marble and Black Marble imagery. Click the orange marker (live case: Morocco 2026) or any white marker (benchmark floods in 10 other countries). Go straight to the map with https://rabaaab.github.io/under-the-clouds/app/#map
 
+**Time machine:** on the live map, "Time machine" shows the model's water on each Sentinel-1 pass over Ksar El Kebir, with a curve and a play button. Orange is water the U-Net finds on that date that is not water on every date (sea, rivers and reservoirs are removed). The lowest value, on the dry date, is the model's false-alarm floor. It currently has five passes (22 Dec, 15 Jan, 2 Feb, 14 Feb, 20 Feb); more are added as their radar files are processed. This is a space-time use of our 2D model, not a trained 3D CNN, and the values are model estimates.
+
+**Evidence and NISAR windows:** the "Evidence" tab lists the five checks we ran (11-flood benchmark, held-out Bolivia flood, Morocco against Zenodo masks, Morocco against NASA's optical image of 14 Feb, NISAR on the Mozambique flood), each with what it shows and what it does not. The "NISAR" tab shows the NISAR L-band radar over Ksar El Kebir (also available as a map layer) and the Mozambique test.
+
 **Guided tour:** press "60-second tour" on the first screen for a five-step walk-through: the flood, NASA's cloud-covered image, the radar, what the water reaches, and how far to trust it.
+
+**Situation report:** on the live map, "Situation report for responders" downloads a CSV (opens in Excel) with the estimate figures, the places within 500 m of new water (Latin and Arabic names, coordinates) and the road segments that touch the flood. It is marked as a model estimate. The road rows list whole road segments, so their lengths are larger than the headline figure, which counts only the part inside flooded areas.
 
 **Cloud test:** on the live map, press "Cloud test" to compare NASA's own optical satellite image of 8 Feb 2026 (MODIS Terra true colour, via NASA GIBS) with our Sentinel-1 radar and the flooded area the model finds. Over Ksar El Kebir the optical image is covered by cloud on that day, the radar is not. This is a visual comparison for one place and one date, not a measurement of how often clouds hide floods.
 
@@ -226,6 +232,8 @@ How to read it: most of the water the optical image shows is also marked by the 
 - **Known false alarms on the Moroccan map:** a small blob near the top-right corner (about 35.24 N, -5.77 E) and a short coastal line near Larache. The land mask uses Natural Earth, which is only accurate to a few hundred metres, so we use a 1 km coastal margin.
 - The clean-up settings (coastal margin and thin-shape removal) were chosen by looking at the result, not tuned against a reference.
 - Flooded vegetation and very shallow water look grey, not black, in radar, so both methods can miss them.
+
+- **Floods only.** Landslides, earthquakes, wildfire, oil spills and deforestation are the roadmap, not built and not tested: each needs labelled examples we do not have. The "Radar change" layer shows any change in radar brightness, but it is not classified by the model. The change-and-impact steps of the pipeline are not flood-specific; only the classifier is.
 
 ## Repository structure
 

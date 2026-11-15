@@ -112,6 +112,7 @@
   .tk i { display: block; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #8696B2; margin-top: 8px; }
   .tk.on { color: var(--text); cursor: pointer; } .tk.on i { width: 14px; height: 14px; margin-top: 5px; background: var(--gold); border: 0; }
   .tk.on:hover i { box-shadow: 0 0 0 5px rgba(211,165,79,.25); }
+  .tk.proc { color: var(--text); } .tk.proc i { background: #8696B2; border-color: #8696B2; } .tk.proc:hover i { box-shadow: 0 0 0 5px rgba(134,150,178,.3); }
   .tkl { position: absolute; top: 31px; width: 80px; margin-left: -40px; text-align: center; font: 600 10.5px var(--sans); letter-spacing: .12em; color: var(--gold); }
   .tlnote { position: absolute; right: 22px; bottom: 9px; font-size: 11px; color: var(--micro); }
   .credit { position: absolute; left: 22px; bottom: 9px; font-size: 10.5px; color: var(--micro); max-width: 52%; line-height: 1.35; }
@@ -122,9 +123,15 @@
   .zoom button:hover { background: rgba(255,255,255,.1); }
 
   /* sheet (how it works, method, about) */
-  .sheetwrap { position: fixed; inset: 0; z-index: 2000; background: rgba(8,13,24,.7); display: none; align-items: center; justify-content: center; padding: 20px; }
-  .sheetwrap.open { display: flex; }
-  .sheet { width: min(760px, 100%); max-height: min(86vh, 760px); overflow: auto; border-radius: 26px; padding: 26px 30px 28px; background: #172640; border: 1px solid var(--glass-edge); box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+  .sheetwrap { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: stretch; justify-content: center; padding: 0; visibility: hidden; opacity: 0; pointer-events: none; background: radial-gradient(1000px 640px at 88% -8%, rgba(86,116,200,.30), transparent 62%), radial-gradient(760px 520px at 4% 108%, rgba(229,84,106,.14), transparent 62%), linear-gradient(rgba(8,13,24,.90), rgba(8,13,24,.97)), url(earth/day.jpg) center/cover; transition: opacity .45s ease, visibility 0s linear .45s; }
+  .starfield { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .starfield.tw { animation: twinkle 5.5s ease-in-out infinite alternate; }
+  @keyframes twinkle { from { opacity: .2; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .starfield.tw { animation: none; } }
+  .sheetwrap.open { visibility: visible; opacity: 1; pointer-events: auto; transition: opacity .45s ease; }
+  .sheet { position: relative; z-index: 1; width: min(1180px, 100%); height: 100%; overflow: auto; padding: 0 28px 90px; background: transparent; border: 0; box-shadow: none; transform: translateY(22px); transition: transform .6s cubic-bezier(.2,.7,.2,1); }
+  .sheetwrap.open .sheet { transform: none; }
+  .sheet .top { position: sticky; top: 0; z-index: 6; padding: 18px 0 16px; background: linear-gradient(rgba(8,13,24,.97) 72%, rgba(8,13,24,0)); }
   .sheet .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .tabs { display: inline-flex; gap: 4px; padding: 4px; background: rgba(255,255,255,.07); border-radius: 999px; }
   .tabs button { padding: 7px 16px; border-radius: 999px; font: 600 13px var(--sans); color: var(--muted); }
@@ -205,6 +212,110 @@
   body.touring[data-ts="4"] .rank { bottom: 12px; } body.touring[data-ts="4"] .schips { display: none; }
   body.touring[data-ts="4"] .tour { left: auto; right: 44px; transform: none; width: 390px; bottom: 196px; }
   body.touring .chips { bottom: 262px; } body.touring .rank { bottom: 262px; } body.touring .schips { bottom: 440px; }
+  .sw .ns { width: 14px; height: 10px; border-radius: 3px; background: linear-gradient(90deg, #10203A, #9CB6AC); }
+  .tabs { flex-wrap: wrap; }
+  .tm { left: 44px; right: 44px; bottom: 34px; border-radius: 24px; padding: 14px 22px 14px; z-index: 710; background: rgba(14,23,40,.84); }
+  .tm[hidden] { display: none; }
+  .tm .tmhead { display: flex; justify-content: space-between; align-items: center; }
+  .tm svg { width: 100%; height: auto; display: block; margin-top: 4px; max-height: 150px; }
+  .tm .tmrow { display: flex; align-items: center; gap: 10px; margin-top: 2px; flex-wrap: wrap; }
+  .tm .tb { font: 600 14px var(--sans); height: 38px; border-radius: 999px; padding: 0 18px; }
+  .tm .tb.p { background: var(--text); color: var(--ground); min-width: 76px; }
+  .tm .tb.s { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); color: var(--text); padding: 0 14px; }
+  #tmLabel { font: 500 13px var(--sans); color: #E3EBF5; margin-left: 6px; }
+  .tm .tmnote { margin: 6px 0 0; font: 400 12px/1.4 var(--sans); color: var(--muted); }
+  body[data-tm] .timeline, body[data-tm] .chips, body[data-tm] .method, body[data-tm] #divider, body[data-tm] .cloudnote, body[data-tm] .side, body[data-tm] .title .links { display: none !important; }
+  .evc { border: 1px solid rgba(255,255,255,.14); border-radius: 14px; padding: 12px 16px; margin-top: 12px; background: rgba(255,255,255,.04); }
+  .evc h3 { margin: 0 0 4px; font: 600 16px var(--display); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .evt { font: 600 10.5px var(--sans); letter-spacing: .1em; text-transform: uppercase; border-radius: 999px; padding: 3px 9px; border: 1px solid currentColor; }
+  .evt.up { color: #7FD1AE; } .evt.mid { color: #D3A54F; } .evt.dn { color: #F08A98; } .evt.lim { color: #A9B8CE; }
+  .evc .nums { font: 500 22px var(--display); color: var(--text); margin: 2px 0 4px; }
+  .evc .nums small { font: 500 12px var(--sans); color: var(--muted); margin-left: 6px; }
+  .evc p { margin: 4px 0 0; font-size: 13.5px; max-width: none; }
+  .evc p b { color: var(--text); }
+  .fig { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .fig figure { margin: 0; } .fig img, .sheet img.wide { width: 100%; display: block; border-radius: 10px; background: #000; }
+  .sheet img.wide { margin-top: 12px; background: #fff; }
+  .fig figcaption, .figcap { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  @media (max-width: 860px) { .fig { grid-template-columns: 1fr; } }
+
+  /* ---- pages ---- */
+  .pg h1 { margin: 10px 0 0; font: 600 clamp(34px, 5vw, 58px)/1.02 var(--display); letter-spacing: -.03em; max-width: 18ch; }
+  .sheet .pg p { margin: 12px 0 0; max-width: 64ch; color: #C9D6E6; font-size: 16px; line-height: 1.55; }
+  .pg-hero { padding: 26px 0 8px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: 34px; align-items: center; }
+  .pg-hero.solo { grid-template-columns: 1fr; }
+  .pg .kpis { display: flex; flex-wrap: wrap; gap: 12px; margin: 22px 0 6px; }
+  .pg .kpi { padding: 14px 18px; border-radius: 18px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); min-width: 150px; }
+  .pg .kpi b { display: block; font: 500 30px/1 var(--display); letter-spacing: -.01em; }
+  .pg .kpi span { display: block; margin-top: 6px; font-size: 12.5px; color: var(--muted); max-width: 22ch; line-height: 1.35; }
+  .pg h2 { margin: 40px 0 4px; font: 600 28px/1.1 var(--display); letter-spacing: -.02em; }
+  .pg .lead { margin-top: 6px; }
+  .pg-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+  .pcard { border-radius: 22px; padding: 20px 22px; background: rgba(23,38,64,.72); border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(10px); }
+  .pcard.wide { grid-column: 1 / -1; }
+  .pcard h3 { margin: 0; font: 600 19px/1.2 var(--display); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .pcard .big { margin: 8px 0 2px; font: 500 40px/1 var(--display); letter-spacing: -.02em; }
+  .pcard .big small { font: 500 13px var(--sans); color: var(--muted); letter-spacing: 0; margin-left: 8px; }
+  .sheet .pcard p { font-size: 14px; margin-top: 8px; max-width: none; }
+  .sheet .pcard p b { color: var(--text); }
+  .pcard .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: center; }
+  .br { display: grid; grid-template-columns: 112px 1fr 46px; gap: 10px; align-items: center; margin: 7px 0; font-size: 13px; color: #E3EBF5; }
+  .br b { font: 500 14px var(--display); text-align: right; font-variant-numeric: tabular-nums; }
+  .bt { position: relative; height: 10px; border-radius: 5px; background: rgba(255,255,255,.1); }
+  .bt i { display: block; height: 100%; border-radius: 5px; }
+  .bt u { position: absolute; top: -4px; width: 3px; height: 18px; border-radius: 2px; background: var(--gold); }
+  .legend2 { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .legend2 i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .cmp { position: relative; overflow: hidden; border-radius: 16px; background: #0b1424; aspect-ratio: 1 / 1; user-select: none; --x: 50%; }
+  .cmp.tall { aspect-ratio: 1119 / 1340; max-height: 560px; }
+  .cmp .cl { position: absolute; inset: 0; }
+  .cmp .cl.b { clip-path: inset(0 0 0 var(--x)); }
+  .cmp .cl img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cmp .ch { position: absolute; top: 0; bottom: 0; left: var(--x); width: 2px; margin-left: -1px; background: #F4F8FF; box-shadow: 0 0 0 1px rgba(0,0,0,.3); }
+  .cmp .ch::after { content: '\2194'; position: absolute; top: 50%; left: 50%; width: 38px; height: 38px; margin: -19px 0 0 -19px; border-radius: 50%; background: #F4F8FF; color: #0A0D13; display: grid; place-items: center; font: 600 17px var(--sans); box-shadow: 0 4px 16px rgba(0,0,0,.5); }
+  .cmp input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
+  .cmp .ct { position: absolute; top: 10px; padding: 5px 11px; border-radius: 999px; background: rgba(14,23,40,.8); font: 600 10.5px var(--sans); letter-spacing: .12em; text-transform: uppercase; pointer-events: none; }
+  .cmp .ct.l { left: 10px; } .cmp .ct.r { right: 10px; }
+  .gauges { display: flex; gap: 14px; flex-wrap: wrap; }
+  .gauge { position: relative; width: 104px; text-align: center; }
+  .gauge svg { width: 90px; height: 90px; display: block; margin: 0 auto; }
+  .gauge b { position: absolute; top: 28px; left: 0; right: 0; font: 600 20px var(--display); }
+  .gauge span { display: block; margin-top: 4px; font-size: 12px; color: var(--muted); }
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 18px; counter-reset: st; }
+  .step { border-radius: 20px; padding: 16px; background: rgba(23,38,64,.72); border: 1px solid rgba(255,255,255,.12); }
+  .step .n { font: 600 11px var(--sans); letter-spacing: .16em; color: var(--gold); }
+  .step h3 { margin: 4px 0 0; font: 600 18px/1.2 var(--display); }
+  .sheet .step p { font-size: 13px; margin-top: 6px; }
+  .step .vis { position: relative; margin-top: 12px; border-radius: 12px; overflow: hidden; background: #0b1424; aspect-ratio: 1.3 / 1; }
+  .step .vis img, .step .vis svg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .step .vis .pair { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+  .step .vis .pair figure { position: relative; margin: 0; overflow: hidden; }
+  .step .vis .pair figure img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .step .vis .pair span { position: absolute; left: 6px; bottom: 6px; padding: 2px 8px; border-radius: 999px; background: rgba(14,23,40,.8); font: 600 10px var(--sans); letter-spacing: .08em; }
+  .flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .flow .nd { padding: 9px 14px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); font: 600 13px var(--sans); }
+  .flow .ar { color: var(--gold); font-size: 18px; }
+  .tl3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-top: 14px; position: relative; }
+  .tl3::before { content: ''; position: absolute; left: 16%; right: 16%; top: 11px; height: 2px; background: rgba(255,255,255,.2); }
+  .tl3 div { text-align: center; position: relative; font-size: 12.5px; color: var(--muted); padding: 0 6px; }
+  .tl3 div i { display: block; width: 14px; height: 14px; margin: 4px auto 8px; border-radius: 50%; background: var(--gold); position: relative; }
+  .tl3 div b { display: block; color: var(--text); font: 600 14px var(--display); }
+  .team { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+  .person { border-radius: 20px; padding: 18px; background: rgba(23,38,64,.72); border: 1px solid rgba(255,255,255,.12); }
+  .person .av { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font: 600 19px var(--display); background: var(--blue); }
+  .person h3 { margin: 10px 0 2px; font: 600 19px var(--display); }
+  .sheet .person p { font-size: 13.5px; margin-top: 4px; }
+  .creds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+  .cr { border-radius: 16px; padding: 14px 16px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); font-size: 13px; color: #C9D6E6; }
+  .cr b { display: block; color: var(--text); font: 600 15px var(--display); margin-bottom: 2px; }
+  .callout2 { border-radius: 18px; padding: 14px 18px; margin-top: 14px; border: 1px solid rgba(211,165,79,.5); background: rgba(211,165,79,.08); font-size: 14px; color: #E3EBF5; }
+  .two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+  .pbtn { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; height: 46px; padding: 0 24px; border-radius: 999px; background: var(--text); color: var(--ground); font: 600 14.5px var(--sans); }
+  @media (max-width: 900px) {
+    .pg-hero { grid-template-columns: 1fr; gap: 20px; } .pg-grid, .two-col, .team, .creds { grid-template-columns: 1fr; } .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pcard .two { grid-template-columns: 1fr; } .br { grid-template-columns: 96px 1fr 46px; } .sheet { padding: 0 16px 90px; } .pg h1 { font-size: 34px; }
+  }
+  @media (max-width: 560px) { .steps { grid-template-columns: 1fr; } }
   .bm { display: flex; flex-direction: column; gap: 6px; padding: 8px 0 2px; border-top: 1px solid rgba(255,255,255,.1); margin-top: 6px; }
   .bmseg, .sseg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; background: rgba(255,255,255,.07); font: 600 12px var(--sans); }
   .bmseg button, .sseg button { padding: 5px 9px; border-radius: 999px; color: var(--muted); white-space: nowrap; }
@@ -245,13 +356,13 @@
     .title { left: 12px; right: 12px; top: 76px; max-width: none; padding: 12px 16px; border-radius: 16px; }
     .title .t { font-size: 26px; } .title .eyeb { font-size: 10px; letter-spacing: .1em; white-space: normal; }
     .side { right: 12px; left: auto; top: 186px; width: 190px; }
-    .lg { display: none; } .title .links { display: flex; gap: 18px; } .title .links .wlink { margin-top: 6px; }
+    .lg { display: none; } .title .links { display: flex; gap: 6px 18px; flex-wrap: wrap; } .title .links .wlink { margin-top: 6px; }
     .legend { padding: 10px 14px; } .lay { padding: 3px 0; font-size: 12px; }
     .tag { top: auto; bottom: 322px; padding: 5px 11px; } .tag i { display: none; }
     .chips { left: 12px; right: 12px; bottom: 150px; gap: 8px; } .chip { padding: 10px 12px; flex: 1; border-radius: 14px; } .chip .v { font-size: 22px; } .chip .v small { font-size: 12px; } .chip .l { font-size: 11px; }
     .method { left: 12px; bottom: 268px; font-size: 12px; } .method button { padding: 6px 12px; }
     .timeline { left: 12px; right: 12px; bottom: 12px; height: 126px; padding: 12px 16px; border-radius: 20px; }
-    .tlbar { left: 22px; right: 22px; } .tlline { top: 58px; } .tlband { top: 52px; } .tk { top: 58px; width: 30px; margin-left: -15px; font-size: 10px; } .tk:not(.on) span { display: none; } .tkl { top: 38px; font-size: 9px; }
+    .tlbar { left: 22px; right: 22px; } .tlline { top: 58px; } .tlband { top: 52px; } .tk { top: 58px; width: 30px; margin-left: -15px; font-size: 10px; } .tk:not(.on):not(.proc) span { display: none; } .tkl { top: 38px; font-size: 9px; }
     .credit { display: none; } .tlnote { display: none; } .timeline .row .micro { font-size: 10px; }
     .zoom { display: none; }
 
@@ -266,6 +377,7 @@
     .schips { left: 12px; right: 12px; bottom: 222px; gap: 8px; } .schips .chip { flex: 1; padding: 10px 12px; border-radius: 14px; } .schips .chip .v { font-size: 22px; } .schips .chip .l { font-size: 11px; }
     .rank { left: 12px; right: 12px; bottom: 12px; padding: 12px 14px 10px; border-radius: 20px; } .rank .rnote { display: none; } .rk { min-width: 56px; } .rk .bar { height: 48px; }
     .bm { display: none; }
+    .tm { left: 12px; right: 12px; bottom: 12px; padding: 12px 14px; border-radius: 20px; } #tmLabel { flex-basis: 100%; margin: 4px 0 0; }
     .tour { left: 12px; right: 12px; bottom: 12px; transform: none; width: auto; padding: 16px 18px; } .tour h2 { font-size: 22px; } .tour p { font-size: 13.5px; }
     body.touring .chips { bottom: 300px; } body.touring .rank { display: none; } body.touring .schips { bottom: 300px; }
     body.touring[data-ts="4"] .tour { left: 12px; right: 12px; width: auto; bottom: 12px; }
@@ -296,6 +408,13 @@
   <div class="cb"><button class="pri" id="openMapBtn">Open the flood map &rarr;</button><button class="lnk" id="cloudCta" style="color:var(--gold)">See the cloud test: optical vs radar</button><button class="lnk" id="backEarthBtn">Back to the Earth</button></div>
 </div>
 
+<div class="ui tm gl mapui liveonly" id="tm" hidden>
+  <div class="tmhead"><span class="micro">Time machine &middot; Sentinel-1 passes &middot; model estimate</span><button class="x" id="tmClose" type="button" aria-label="Close the time machine" style="width:30px;height:30px;font-size:17px">&times;</button></div>
+  <svg id="tmChart" viewBox="0 0 640 128" role="img" aria-label="Non-permanent water found by the model on each radar date"></svg>
+  <div class="tmrow"><button type="button" class="tb s" id="tmPrev" aria-label="Previous date">&lsaquo;</button><button type="button" class="tb p" id="tmPlay">Play</button><button type="button" class="tb s" id="tmNext" aria-label="Next date">&rsaquo;</button><span id="tmLabel"></span></div>
+  <p class="tmnote" id="tmNote"></p>
+</div>
+
 <div class="ui tour gl" id="tour" role="dialog" aria-label="Guided tour" hidden>
   <div class="top"><span class="micro" id="tourStep">Step 1 of 5</span><div class="stp" id="tourDots"></div></div>
   <h2 id="tourTitle"></h2><p id="tourText"></p>
@@ -310,7 +429,7 @@
 </div>
 
 <div class="ui brand"><svg role="img" aria-label="Under the Clouds, orbit with a small satellite" width="58" height="41" viewBox="-14 -12 160 112"><g fill="#F4F8FF"><circle cx="-7.4" cy="36.4" r="0.7"/><circle cx="-4.1" cy="30.2" r="0.8"/><circle cx="-0.2" cy="24.3" r="0.9"/><circle cx="4.3" cy="18.8" r="1.0"/><circle cx="9.3" cy="13.8" r="1.1"/><circle cx="14.9" cy="9.4" r="1.1"/><circle cx="20.8" cy="5.5" r="1.2"/><circle cx="27.1" cy="2.3" r="1.3"/><circle cx="33.7" cy="-0.3" r="1.4"/><circle cx="40.5" cy="-2.3" r="1.5"/><circle cx="47.5" cy="-3.5" r="1.6"/><circle cx="54.5" cy="-4.0" r="1.7"/><circle cx="61.6" cy="-3.8" r="1.8"/><circle cx="68.6" cy="-2.9" r="1.9"/><circle cx="75.5" cy="-1.2" r="2.0"/><circle cx="82.2" cy="1.1" r="2.0"/><circle cx="88.6" cy="4.1" r="2.1"/><circle cx="94.7" cy="7.7" r="2.2"/><circle cx="100.4" cy="11.9" r="2.3"/><circle cx="105.7" cy="16.7" r="2.4"/><circle cx="110.4" cy="21.9" r="2.5"/><circle cx="114.6" cy="27.7" r="2.6"/></g><g fill="#F4F8FF" transform="translate(126 35) rotate(-28) scale(0.82)"><rect x="-4.2" y="-4.2" width="8.4" height="8.4" rx="1.5"/><rect x="-8.7" y="-0.7" width="4.5" height="1.4"/><rect x="-15.899999999999999" y="-3.8" width="7.2" height="7.6"/><rect x="-24.099999999999998" y="-3.8" width="7.2" height="7.6"/><rect x="4.2" y="-0.7" width="4.5" height="1.4"/><rect x="8.7" y="-3.8" width="7.2" height="7.6"/><rect x="16.9" y="-3.8" width="7.2" height="7.6"/></g><path fill="#F4F8FF" d="M31.8 14.7a3.2 3.2 0 1 0 6.4 0a3.2 3.2 0 1 0 -6.4 0zM40 14.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 14.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60.4 14.7a4.6 4.6 0 1 0 9.2 0a4.6 4.6 0 1 0 -9.2 0zM73.2 14.7a1.8 1.8 0 1 0 3.7 0a1.8 1.8 0 1 0 -3.7 0zM22.3 24.5a2.7 2.7 0 1 0 5.5 0a2.7 2.7 0 1 0 -5.5 0zM30 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 24.5a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM21.3 34.3a3.7 3.7 0 1 0 7.4 0a3.7 3.7 0 1 0 -7.4 0zM30 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 34.3a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80.2 34.3a4.8 4.8 0 1 0 9.7 0a4.8 4.8 0 1 0 -9.7 0zM92 34.3a3 3 0 1 0 5.9 0a3 3 0 1 0 -5.9 0zM10.1 44.1a4.9 4.9 0 1 0 9.7 0a4.9 4.9 0 1 0 -9.7 0zM20 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90 44.1a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM103 44.1a2 2 0 1 0 3.9 0a2 2 0 1 0 -3.9 0zM10 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM20 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90 53.9a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM103.2 53.9a1.8 1.8 0 1 0 3.7 0a1.8 1.8 0 1 0 -3.7 0zM10.7 63.7a4.3 4.3 0 1 0 8.5 0a4.3 4.3 0 1 0 -8.5 0zM20 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM30 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM40 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM50 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM60 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM70 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM80 63.7a5 5 0 1 0 10 0a5 5 0 1 0 -10 0zM90.7 63.7a4.3 4.3 0 1 0 8.5 0a4.3 4.3 0 1 0 -8.5 0z"/><g class="twk"><circle cx="-8" cy="4" r="1.3" fill="#F4F8FF" style="animation-delay:0s"/><circle cx="126" cy="2" r="1.1" fill="#F4F8FF" style="animation-delay:0.7s"/><circle cx="140" cy="60" r="1.4" fill="#F4F8FF" style="animation-delay:1.3s"/><circle cx="2" cy="84" r="1.0" fill="#F4F8FF" style="animation-delay:0.4s"/><circle cx="120" cy="86" r="1.2" fill="#F4F8FF" style="animation-delay:1.9s"/><circle cx="86" cy="-6" r="1.0" fill="#F4F8FF" style="animation-delay:1.1s"/><circle cx="-11" cy="60" r="1.1" fill="#F4F8FF" style="animation-delay:2.4s"/><circle cx="64" cy="96" r="0.9" fill="#F4F8FF" style="animation-delay:0.9s"/></g><g class="spark"><g fill="#E5546A" transform="translate(55 89.4)"><rect x="-4.7" y="-4.7" width="9.4" height="9.4"/><rect x="-4.7" y="-4.7" width="9.4" height="9.4" transform="rotate(45)"/></g></g></svg><b>under the clouds</b></div>
-<div class="ui nav" role="navigation" aria-label="Sections"><button id="navEarth">Earth</button><button data-open="how">How it works</button><button data-open="method">Method</button><button id="navResults">Results</button><button data-open="about">About</button></div>
+<div class="ui nav" role="navigation" aria-label="Sections"><button id="navEarth">Earth</button><button data-open="how">How it works</button><button data-open="method">Method</button><button data-open="evidence">Evidence</button><button data-open="nisar">NISAR</button><button id="navResults">Results</button><button data-open="about">About</button></div>
 <button class="ui menubtn gl" data-open="how">Menu</button>
 
 <div class="ui title gl mapui">
@@ -318,6 +437,8 @@
   <div class="t" id="place">Loading</div>
   <div class="links">
     <button class="wlink liveonly" id="cloudBtn" type="button" aria-pressed="false">Cloud test<span class="lg">: NASA optical vs radar</span> &rarr;</button>
+    <button class="wlink liveonly" id="tmBtn" type="button">Time machine<span class="lg">: the flood over time</span> &rarr;</button>
+    <button class="wlink liveonly" id="reportBtn" type="button">Situation report<span class="lg"> for responders</span> &darr;</button>
     <button class="wlink liveonly" id="worldBtn" type="button"><span class="lg">Compare with </span>11 floods<span class="lg"> in other countries</span> &rarr;</button>
   </div>
 </div>
@@ -338,6 +459,8 @@
     <label class="lay"><input type="checkbox" id="tRadar"><span class="sw"><i class="rd"></i></span><span class="t">Radar image</span><span class="ck"></span></label>
     <label class="lay" title="Change in radar brightness between the two dates, for any kind of surface change. Not a flood map: wind on water, crops and building work also change it."><input type="checkbox" id="tChg"><span class="sw"><i class="cg"></i></span><span class="t">Radar change</span><span class="ck"></span></label>
     <div class="chgkey" id="chgKey" hidden><i class="bar"></i><div class="lab"><span>darker</span><span>no change</span><span>brighter</span></div><p>Any change between the two dates, not only water. Not a flood map.</p></div>
+    <label class="lay" title="NASA-ISRO NISAR L-band radar, 25 October 2026, eight months after the flood. Open water only."><input type="checkbox" id="tNis"><span class="sw"><i class="ns"></i></span><span class="t">NISAR L-band radar</span><span class="ck"></span></label>
+    <div class="chgkey" id="nisKey" hidden><p>NISAR, 25 Oct 2026, eight months after the flood. Open water only. Not the flood, not our trained model.</p></div>
     <div class="bm"><span class="micro">Basemap &middot; NASA imagery</span><div class="bmseg" id="bmseg" role="radiogroup" aria-label="Basemap"><button type="button" role="radio" aria-checked="true" data-bm="osm">Dark</button><button type="button" role="radio" aria-checked="false" data-bm="bm">Blue Marble</button><button type="button" role="radio" aria-checked="false" data-bm="tc">True colour</button></div></div>
   </div>
   <div class="placespanel gl" id="placesPanel" role="region" aria-label="Places near the flood">
@@ -358,7 +481,7 @@
   <div class="row"><span class="micro" id="tlTitle" style="color:#C9D6E6">Sentinel-1 passes &middot; one every 6 days</span><span class="micro" id="badge" style="color:var(--gold)">Model estimate &middot; not independently verified</span></div>
   <div class="tlbar" id="tlbar"></div>
   <div class="credit" id="credit">Contains modified Copernicus Sentinel data (2026), ASF DAAC HyP3. Roads, places and basemap &copy; OpenStreetMap contributors.</div>
-  <div class="tlnote" id="tlnote">Filled: processed. Open: radar available, not processed.</div>
+  <div class="tlnote" id="tlnote">Gold: the before and after pair. Grey: in the time machine (click). Open: not processed.</div>
 </div>
 
 <div class="ui sidescene mapui sceneonly gl" id="sceneLegend">
@@ -378,8 +501,9 @@
 </div>
 
 <div class="sheetwrap" id="sheetwrap" role="dialog" aria-modal="true" aria-label="About this map">
+  <canvas class="starfield" id="stars1" aria-hidden="true"></canvas><canvas class="starfield tw" id="stars2" aria-hidden="true"></canvas>
   <div class="sheet">
-    <div class="top"><div class="tabs" role="tablist"><button role="tab" data-tab="how">How it works</button><button role="tab" data-tab="method">Method</button><button role="tab" data-tab="about">About</button></div><button class="x" id="closeSheet" aria-label="Close">&times;</button></div>
+    <div class="top"><div class="tabs" role="tablist"><button role="tab" data-tab="how">How it works</button><button role="tab" data-tab="method">Method</button><button role="tab" data-tab="evidence">Evidence</button><button role="tab" data-tab="nisar">NISAR</button><button role="tab" data-tab="about">About</button></div><button class="x" id="closeSheet" aria-label="Close">&times;</button></div>
     <div id="sheetBody"></div>
   </div>
 </div>
@@ -416,7 +540,7 @@
   const cover = () => { map.invalidateSize(); const vb = L.latLngBounds(viewBounds), z = map.getBoundsZoom(vb, true); map.setMinZoom(Math.max(3, z - 4)); map.setMaxBounds([[vb.getSouth() - 3, vb.getWest() - 4], [vb.getNorth() + 3, vb.getEast() + 4]]); if (!map._covered) { map.setView(vb.getCenter(), z, { animate: false }); map._covered = true; } updateClip(); };
   map.setView(centre, 11);
   ['beforePane', 'afterPane', 'changePane', 'vectorPane'].forEach((n, i) => { map.createPane(n).style.zIndex = 410 + i * 10; });
-  [['sRadar', 412], ['sTruth', 442], ['sModel', 446], ['chgPane', 425]].forEach(([n, z]) => { map.createPane(n).style.zIndex = z; });
+  [['sRadar', 412], ['sTruth', 442], ['sModel', 446], ['chgPane', 425], ['nisPane', 426], ['tmRadar', 413], ['tmFlood', 433]].forEach(([n, z]) => { map.createPane(n).style.zIndex = z; });
 
   // ---------- radar colouring: grey radar to a blue, teal and cream ramp (same ramp for both dates) ----------
   const STOPS = [[0, [16, 30, 56]], [0.40, [54, 92, 126]], [0.75, [156, 182, 172]], [1, [240, 236, 216]]];
@@ -553,13 +677,19 @@
       onEachFeature: (f, l) => f.properties && f.properties.name && l.bindTooltip(nameTip(f.properties.name), { direction: 'top', offset: [0, -4] })
     });
   }
-  const tog = { change: $('tChange'), roads: $('tRoads'), villages: $('tVillages'), radar: $('tRadar'), chg: $('tChg') };
-  let cur = methods[0], cloudMode = false, cloudPrev = null;
+  const tog = { change: $('tChange'), roads: $('tRoads'), villages: $('tVillages'), radar: $('tRadar'), chg: $('tChg'), nis: $('tNis') };
+  let nisLayer = null;
+  try { const nm = await getJSON('data/nisar/nisar_meta.json'); nisLayer = L.imageOverlay('data/nisar/nisar_hh_overlay.png', nm.overlay_bounds, { pane: 'nisPane', opacity: 0.92 }); } catch (e) { /* optional layer */ }
+  if (!nisLayer) { $('tNis').closest('label').style.display = 'none'; }
+  let cur = methods[0], cloudMode = false, cloudPrev = null, tmMode = false;
   function applyLayers() {
+    if (tmMode) return;
     methods.forEach((m) => { map.removeLayer(m.roads); map.removeLayer(m.villages); });
     if (tog.roads.checked) cur.roads.addTo(map);
     if (tog.villages.checked) cur.villages.addTo(map);
     if (tog.change.checked) { if (!map.hasLayer(change)) change.addTo(map); } else { map.removeLayer(change); }
+    $('nisKey').hidden = !tog.nis.checked;
+    if (nisLayer) { if (tog.nis.checked && !cloudMode) { if (!map.hasLayer(nisLayer)) nisLayer.addTo(map); } else map.removeLayer(nisLayer); }
     const wantChg = tog.chg.checked && !cloudMode;
     $('chgKey').hidden = !tog.chg.checked;
     if (wantChg && !chgLayer && !chgBusy) { chgBusy = true; buildChange().then((l) => { chgLayer = l; chgBusy = false; applyLayers(); }).catch(() => { chgBusy = false; tog.chg.checked = false; $('chgKey').hidden = true; }); }
@@ -610,6 +740,7 @@
   // ---------- timeline of Sentinel-1 passes on this track ----------
   const PASSES = ['Dec 22', 'Dec 28', 'Jan 3', 'Jan 9', 'Jan 15', 'Jan 21', 'Jan 27', 'Feb 2', 'Feb 8', 'Feb 14', 'Feb 20'];
   const tlbar = $('tlbar');
+  let tmDates = {}; try { const sj = await getJSON('data/time/series.json'); sj.series.forEach((x) => { tmDates[x.label] = true; }); } catch (e) { /* optional */ }
   if (dm && !meta.synthetic && PASSES.includes(dm[1]) && PASSES.includes(dm[2])) {
     const pos = (d) => (PASSES.indexOf(d) / (PASSES.length - 1)) * 100;
     const band = document.createElement('div'); band.className = 'tlband'; band.style.left = pos(dm[1]) + '%'; band.style.width = (pos(dm[2]) - pos(dm[1])) + '%';
@@ -619,6 +750,7 @@
       const t = document.createElement(on ? 'button' : 'div'); t.className = 'tk' + (on ? ' on' : ''); t.style.left = pos(d) + '%';
       t.innerHTML = '<i></i><span></span>'; t.querySelector('span').textContent = d;
       if (on) { t.type = 'button'; t.title = d === dm[1] ? 'Show the Before image' : 'Show the After image'; t.setAttribute('aria-label', (d === dm[1] ? 'Before, ' : 'After, ') + d); t.onclick = () => animateTo(d === dm[1] ? 0 : 1); }
+      else if (tmDates[d]) { t.className = 'tk proc'; t.style.cursor = 'pointer'; t.title = 'Open in the time machine'; t.addEventListener('click', () => tmEnter(d)); }
       else t.title = 'Radar available, not processed';
       tlbar.appendChild(t);
     });
@@ -629,27 +761,95 @@
   const sheetWrap = $('sheetwrap'), body = $('sheetBody');
   const li = (b, t) => '<li><b>' + b + '</b>' + t + '</li>';
   const worldRows = () => world ? Object.entries(world).sort((x, y) => y[1].model.iou - x[1].model.iou).map(([id, e]) => '<tr><td>' + dispName(id) + (e.split === 'bolivia' ? ' (held out)' : '') + '</td><td>' + e.n_scenes + '</td><td>' + e.model.iou.toFixed(2) + '</td><td>' + e.baseline_vh.iou.toFixed(2) + '</td></tr>').join('') : '';
-  const TABS = {
-    how: () => '<h2>How it works</h2><p>Radar sees through cloud, rain and night, so it can map a flood when ordinary cameras cannot. The same steps work anywhere on Earth.</p><ol>' +
-      li('1. Radar images', 'Sentinel-1 scenes, delivered through NASA\u2019s ASF DAAC, from before and after a flood.') + li('2. A neural network reads them', 'A U-Net marks each pixel as water or not water.') +
-      li('3. Only the new water', 'Water after the event that was not water before it. Rivers, lakes and the sea are removed.') + li('4. Impact', 'Roads and places from OpenStreetMap are checked against the new flooding.') + '</ol>',
-    method: () => '<h2>Method and checks</h2><p>A U-Net with an ImageNet-pretrained ResNet-34 encoder, trained for 30 epochs on the public Sen1Floods11 dataset: Sentinel-1 radar (VV and VH) with hand-labelled water maps from floods in 11 countries.</p>' +
-      '<table><tr><th>Check</th><th>Model IoU</th><th>Best simple threshold</th></tr><tr><td>Test split, 90 scenes from 10 floods</td><td>0.687</td><td>0.530</td></tr><tr><td>Bolivia flood, held out, 15 scenes</td><td>0.601</td><td>0.586*</td></tr></table>' +
-      '<p>*Naive per-scene threshold; against the single tuned threshold the model leads by 0.08.</p>' +
-      (world ? '<table><tr><th>Flood</th><th>Scenes</th><th>Model IoU</th><th>Threshold IoU</th></tr>' + worldRows() + '</table>' : '') +
-      '<p>The test scenes come from the same floods as the training scenes but are different pictures, so the Bolivia row is the fairer check. Morocco 2026 is not verified: we have no expert flood map for those dates, and a first check against threshold-made water masks (Zenodo) favours the simple threshold, not the model.</p>' +
-      '<p>For the Morocco map, the sea and a 1 km coastal strip are masked and tiny shapes are removed. That also removes some real narrow flooding, so the true area is probably between the cleaned and raw values.</p>',
-    about: () => '<h2>About</h2><p>An independent team project for the NASA Space Apps Challenge 2026, challenge Dancing with the SARs. Built by Rabab, Ikram and Aya. Not an official NASA product.</p><ul>' +
-      li('Model output, not a flood map', 'Road and place counts show what lies in or near detected water. They do not mean a road is impassable or a village is flooded.') +
-      li('Sentinel-1, not NISAR', 'No public NISAR data exists for the Morocco dates, so we used Sentinel-1. The pipeline is built to take other radar. Flooded vegetation and very shallow water look grey in radar and can be missed.') +
-      li('NASA data', 'Sentinel-1 scenes from the ASF DAAC and processing by ASF HyP3. Earth imagery: NASA Blue Marble, Black Marble and VIIRS true colour (clouds of 8 Feb 2026) through NASA GIBS and Visible Earth.') +
-      li('Other data', 'Contains modified Copernicus Sentinel data. Roads and places \u00a9 OpenStreetMap contributors. Training and checks: Sen1Floods11.') +
-      li('AI use', 'Claude was used for research, code, documentation and design. The team ran the code, trained the model and checked the results.') + '</ul>'
+  // ---------- pages: each tab is a full-screen page with widgets ----------
+  const eT = (cls, txt) => '<span class="evt ' + cls + '">' + txt + '</span>';
+  const kpis = (arr) => '<div class="kpis">' + arr.map(([v, l, c]) => '<div class="kpi"><b' + (c ? ' style="color:' + c + '"' : '') + '>' + v + '</b><span>' + l + '</span></div>').join('') + '</div>';
+  const bars = (rows) => rows.map((r) => '<div class="br"><span>' + r.label + '</span><div class="bt"><i style="width:' + Math.round(r.v * 100) + '%;background:' + (r.color || '#F4F8FF') + '"></i>' + (r.tick != null ? '<u style="left:' + Math.round(r.tick * 100) + '%"></u>' : '') + '</div><b>' + r.v.toFixed(2) + '</b></div>').join('');
+  const gauge = (v, label, color) => '<div class="gauge"><svg viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="8"/><circle cx="40" cy="40" r="32" fill="none" stroke="' + color + '" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + (201.06 * v).toFixed(1) + ' 201.06" transform="rotate(-90 40 40)"/></svg><b>' + v.toFixed(2) + '</b><span>' + label + '</span></div>';
+  const cmp = (cls, aLayers, bLayers, lt, rt, label) => '<div class="cmp ' + cls + '" role="group" aria-label="' + label + '"><div class="cl a">' + aLayers + '</div><div class="cl b">' + bLayers + '</div><i class="ch"></i><span class="ct l">' + lt + '</span><span class="ct r">' + rt + '</span><input type="range" min="3" max="97" value="50" aria-label="' + label + '"></div>';
+  const im = (src, extra) => '<img src="' + src + '" alt="" ' + (extra || '') + '>';
+  const flowRows = () => world ? Object.entries(world).sort((x, y) => x[1].model.iou - y[1].model.iou).reverse().map(([id, e]) => ({ label: dispName(id) + (e.split === 'bolivia' ? ' *' : ''), v: e.model.iou, tick: e.baseline_vh.iou, color: id === 'Pakistan' ? '#E5546A' : '#F4F8FF' })) : [];
+  function impactSvg() {
+    const [[s0, w0], [n0, e0]] = bounds, W = 400, H = 280, X = (lon) => ((lon - w0) / (e0 - w0) * W).toFixed(1), Y = (lat) => ((n0 - lat) / (n0 - s0) * H).toFixed(1);
+    let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="' + W + '" height="' + H + '" fill="#0b1424"/><image href="' + urlA + '" width="' + W + '" height="' + H + '" opacity=".55" preserveAspectRatio="none"/><image href="' + (tintCache['data/change.png'] || 'data/change.png') + '" width="' + W + '" height="' + H + '" preserveAspectRatio="none"/>';
+    cur.roads.eachLayer((l) => { const f = l.feature; if (!f || !f.geometry) return; (f.geometry.type === 'MultiLineString' ? f.geometry.coordinates : [f.geometry.coordinates]).forEach((c) => { svg += '<polyline fill="none" stroke="#D3A54F" stroke-width="1.6" stroke-linecap="round" points="' + c.map(([x, y]) => X(x) + ',' + Y(y)).join(' ') + '"/>'; }); });
+    cur.villages.eachLayer((l) => { const f = l.feature; if (f && f.geometry && f.geometry.type === 'Point') svg += '<circle cx="' + X(f.geometry.coordinates[0]) + '" cy="' + Y(f.geometry.coordinates[1]) + '" r="3" fill="#F4F8FF" stroke="#0E1728" stroke-width="1"/>'; });
+    return svg + '</svg>';
+  }
+  const unetSvg = () => {
+    let g = '<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><rect width="400" height="260" fill="#0b1424"/>';
+    const hs = [150, 118, 88, 62], col = '#54708F';
+    hs.forEach((h, i) => { g += '<rect x="' + (24 + i * 44) + '" y="' + (40 + (150 - h) / 2) + '" width="24" height="' + h + '" rx="5" fill="' + col + '"/>'; g += '<rect x="' + (332 - i * 44) + '" y="' + (40 + (150 - h) / 2) + '" width="24" height="' + h + '" rx="5" fill="#8DB3A5"/>'; g += '<path d="M' + (48 + i * 44) + ' ' + (115) + ' H' + (332 - i * 44) + '" stroke="rgba(255,255,255,.25)" stroke-dasharray="3 4"/>'; });
+    g += '<rect x="178" y="92" width="44" height="46" rx="6" fill="#D3A54F"/><text x="200" y="70" text-anchor="middle" font-size="11" fill="#C9D6E6" font-family="Inter">ResNet-34 encoder</text><text x="200" y="168" text-anchor="middle" font-size="11" fill="#C9D6E6" font-family="Inter">decoder</text>';
+    g += '<text x="24" y="226" font-size="12" fill="#F4F8FF" font-family="Inter">VV + VH radar</text><text x="376" y="226" text-anchor="end" font-size="12" fill="#F4F8FF" font-family="Inter">water or not</text><path d="M130 220 H260" stroke="#D3A54F" stroke-width="2"/><path d="M254 214 l8 6 l-8 6" fill="none" stroke="#D3A54F" stroke-width="2"/></svg>';
+    return g;
   };
-  const openSheet = (tab) => { body.innerHTML = TABS[tab](); sheetWrap.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab))); sheetWrap.classList.add('open'); };
+  const waveSvg = () => {
+    const pts = (cyc, amp, y0) => { let d = ''; for (let i = 0; i <= 240; i++) { const x = 10 + i * 1.6, y = y0 + Math.sin(i / 240 * cyc * 2 * Math.PI) * amp; d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1); } return d; };
+    return '<svg viewBox="0 0 400 190" aria-hidden="true" style="width:100%;display:block"><text x="10" y="18" font-size="12" fill="#C9D6E6" font-family="Inter">Sentinel-1, C-band: wavelength about 5.5 cm</text><path d="' + pts(11, 14, 52) + '" fill="none" stroke="#8DB3A5" stroke-width="2.2"/><text x="10" y="112" font-size="12" fill="#C9D6E6" font-family="Inter">NISAR, L-band: wavelength about 24 cm</text><path d="' + pts(2.5, 22, 150) + '" fill="none" stroke="#D3A54F" stroke-width="2.2"/></svg>';
+  };
+  const TABS = {
+    how: async () => {
+      if (!tintCache['data/change.png']) { try { await tinted('data/change.png'); } catch (e) { /* fine */ } }
+      return '<div class="pg"><header class="pg-hero solo"><div><div class="eyeb">How it works</div><h1>From a radar picture to a list of roads and villages.</h1><p>Radar sees through cloud, rain and night, so it can map a flood when ordinary cameras cannot. The same four steps work anywhere on Earth.</p></div></header>' +
+        '<div class="steps">' +
+        '<div class="step"><div class="n">STEP 1</div><h3>Two radar images</h3><p>Sentinel-1 scenes from before and after, delivered through NASA\u2019s ASF DAAC.</p><div class="vis"><div class="pair"><figure>' + im(urlB) + '<span>BEFORE</span></figure><figure>' + im(urlA) + '<span>AFTER</span></figure></div></div></div>' +
+        '<div class="step"><div class="n">STEP 2</div><h3>A neural network reads them</h3><p>A U-Net marks every pixel as water or not water, on each date.</p><div class="vis">' + unetSvg() + '</div></div>' +
+        '<div class="step"><div class="n">STEP 3</div><h3>Only the new water</h3><p>Water after the event that was not water before. Rivers, lakes and the sea drop out.</p><div class="vis">' + im(urlA, 'style="opacity:.6"') + im(tintCache['data/change.png'] || 'data/change.png') + '</div></div>' +
+        '<div class="step"><div class="n">STEP 4</div><h3>What it reaches</h3><p>Roads and places from OpenStreetMap are checked against the new water.</p><div class="vis">' + impactSvg() + '</div></div></div>' +
+        kpis([['51.2 km\u00b2', 'new flooding found, model estimate', '#F08A98'], ['22.9 km', 'of road in flooded areas'], ['35', 'places within 500 m']]) +
+        '<div class="callout2">These are model estimates, not verified measurements, and a road in the list is not necessarily impassable. See the Evidence page for what we checked.</div>' +
+        '<a class="pbtn" href="#" data-go="tour">Take the 60-second tour &rarr;</a></div>';
+    },
+    method: () => {
+      const rows = flowRows();
+      return '<div class="pg"><header class="pg-hero"><div><div class="eyeb">Method</div><h1>A U-Net, held to a simple threshold.</h1><p>An ImageNet-pretrained ResNet-34 encoder, trained for 30 epochs on the public Sen1Floods11 dataset: Sentinel-1 radar (VV and VH) with hand-labelled water maps from floods in 11 countries. Every number is compared with the best simple threshold.</p></div><div class="pcard" style="padding:10px">' + unetSvg() + '</div></header>' +
+        kpis([['ResNet-34', 'encoder, ImageNet-pretrained'], ['252', 'training scenes'], ['90', 'test scenes, 10 floods'], ['15', 'held-out scenes (Bolivia)']]) +
+        '<h2>Results by flood</h2><div class="pcard wide">' + bars(rows) + '<div class="legend2"><span><i style="background:#F4F8FF"></i>U-Net IoU</span><span><i style="background:#D3A54F"></i>best simple threshold</span><span>* held out of training</span></div></div>' +
+        '<div class="pg-grid"><div class="pcard"><h3>Why a threshold baseline</h3><p>A model has to beat the obvious method. We fitted one threshold on VH (-23.75 dB) on the training scenes and scored both on the same pixels: IoU 0.69 against 0.53 on the 90 test scenes.</p></div><div class="pcard"><h3>The fairer check</h3><p>The test scenes come from the same floods as the training scenes, in different pictures. Bolivia was held out entirely: 0.60 against 0.52 for the tuned threshold (0.59 for a naive per-scene threshold).</p></div>' +
+        '<div class="pcard wide"><h3>Morocco 2026 is not verified</h3><p>We have no expert flood map for those dates. A first check against threshold-made water masks (Zenodo) favours the simple threshold. For the Morocco map, the sea and a 1 km coastal strip are masked and tiny shapes removed, which also removes some real narrow flooding, so the true area is probably between the cleaned and raw values.</p></div></div></div>';
+    },
+    evidence: () => {
+      const w = world ? Object.values(world) : [], beat = w.filter((e) => e.model.iou > e.baseline_vh.iou).length, rows = flowRows();
+      const bol = world && world.Bolivia ? 'data/world/Bolivia/' : null;
+      const bolCmp = bol ? cmp('', im(bol + 'radar.jpg') + im(bol + 'model.png'), im(bol + 'radar.jpg') + im(bol + 'truth.png'), 'Model', 'Hand-labelled', 'Bolivia, model water on the left, hand-labelled water on the right') : '';
+      return '<div class="pg"><header class="pg-hero solo"><div><div class="eyeb">Evidence</div><h1>How much can you trust it?</h1><p>Five checks, from the strongest to the weakest. Each one says what it proves and what it does not. We show the one that went against us.</p></div></header>' +
+        kpis([['11', 'floods checked, in 11 countries'], ['0.69', 'IoU on 90 held-out scenes', '#7FD1AE'], ['5', 'independent checks'], ['1', 'went against the model', '#F08A98']]) +
+        '<div class="pg-grid">' +
+        '<div class="pcard wide"><h3>1. Hand-labelled floods in 11 countries ' + eT('up', 'supports') + '</h3><div class="two"><div><div class="big">0.69<small>U-Net IoU on 90 scenes &middot; best simple threshold 0.53</small></div><p><b>It shows:</b> the model beats the best simple threshold on ' + (w.length ? beat + ' of ' + w.length : 'every') + ' floods. Pakistan is the weakest (0.27) and we show it.</p><p><b>It does not show:</b> a new region. The test scenes come from the same floods as the training scenes, in different pictures.</p></div><div>' + bars(rows) + '<div class="legend2"><span><i style="background:#F4F8FF"></i>U-Net</span><span><i style="background:#D3A54F"></i>best simple threshold</span><span>* held out</span></div></div></div></div>' +
+        '<div class="pcard"><h3>2. A flood the model never saw ' + eT('up', 'supports') + '</h3>' + bolCmp + '<div class="big" style="font-size:30px">0.60<small>Bolivia, model IoU &middot; tuned threshold 0.52</small></div><p><b>It shows:</b> the model transfers to a new flood better than one threshold does. Drag the line: model on the left, hand-labelled water on the right.</p><p><b>It does not show:</b> a large lead. 15 scenes are few, and a naive per-scene threshold gets 0.59.</p></div>' +
+        '<div class="pcard"><h3>3. Morocco against independent masks ' + eT('dn', 'against') + '</h3><div style="margin-top:14px">' + bars([{ label: 'U-Net', v: 0.256, color: '#E5546A' }, { label: 'Simple threshold', v: 0.442, color: '#D3A54F' }]) + '</div><div class="big" style="font-size:30px">0.26 <small>vs 0.44 &middot; Zenodo masks, 634,522 pixels</small></div><p><b>It shows:</b> on these masks the simple threshold wins. The model finds the darkest water and misses moderately dark water.</p><p><b>It does not show:</b> who is right. The masks were made with an Otsu threshold, cover part of the scene, and their dates may not match 8 February.</p></div>' +
+        '<div class="pcard wide"><h3>4. Morocco against NASA\u2019s optical image of the same day (14 Feb) ' + eT('lim', 'limited') + '</h3><img src="data/evidence/optical_14feb.png" alt="MODIS Aqua clear blocks, optical water, and U-Net water on 14 February 2026" style="width:100%;border-radius:12px;margin-top:12px;display:block"><div class="legend2"><span>left: cloud-free blocks</span><span>middle: water seen in the optical image</span><span>right: water the U-Net finds</span></div><div class="two" style="margin-top:6px"><div><div class="big">79%<small>of the water the optical image shows is also marked</small></div></div><div><p><b>It shows:</b> the radar water and the optical image agree on most of what the optical image can see.</p><p><b>It does not show:</b> accuracy. Optical pixels are 250 m, half the scene is under cloud, and the simple threshold scores the same.</p></div></div></div>' +
+        '<div class="pcard wide"><h3>5. NISAR on a real flood, against Copernicus EMS ' + eT('mid', 'mixed') + '</h3><div class="two"><img src="data/nisar/mozambique.png" alt="Copernicus flood map and two NISAR results for the Mozambique flood" style="width:100%;border-radius:12px;background:#fff"><div><div class="gauges"><div>' + gauge(0.96, 'precision', '#7FD1AE') + '</div><div>' + gauge(0.35, 'recall', '#D3A54F') + '</div><div>' + gauge(0.34, 'IoU', '#8DB3A5') + '</div></div><p><b>It shows:</b> almost everything the model marks as flood on this new radar is confirmed by Copernicus.</p><p><b>It does not show:</b> that it finds the whole flood. It finds about a third, and the NISAR products are early, not fully calibrated.</p></div></div></div>' +
+        '</div><div class="two-col"><div class="pcard"><h3>We can say</h3><p>The model maps water well on hand-labelled floods, works through cloud, and transfers to a new flood better than a simple threshold.</p></div><div class="pcard"><h3>We cannot say</h3><p>That the Morocco flood map is verified, that NISAR flood mapping is solved, or that the same model works for other disasters.</p></div></div></div>';
+    },
+    nisar: () => '<div class="pg"><header class="pg-hero"><div><div class="eyeb">NISAR</div><h1>The next radar, tested on a real flood.</h1><p>NISAR, the NASA-ISRO radar satellite, uses L-band, a longer wavelength than Sentinel-1\u2019s C-band. Its public data starts in mid-2026, so it did not see the January to February flood in Morocco. We tested it two other ways.</p>' +
+      kpis([['L-band', 'about 24 cm wavelength'], ['0.96', 'precision on a real flood (Mozambique)', '#7FD1AE'], ['0.35', 'recall: about a third of the flood', '#D3A54F']]) + '<button type="button" class="pbtn" id="nisMapBtn">Show NISAR on the map &rarr;</button></div>' +
+      '<div>' + cmp('tall', im('data/nisar/nisar_hh.jpg'), im('data/nisar/nisar_hv.jpg'), 'HH', 'HV', 'NISAR HH on the left, HV on the right, over Ksar El Kebir, 25 October 2026') + '<div class="figcap" style="font-size:12px;color:var(--muted);margin-top:6px">Ksar El Kebir, 25 Oct 2026. Drag to compare HH and HV. Dark shape at the bottom right: the Oued El Makhazine reservoir. Black: outside the NISAR frame.</div></div></header>' +
+      '<h2>Why a model trained on Sentinel-1 reads nothing in NISAR</h2><div class="pg-grid"><div class="pcard"><h3>Two different wavelengths</h3>' + waveSvg() + '</div><div class="pcard"><h3>Water barely stands out in L-band HV</h3><div style="margin-top:16px">' + bars([{ label: 'Sentinel-1 VH', v: 13 / 15, color: '#8DB3A5' }, { label: 'NISAR HV', v: 4 / 15, color: '#D3A54F' }]).replace(/<b>[0-9.]+<\/b>/g, (m, i) => m).replace('<b>0.87</b>', '<b>13 dB</b>').replace('<b>0.27</b>', '<b>4 dB</b>') + '</div><p>How much darker water is than land. With only about 4 dB of contrast in HV, our model finds no water in NISAR as it is (IoU 0.00).</p></div></div>' +
+      '<h2>The fix, without retraining</h2><div class="pcard wide"><div class="flow"><span class="nd">NISAR HH</span><span class="ar">\u2192</span><span class="nd">synthetic VH made from HH</span><span class="ar">\u2192</span><span class="nd">level matched from the radar itself</span><span class="ar">\u2192</span><span class="nd">same U-Net</span><span class="ar">\u2192</span><span class="nd" style="border-color:#7FD1AE">water</span></div><p>With this input the model finds the reservoirs around Ksar El Kebir: IoU 0.63 against OpenStreetMap water. That is one scene of mostly permanent water, eight months after the flood.</p></div>' +
+      '<h2>A real flood: Mozambique, Limpopo, January 2026</h2><div class="pcard wide"><div class="tl3"><div><i></i><b>5 Jan</b>NISAR before the flood</div><div><i></i><b>17 Jan</b>NISAR during the flood</div><div><i style="background:#7FD1AE"></i><b>18 Jan</b>Copernicus EMS flood map (EMSR857)</div></div><img src="data/nisar/mozambique.png" alt="Copernicus flood map and two NISAR results for the Mozambique flood" style="width:100%;border-radius:12px;background:#fff;margin-top:16px;display:block"><div class="legend2"><span>left: Copernicus flood map</span><span>middle: a simple HH threshold from Ksar</span><span>right: our model with the fix. Dark blue = flood water</span></div>' +
+      '<div class="two" style="margin-top:14px"><div class="gauges">' + gauge(0.96, 'precision', '#7FD1AE') + gauge(0.35, 'recall', '#D3A54F') + gauge(0.34, 'IoU', '#8DB3A5') + '</div><div><p>The level shift is computed from the radar image of 5 January, before the flood. The Copernicus map was used only to score. 96% of what the model marks is confirmed, but it finds about a third of the flood: flooded fields and vegetation are bright in L-band and are missed.</p></div></div></div>' +
+      '<div class="callout2">A validated workaround, not a finished NISAR flood product. The NISAR products used are early, not fully calibrated. The next step is training on L-band labels.</div>' +
+      '<p class="figcap" style="font-size:12px;color:var(--muted)">Data: NISAR (NASA-ISRO) via ASF DAAC; Copernicus Emergency Management Service (\u00a9 2026 European Union), EMSR857; OpenStreetMap contributors. Experiments by Ikram.</p></div>',
+    about: () => '<div class="pg"><header class="pg-hero solo"><div><div class="eyeb">About</div><h1>Built in a weekend, with the limits written down.</h1><p>An independent team project for the NASA Space Apps Challenge 2026 in Mekn\u00e8s, challenge Dancing with the SARs. Not an official NASA product.</p></div></header>' +
+      '<h2>The team</h2><div class="team"><div class="person"><div class="av">R</div><h3>Rabab</h3><p>The model, training and evaluation, the pipeline, the interface, the documentation.</p></div><div class="person"><div class="av">I</div><h3>Ikram</h3><p>Sentinel-1 processing, the Morocco scenes, the coastal clean-up, road and village data, the NISAR experiments.</p></div><div class="person"><div class="av">A</div><h3>Aya</h3><p>The independent Morocco check against the Zenodo masks, and the honest report of what it showed.</p></div></div>' +
+      '<h2>Data and credits</h2><div class="creds"><div class="cr"><b>NASA</b>Sentinel-1 scenes from the ASF DAAC and HyP3 processing. NISAR via ASF DAAC. Earth imagery: Blue Marble, Black Marble, VIIRS and MODIS through NASA GIBS and Visible Earth.</div><div class="cr"><b>Copernicus</b>Contains modified Copernicus Sentinel data (2026). Emergency Management Service EMSR857 for the Mozambique reference.</div><div class="cr"><b>Sen1Floods11</b>Sentinel-1 radar with hand-labelled water from floods in 11 countries (Bonafilia et al., 2020), used to train and test.</div><div class="cr"><b>OpenStreetMap</b>Roads and places, \u00a9 OpenStreetMap contributors.</div><div class="cr"><b>Zenodo</b>SAR Morocco Flood Dataset (CC BY 4.0): semi-automatic water masks used for a first check.</div><div class="cr"><b>Natural Earth</b>Land outline for the coastal mask.</div></div>' +
+      '<h2>Limits and honesty</h2><div class="two-col"><div class="pcard"><h3>Model output, not a flood map</h3><p>Road and place counts show what lies in or near detected water. They do not mean a road is impassable or a village is flooded. Flooded vegetation and very shallow water look grey in radar and can be missed.</p></div><div class="pcard"><h3>Sentinel-1 for Morocco, NISAR as a test</h3><p>No public NISAR data exists for the Morocco dates, so the flood map uses Sentinel-1. Floods only for now: other disasters are the roadmap, not built and not tested.</p></div><div class="pcard wide"><h3>AI use</h3><p>AI tools (Claude) were used for research, code, documentation and design. The team ran the code, trained the model on a GPU, processed the radar scenes and checked the results.</p></div></div></div>'
+  };
+  const openSheet = async (tab) => { sheetWrap.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab))); const html = await TABS[tab](); body.innerHTML = html; sheetWrap.classList.add('open'); const sh = sheetWrap.querySelector('.sheet'); if (sh) sh.scrollTop = 0; };
+  sheetWrap.addEventListener('input', (e) => { const c = e.target.closest && e.target.closest('.cmp'); if (c && e.target.type === 'range') c.style.setProperty('--x', e.target.value + '%'); });
+  sheetWrap.addEventListener('click', (e) => { const g = e.target.closest && e.target.closest('[data-go="tour"]'); if (g) { e.preventDefault(); closeSheet(); startTour(); } });
   const closeSheet = () => sheetWrap.classList.remove('open');
   document.querySelectorAll('[data-open]').forEach((b) => b.addEventListener('click', () => openSheet(b.dataset.open)));
   sheetWrap.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => openSheet(b.dataset.tab)));
+
+  body.addEventListener('click', (e) => {
+    if (!e.target.closest('#nisMapBtn')) return;
+    closeSheet(); if (tmMode) tmExit(true);
+    const go = () => { tog.nis.checked = true; applyLayers(); map.flyTo(centre, map.getBoundsZoom(L.latLngBounds(bounds), true), { duration: REDUCE ? 0 : 1.2 }); };
+    if (stage !== 'map') { selected = 'live'; openMap(); setTimeout(go, REDUCE ? 50 : 1500); } else { if (view === 'scene') showLive(); go(); }
+  });
   $('closeSheet').onclick = closeSheet; sheetWrap.addEventListener('click', (e) => { if (e.target === sheetWrap) closeSheet(); });
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeSheet(); setPanel(false); } });
   $('navResults').onclick = () => { closeSheet(); if (stage === 'map') { selected = 'live'; showLive(); } else { selected = 'live'; openMap(); } };
@@ -663,7 +863,7 @@
   const bodyEl = document.body;
 
   function clearLive() {
-    [radB, radA, change].forEach((l) => map.removeLayer(l)); if (chgLayer) map.removeLayer(chgLayer);
+    [radB, radA, change].forEach((l) => map.removeLayer(l)); if (chgLayer) map.removeLayer(chgLayer); if (nisLayer) map.removeLayer(nisLayer);
     methods.forEach((m) => { map.removeLayer(m.roads); map.removeLayer(m.villages); });
   }
   function clearScene() { sceneLayers.forEach((l) => map.removeLayer(l)); sceneLayers = []; }
@@ -690,10 +890,15 @@
   function showScene(id) {
     const e = world && world[id]; if (!e) return;
     if (view === 'live') { map._liveCentre = map.getCenter(); }
-    setCloud(false); clearLive(); clearScene(); view = 'scene'; sceneId = id; bodyEl.dataset.view = 'scene';
+    if (tmMode) tmExit(true); setCloud(false); clearLive(); clearScene(); view = 'scene'; sceneId = id; bodyEl.dataset.view = 'scene';
     const u = 'data/world/' + id + '/';
     sceneLayers = [L.imageOverlay(u + 'radar.jpg', e.bounds, { pane: 'sRadar' }), L.imageOverlay(u + 'truth.png', e.bounds, { pane: 'sTruth' }), L.imageOverlay(u + 'model.png', e.bounds, { pane: 'sModel' })];
-    sceneLayers.forEach((l) => l.addTo(map)); applyScene();
+    sceneLayers.forEach((l) => l.addTo(map));
+    // soft edges: the radar patch fades into the map instead of ending in a hard rectangle
+    const fade = 'linear-gradient(to right, transparent 0, #000 10%, #000 90%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 10%, #000 90%, transparent 100%)';
+    sceneLayers.forEach((l) => { const el = l.getElement(); if (!el) return; el.style.setProperty('-webkit-mask-image', fade); el.style.setProperty('mask-image', fade); el.style.setProperty('-webkit-mask-composite', 'source-in'); el.style.setProperty('mask-composite', 'intersect'); });
+    { const re = sceneLayers[0].getElement(); if (re) re.style.setProperty('filter', 'brightness(.78) saturate(.92)'); }   // match the darker look of the live map
+    applyScene();
     $('eyebrow').textContent = 'Benchmark flood \u00b7 Sentinel-1 radar'; $('place').textContent = dispName(id);
     $('sIou').textContent = e.model.iou.toFixed(2); $('sBase').textContent = e.baseline_vh.iou.toFixed(2); $('sN').textContent = String(e.n_scenes);
     $('rankNote').textContent = (e.model.precision > 0.6 && e.model.recall < 0.4) ? 'Hardest flood: finds only ' + Math.round(e.model.recall * 100) + '% of the water, but what it marks is right (' + Math.round(e.model.precision * 100) + '%)' : (e.split === 'bolivia' ? 'Held-out flood: not in training' : 'Same flood, different scenes than training');
@@ -704,7 +909,7 @@
   async function fitSplit(id, e) {
     if (sceneId !== id) return;
     const narrow = window.innerWidth < 860;
-    map.fitBounds(e.bounds, { animate: false, paddingTopLeft: [narrow ? 12 : 60, narrow ? 190 : 110], paddingBottomRight: [narrow ? 12 : 60, narrow ? 330 : 260] });
+    map.fitBounds(e.bounds, { animate: false, paddingTopLeft: [narrow ? 8 : 24, narrow ? 170 : 92], paddingBottomRight: [narrow ? 8 : 24, narrow ? 300 : 196] });
     fitRatio = 0.5;
     try {
       const im = await loadImg('data/world/' + id + '/truth.png'); if (sceneId !== id) return;
@@ -984,6 +1189,7 @@
   }
   async function backToEarth() {
     if (stage === 'earth') return;
+    if (tmMode) tmExit(true);
     setCloud(false);
     try { await ensureEarth(); } catch (e) { return; }
     canvas.style.visibility = 'visible'; canvas.style.opacity = 1; startEarth();
@@ -1026,6 +1232,107 @@
   else { setStage('earth'); ensureEarth().then(() => { earth.st.idleAt = 0; startEarth(); }).catch(() => { setStage('map'); canvas.style.visibility = 'hidden'; }); }
 
 
+  // ---------- situation report: the table a responder would take away (CSV, opens in Excel) ----------
+  function downloadReport() {
+    const m = cur, sm = (m.meta && m.meta.summary) || {}, q = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+    const km = (coords) => { let d = 0; for (let i = 1; i < coords.length; i++) { const [x1, y1] = coords[i - 1], [x2, y2] = coords[i], R = 6371.0088, p = Math.PI / 180, a = Math.sin((y2 - y1) * p / 2) ** 2 + Math.cos(y1 * p) * Math.cos(y2 * p) * Math.sin((x2 - x1) * p / 2) ** 2; d += 2 * R * Math.asin(Math.sqrt(a)); } return d; };
+    const rows = [];
+    rows.push(['Under the Clouds: situation report']);
+    rows.push(['Status', 'MODEL ESTIMATE, not independently verified. Check on the ground before acting.']);
+    rows.push(['Event', meta.event_name || '']);
+    rows.push(['Method', m.label]);
+    rows.push(['Radar dates', dm ? 'before ' + dm[1] + ', after ' + dm[2] + ' ' + dm[3] : '']);
+    rows.push(['New flooding found (km2)', (sm.flooded_area_km2 != null ? sm.flooded_area_km2.toFixed(1) : '')]);
+    rows.push(['Road in flooded areas (km)', (sm.road_km_affected != null ? sm.road_km_affected.toFixed(1) : '')]);
+    rows.push(['Places within ' + (sm.village_buffer_m || 500) + ' m of new water', sm.villages_near_flood != null ? sm.villages_near_flood : '']);
+    rows.push(['Data', 'Sentinel-1 radar (Copernicus, processed by ASF HyP3); roads and places: OpenStreetMap contributors; analysis: Under the Clouds team']);
+    rows.push([]);
+    rows.push(['Note', 'The headline road length counts only the part of each road inside flooded areas. The road rows below list the WHOLE road segment that touches the flood, so their lengths are larger.']);
+    rows.push([]);
+    rows.push(['Type', 'Name (Latin)', 'Name (Arabic)', 'Latitude', 'Longitude', 'Whole road segment length (km)', 'Road class']);
+    const places = [], roads = [];
+    m.villages.eachLayer((l) => { const f = l.feature; if (f && f.geometry && f.geometry.type === 'Point') { const [lon, lat] = f.geometry.coordinates; places.push([f.properties && f.properties.name, lat, lon]); } });
+    m.roads.eachLayer((l) => {
+      const f = l.feature; if (!f || !f.geometry) return;
+      const lines = f.geometry.type === 'MultiLineString' ? f.geometry.coordinates : [f.geometry.coordinates];
+      const len = lines.reduce((a, c) => a + km(c), 0), c0 = lines[0][Math.floor(lines[0].length / 2)];
+      roads.push([f.properties && f.properties.name, c0[1], c0[0], len, f.properties && f.properties.highway]);
+    });
+    places.sort((a, b) => String(latin(a[0])).localeCompare(String(latin(b[0]))));
+    roads.sort((a, b) => b[3] - a[3]);
+    places.forEach(([n, lat, lon]) => rows.push(['place', latin(n) || '(unnamed)', arabic(n), lat.toFixed(5), lon.toFixed(5), '', '']));
+    roads.forEach(([n, lat, lon, len, hw]) => rows.push(['road', latin(n) || '(unnamed)', arabic(n), lat.toFixed(5), lon.toFixed(5), len.toFixed(2), hw || '']));
+    const csv = '\uFEFF' + rows.map((r) => r.map(q).join(',')).join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })), a = document.createElement('a');
+    a.href = url; a.download = 'situation_report_ksar_el_kebir_' + (m.key === 'main' ? 'unet' : 'threshold') + '.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+  $('reportBtn').onclick = downloadReport;
+
+  // ---------- time machine: the model's water on every radar pass, with a curve and a play button ----------
+  let tmData = null, tmIdx = 0, tmTimer = 0, tmRad = null, tmFlood = null;
+  const tmKey = (d) => d.date.replace(/-/g, '');
+  const tmUrl = (d, k) => 'data/time/' + tmKey(d) + (k === 'r' ? '_radar.jpg' : '_flood.png');
+  function tmDraw() {
+    const S = tmData.series, W = 640, H = 128, ml = 40, mr = 14, mt = 12, mb = 26, t0 = new Date(S[0].date).getTime(), t1 = new Date(S[S.length - 1].date).getTime();
+    const ymax = Math.max(10, Math.ceil(Math.max(...S.map((d) => d.km2)) / 10) * 10), X = (d) => ml + (W - ml - mr) * ((new Date(d.date).getTime() - t0) / (t1 - t0)), Y = (v) => mt + (H - mt - mb) * (1 - v / ymax);
+    let svg = '<line x1="' + ml + '" y1="' + Y(0) + '" x2="' + (W - mr) + '" y2="' + Y(0) + '" stroke="rgba(255,255,255,.25)"/><text x="' + (ml - 6) + '" y="' + (mt + 4) + '" text-anchor="end" font-size="10" fill="#A9B8CE">' + ymax + '</text><text x="' + (ml - 6) + '" y="' + (Y(0) + 3) + '" text-anchor="end" font-size="10" fill="#A9B8CE">0</text><text x="' + ml + '" y="9" font-size="10" fill="#A9B8CE">km\u00b2</text>';
+    const pts = S.map((d) => X(d).toFixed(1) + ',' + Y(d.km2).toFixed(1)).join(' ');
+    svg += '<polyline points="' + pts + '" fill="none" stroke="#D35F3F" stroke-width="2.4" stroke-linejoin="round"/>';
+    S.forEach((d, i) => { svg += '<g data-i="' + i + '" style="cursor:pointer"><circle class="tp" cx="' + X(d).toFixed(1) + '" cy="' + Y(d.km2).toFixed(1) + '" r="5.5" fill="#0E1728" stroke="#F4F8FF" stroke-width="1.6"/><circle cx="' + X(d).toFixed(1) + '" cy="' + Y(d.km2).toFixed(1) + '" r="16" fill="transparent"/><text x="' + X(d).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="10.5" fill="#C9D6E6">' + d.label + '</text></g>'; });
+    $('tmChart').innerHTML = svg;
+  }
+  function tmSet(i) {
+    const S = tmData.series; tmIdx = Math.max(0, Math.min(S.length - 1, i)); const d = S[tmIdx];
+    tmRad.setUrl(tmUrl(d, 'r')); tmFlood.setUrl(tmUrl(d, 'f'));
+    $('tmChart').querySelectorAll('g[data-i]').forEach((g) => { const on = +g.dataset.i === tmIdx, c = g.querySelector('.tp'); c.setAttribute('fill', on ? '#D35F3F' : '#0E1728'); c.setAttribute('r', on ? '7.5' : '5.5'); });
+    $('tmLabel').textContent = d.label + ' \u00b7 ' + d.km2.toFixed(1) + ' km\u00b2 of non-permanent water (model estimate)';
+    S.slice(Math.max(0, tmIdx - 1), tmIdx + 3).forEach((x) => { new Image().src = tmUrl(x, 'r'); new Image().src = tmUrl(x, 'f'); });
+  }
+  function tmStop() { clearInterval(tmTimer); tmTimer = 0; $('tmPlay').textContent = 'Play'; }
+  function tmPlay() { if (tmTimer) { tmStop(); return; } $('tmPlay').textContent = 'Pause'; if (tmIdx >= tmData.series.length - 1) tmSet(0); tmTimer = setInterval(() => { if (tmIdx >= tmData.series.length - 1) { tmStop(); return; } tmSet(tmIdx + 1); }, 1500); }
+  async function tmEnter(startLabel) {
+    if (tmMode) { if (startLabel) { const j = tmData.series.findIndex((d) => d.label === startLabel); if (j >= 0) { tmStop(); tmSet(j); } } return; }
+    if (!tmData) { try { tmData = await getJSON('data/time/series.json'); } catch (e) { return; } }
+    setCloud(false); if (view === 'scene') showLive();
+    if (stage !== 'map') { selected = 'live'; openMap(); await wait(1500); }
+    tmMode = true; document.body.dataset.tm = '1';
+    [radB, radA, change].forEach((l) => map.removeLayer(l)); if (chgLayer) map.removeLayer(chgLayer); if (nisLayer) map.removeLayer(nisLayer);
+    methods.forEach((m) => { map.removeLayer(m.roads); map.removeLayer(m.villages); });
+    tmRad = L.imageOverlay(tmUrl(tmData.series[0], 'r'), tmData.bounds, { pane: 'tmRadar' }).addTo(map);
+    tmFlood = L.imageOverlay(tmUrl(tmData.series[0], 'f'), tmData.bounds, { pane: 'tmFlood' }).addTo(map);
+    const lows = tmData.series.reduce((a, b) => (b.km2 < a.km2 ? b : a));
+    $('tmNote').textContent = 'Orange: water the U-Net finds on that date that is not water on every date (sea, rivers and reservoirs are removed). The lowest value (' + lows.km2.toFixed(1) + ' km\u00b2 on ' + lows.label + ') is the model\u2019s false-alarm floor. Model estimate, not independently verified.';
+    $('tm').hidden = false; tmDraw(); map.flyTo(centre, liveZoom(), { duration: REDUCE ? 0 : 1.0 });
+    const j0 = typeof startLabel === 'string' ? tmData.series.findIndex((d) => d.label === startLabel) : -1;
+    tmSet(j0 >= 0 ? j0 : tmData.series.reduce((bi, d, i, arr) => (d.km2 > arr[bi].km2 ? i : bi), 0));   // open on the chosen date, else the peak
+  }
+  function tmExit(quiet) {
+    if (!tmMode) return;
+    tmStop(); tmMode = false; delete document.body.dataset.tm; $('tm').hidden = true;
+    if (tmRad) map.removeLayer(tmRad); if (tmFlood) map.removeLayer(tmFlood);
+    applyLayers(); if (!quiet) showLive();
+  }
+  $('tmBtn').onclick = () => tmEnter(); $('tmClose').onclick = () => tmExit(false);
+  $('tmPrev').onclick = () => { tmStop(); tmSet(tmIdx - 1); }; $('tmNext').onclick = () => { tmStop(); tmSet(tmIdx + 1); }; $('tmPlay').onclick = tmPlay;
+  $('tmChart').addEventListener('click', (e) => { const g = e.target.closest('[data-i]'); if (g) { tmStop(); tmSet(+g.dataset.i); } });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && tmMode) tmExit(false); });
+
+  // ---------- stars behind the pages ----------
+  function drawStars() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    [['stars1', 330, 1], ['stars2', 90, 2]].forEach(([id, n, seed0]) => {
+      const c = $(id); c.width = Math.round(innerWidth * dpr); c.height = Math.round(innerHeight * dpr);
+      const x = c.getContext('2d'); x.scale(dpr, dpr); let seed = 7000 + seed0 * 311; const rnd = () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296;
+      for (let i = 0; i < n; i++) {
+        const px = rnd() * innerWidth, py = rnd() * innerHeight, big = rnd() < 0.09, r = big ? 1.1 + rnd() * 1.1 : 0.3 + rnd() * rnd() * 1.0, a = big ? 0.75 + rnd() * 0.25 : 0.2 + rnd() * 0.7;
+        const tint = rnd(), col = tint < 0.12 ? '255,225,170' : tint < 0.28 ? '190,215,255' : '235,240,250';
+        if (big) { const g = x.createRadialGradient(px, py, 0, px, py, r * 5); g.addColorStop(0, 'rgba(' + col + ',' + (a * 0.55) + ')'); g.addColorStop(1, 'rgba(' + col + ',0)'); x.fillStyle = g; x.beginPath(); x.arc(px, py, r * 5, 0, 6.283); x.fill(); }
+        x.fillStyle = 'rgba(' + col + ',' + a + ')'; x.beginPath(); x.arc(px, py, r, 0, 6.283); x.fill();
+      }
+    });
+  }
+  drawStars(); let srt; window.addEventListener('resize', () => { clearTimeout(srt); srt = setTimeout(drawStars, 200); });
+
   // ---------- guided tour: five steps, each sets the whole view, so Back and Next always land in the right state ----------
   const wait = (ms) => new Promise((r) => setTimeout(r, REDUCE ? 30 : ms));
   const liveZoom = () => map.getBoundsZoom(L.latLngBounds(bounds), true);
@@ -1061,7 +1368,7 @@
     if (tour.busy) return; tour.busy = true; tour.i = i; document.body.dataset.ts = String(i); drawTour();
     try { await TOUR[i].run(); } catch (e) { /* keep going */ } finally { tour.busy = false; }
   }
-  function startTour() { tour.on = true; document.body.classList.add('touring'); $('tour').hidden = false; try { closeSheet(); } catch (e) { /* none */ } tourGo(0); }
+  function startTour() { if (tmMode) tmExit(true); tour.on = true; document.body.classList.add('touring'); $('tour').hidden = false; try { closeSheet(); } catch (e) { /* none */ } tourGo(0); }
   function endTour(final) {
     tour.on = false; document.body.classList.remove('touring'); delete document.body.dataset.ts; $('tour').hidden = true; cover();
     if (final) { setCloud(false); if (view === 'scene') showLive(); }

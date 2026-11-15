@@ -1,0 +1,45 @@
+{
+ "series": [
+  {
+   "date": "2025-12-22",
+   "label": "Dec 22",
+   "km2": 7.8,
+   "valid": 1.0
+  },
+  {
+   "date": "2026-01-15",
+   "label": "Jan 15",
+   "km2": 14.7,
+   "valid": 1.0
+  },
+  {
+   "date": "2026-02-02",
+   "label": "Feb 2",
+   "km2": 21.6,
+   "valid": 1.0
+  },
+  {
+   "date": "2026-02-14",
+   "label": "Feb 14",
+   "km2": 42.1,
+   "valid": 1.0
+  },
+  {
+   "date": "2026-02-20",
+   "label": "Feb 20",
+   "km2": 25.7,
+   "valid": 1.0
+  }
+ ],
+ "bounds": [
+  [
+   34.899928135106,
+   -6.25
+  ],
+  [
+   35.25,
+   -5.750089831117499
+  ]
+ ],
+ "note": "Water found by the U-Net on each date, minus water present on every date (sea, rivers, reservoirs); objects under 20 pixels removed. Model estimate."
+}
