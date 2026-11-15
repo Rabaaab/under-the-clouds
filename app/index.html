@@ -386,6 +386,11 @@
     .callout .ct { font-size: 28px; }
     .placespanel { max-height: 36vh; }
     .cloudnote { left: 12px; right: 12px; top: auto; bottom: 360px; max-width: none; padding: 10px 14px; font-size: 12.5px; }
+    /* cloud test on a small screen: keep only the way back in the title card, put the note right under it, and hide what would overlap */
+    body[data-cloud] .title .links .wlink:not(#cloudBtn) { display: none; }
+    body[data-cloud] .cloudnote { top: 214px; bottom: auto; }
+    body[data-cloud] .tag { bottom: 152px; }
+    body[data-cloud] .method, body[data-cloud] .chips, body[data-cloud] .side { display: none !important; }
     .sidescene { right: 12px; left: 12px; width: auto; top: 176px; padding: 10px 14px; gap: 8px; } .leg2 { flex-direction: row; gap: 14px; flex-wrap: wrap; }
     .schips { left: 12px; right: 12px; bottom: 222px; gap: 8px; } .schips .chip { flex: 1; padding: 10px 12px; border-radius: 14px; } .schips .chip .v { font-size: 22px; } .schips .chip .l { font-size: 11px; }
     .rank { left: 12px; right: 12px; bottom: 12px; padding: 12px 14px 10px; border-radius: 20px; } .rank .rnote { display: none; } .rk { min-width: 56px; } .rk .bar { height: 48px; }
@@ -1017,7 +1022,7 @@
   document.querySelectorAll('#cloudDates button').forEach((b) => b.addEventListener('click', () => setCloudDate(b.dataset.d, true)));
   function setCloud(on, keepBasemap, to) {
     if (on === cloudMode) return;
-    cloudMode = on; cloudBtn.setAttribute('aria-pressed', String(on));
+    cloudMode = on; cloudBtn.setAttribute('aria-pressed', String(on)); document.body.toggleAttribute('data-cloud', on);
     cloudBtn.innerHTML = on ? '&larr; Back<span class="lg"> to the flood map</span>' : 'Cloud test<span class="lg">: NASA optical vs radar</span> &rarr;';
     if (on) {
       cloudPrev = { bm: basemapKey, roads: tog.roads.checked, villages: tog.villages.checked, radar: tog.radar.checked, change: tog.change.checked, dB: $('dBefore').textContent };
